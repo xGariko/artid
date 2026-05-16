@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx tsc *)",
+      "Bash(node -e \"const z = require\\('zod'\\); console.log\\('email:', typeof z.email\\); console.log\\('iso:', z.iso ? Object.keys\\(z.iso\\) : 'no'\\); console.log\\('string\\(\\).datetime:', typeof z.string\\(\\).datetime\\); console.log\\('string\\(\\).date:', typeof z.string\\(\\).date\\); console.log\\('string\\(\\).url:', typeof z.string\\(\\).url\\); console.log\\('string\\(\\).regex:', typeof z.string\\(\\).regex\\); console.log\\('int:', typeof z.int\\); console.log\\('string\\(\\).ip:', typeof z.string\\(\\).ip\\); console.log\\('string\\(\\).uuid:', typeof z.string\\(\\).uuid\\);\")",
+      "Bash(npx svelte-check *)",
+      "Bash(npm install *)"
+    ]
+  }
+}
