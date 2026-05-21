@@ -75,23 +75,44 @@ export interface components {
         User: {
             /** Format: int64 */
             id?: number;
-            email?: string;
-            username?: string;
-            password?: string;
-            role?: string;
+            name?: string;
+            surname?: string;
+            mail?: string;
+            passwordHash?: string;
+            /** Format: date */
+            birthdate?: string;
+            birthplace?: string;
+            address?: string;
+            taxId?: string;
+            spidCode?: string;
+            biography?: string;
+            linkedinId?: string;
+            profession?: string;
+            isPublic?: boolean;
+            phone?: string;
+            /** Format: date-time */
+            deletedAt?: string;
         };
         RegisterRequest: {
-            username?: string;
+            name?: string;
+            surname?: string;
             email?: string;
             password?: string;
+            /** Format: date */
+            birthdate?: string;
+            birthplace?: string;
+            taxId?: string;
         };
         AuthResponse: {
             token?: string;
-            username?: string;
-            role?: string;
+            /** Format: int64 */
+            id?: number;
+            email?: string;
+            name?: string;
+            surname?: string;
         };
         LoginRequest: {
-            username?: string;
+            email?: string;
             password?: string;
         };
     };

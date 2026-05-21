@@ -1,7 +1,30 @@
 {
   "permissions": {
     "allow": [
-      "Bash(git:*)"
+      "Bash(git:*)",
+      "PowerShell(Get-ChildItem C:\\\\progetti\\\\artid\\\\app\\\\artid-client\\\\src -Recurse | Where-Object { -not $_.PSIsContainer } | Select-Object FullName)",
+      "mcp__supabase__list_tables",
+      "mcp__supabase__execute_sql",
+      "Bash(npm install *)",
+      "PowerShell(Copy-Item C:\\\\progetti\\\\artid\\\\app\\\\artid-client\\\\node_modules\\\\bootstrap-italia\\\\dist\\\\svg\\\\sprites.svg C:\\\\progetti\\\\artid\\\\app\\\\artid-client\\\\static\\\\sprites.svg -Force)",
+      "Bash(npm uninstall *)",
+      "Bash(npx svelte-kit *)",
+      "PowerShell(Remove-Item C:\\\\progetti\\\\artid\\\\app\\\\artid-client\\\\src\\\\lib\\\\components\\\\Icon.svelte -Force; Remove-Item C:\\\\progetti\\\\artid\\\\app\\\\artid-client\\\\static\\\\sprites.svg -Force; if \\(-not \\(Get-ChildItem C:\\\\progetti\\\\artid\\\\app\\\\artid-client\\\\src\\\\lib\\\\components -ErrorAction SilentlyContinue\\)\\) { Remove-Item C:\\\\progetti\\\\artid\\\\app\\\\artid-client\\\\src\\\\lib\\\\components -Force -ErrorAction SilentlyContinue }; \"ok\")",
+      "Bash(npx openapi-typescript *)",
+      "Bash(npm view *)",
+      "Bash(npm ls *)",
+      "Bash(gh repo *)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "WebFetch(domain:www.npmjs.com)",
+      "WebFetch(domain:registry.npmjs.org)",
+      "WebFetch(domain:unpkg.com)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:cdn.jsdelivr.net)",
+      "WebFetch(domain:data.jsdelivr.com)",
+      "Bash(curl -sI \"https://cdn.jsdelivr.net/gh/italia/spid-smart-button@gh-pages/spid-button.min.js\")",
+      "Bash(curl -sI \"https://cdn.jsdelivr.net/gh/italia/spid-smart-button@gh-pages/spid-button.min.css\")",
+      "Bash(curl -s \"https://cdn.jsdelivr.net/gh/italia/spid-smart-button@gh-pages/spid-button.min.js\")",
+      "Bash(grep -oE \"assetsBaseUrl[^,;}]{0,80}\")"
     ]
   }
 }

@@ -7,7 +7,7 @@ export const FileSchema = z.object({
   extension: z.string().max(20).nullable(),
   mimeType: z
     .string()
-    .regex(/^[\w\-]+\/[\w\-+.]+$/)
+    .regex(/^[\w-]+\/[\w\-+.]+$/)
     .max(100)
     .nullable(),
 });

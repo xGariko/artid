@@ -7,6 +7,7 @@ import afam.artidserver.model.entity.User;
 import afam.artidserver.security.JwtUtil;
 import afam.artidserver.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -29,30 +30,46 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@RequestBody LoginRequest request) {
         authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())
+                new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
         );
 
-        User user = userService.findByUsername(request.getUsername())
+        User user = userService.findByMail(request.getEmail())
                 .orElseThrow();
 
-        String token = jwtUtil.generateToken(user.getUsername(), user.getRole());
-        return ResponseEntity.ok(new AuthResponse(token, user.getUsername(), user.getRole()));
+        String token = jwtUtil.generateToken(user.getMail());
+        return ResponseEntity.ok(new AuthResponse(
+                token,
+                user.getId(),
+                user.getMail(),
+                user.getName(),
+                user.getSurname()
+        ));
     }
 
     @PostMapping("/register")
     public ResponseEntity<AuthResponse> register(@RequestBody RegisterRequest request) {
-        if (userService.findByUsername(request.getUsername()).isPresent()) {
-            return ResponseEntity.badRequest().build();
+        if (userService.findByMail(request.getEmail()).isPresent()) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
         }
 
         User user = new User();
-        user.setUsername(request.getUsername());
-        user.setEmail(request.getEmail());
-        user.setPassword(passwordEncoder.encode(request.getPassword()));
-        user.setRole("USER");
+        user.setName(request.getName());
+        user.setSurname(request.getSurname());
+        user.setMail(request.getEmail());
+        user.setPasswordHash(passwordEncoder.encode(request.getPassword()));
+        user.setBirthdate(request.getBirthdate());
+        user.setBirthplace(request.getBirthplace());
+        user.setTaxId(request.getTaxId());
+        user.setIsPublic(false);
 
         User saved = userService.save(user);
-        String token = jwtUtil.generateToken(saved.getUsername(), saved.getRole());
-        return ResponseEntity.ok(new AuthResponse(token, saved.getUsername(), saved.getRole()));
+        String token = jwtUtil.generateToken(saved.getMail());
+        return ResponseEntity.ok(new AuthResponse(
+                token,
+                saved.getId(),
+                saved.getMail(),
+                saved.getName(),
+                saved.getSurname()
+        ));
     }
 }

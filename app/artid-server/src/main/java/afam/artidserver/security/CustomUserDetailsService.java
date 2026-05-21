@@ -18,14 +18,14 @@ public class CustomUserDetailsService implements UserDetailsService {
     private final UserDAO userDAO;
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userDAO.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("Utente non trovato: " + username));
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        User user = userDAO.findByMail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("Utente non trovato: " + email));
 
         return new org.springframework.security.core.userdetails.User(
-                user.getUsername(),
-                user.getPassword(),
-                List.of(new SimpleGrantedAuthority("ROLE_" + user.getRole().toUpperCase()))
+                user.getMail(),
+                user.getPasswordHash(),
+                List.of(new SimpleGrantedAuthority("ROLE_USER"))
         );
     }
 }

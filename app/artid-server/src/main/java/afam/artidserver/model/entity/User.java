@@ -2,7 +2,11 @@ package afam.artidserver.model.entity;
 
 import lombok.Data;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
+
+import java.time.LocalDate;
+import java.time.OffsetDateTime;
 
 @Data
 @Table("user")
@@ -10,8 +14,36 @@ public class User {
 
     @Id
     private Long id;
-    private String email;
-    private String username;
-    private String password;
-    private String role;
+
+    private String name;
+    private String surname;
+    private String mail;
+
+    @Column("password_hash")
+    private String passwordHash;
+
+    private LocalDate birthdate;
+    private String birthplace;
+    private String address;
+
+    @Column("tax_id")
+    private String taxId;
+
+    @Column("spid_code")
+    private String spidCode;
+
+    private String biography;
+
+    @Column("linkedin_id")
+    private String linkedinId;
+
+    private String profession;
+
+    @Column("is_public")
+    private Boolean isPublic;
+
+    private String phone;
+
+    @Column("deleted_at")
+    private OffsetDateTime deletedAt;
 }

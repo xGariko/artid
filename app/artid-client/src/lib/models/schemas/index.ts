@@ -1,12 +1,2 @@
-export { UserSchema, type User } from "./user.schema.ts";
-export { TagSchema, type Tag } from "./tag.schema.ts";
-export { VisibilityStateSchema, type VisibilityState } from "./visibility-state.schema.ts";
-export { FileSchema, type File } from "./file.schema.ts";
-export { ArtidSchema, type Artid } from "./artid.schema.ts";
-export { ResourceSchema, type Resource } from "./resource.schema.ts";
-export { ArtidResourceSchema, type ArtidResource } from "./artid-resource.schema.ts";
-export { InternalShareSchema, type InternalShare } from "./internal-share.schema.ts";
-export { ExternalShareSchema, type ExternalShare } from "./external-share.schema.ts";
-export { NotificationSchema, type Notification } from "./notification.schema.ts";
-export { CertificationsSchema, type Certifications } from "./certifications.schema.ts";
-export { AuditLogSchema, type AuditLog } from "./audit-log.schema.ts";
+export * from "./entities/index.ts";
+export * from "./dto/index.ts";

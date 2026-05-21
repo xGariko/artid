@@ -1,7 +1,7 @@
 import type { Handle } from "@sveltejs/kit";
 import { redirect } from "@sveltejs/kit";
 
-const PUBLIC_PATHS = ["/login", "/register"];
+const PUBLIC_PATHS = ["/login", "/register", "/welcome"];
 
 function isPublic(pathname: string): boolean {
 	return PUBLIC_PATHS.some((p) => pathname.startsWith(p));
@@ -28,7 +28,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 	const { pathname } = event.url;
 
 	if (pathname === "/") {
-		redirect(303, token ? "/dashboard" : "/login");
+		redirect(303, token ? "/dashboard" : "/welcome");
 	}
 
 	if (!token && !isPublic(pathname)) {

@@ -1,0 +1,81 @@
+// =============================================================
+// ArtID — Global Styles
+// =============================================================
+
+@import "bootstrap/scss/functions";
+
+$primary: #06c;
+$body-color: #17324d;
+
+// Font families
+$font-family-sans-serif: "Titillium Web", system-ui, -apple-system, "Segoe UI", Roboto,
+	"Helvetica Neue", Arial, sans-serif;
+$font-family-serif: "Lora", Georgia, "Times New Roman", serif;
+$font-family-base: $font-family-sans-serif;
+
+// 3. Token brand ArtID
+$artid:            #06c;
+$artid-dark:       #004080;
+$artid-light:      #dce9f5;
+$artid-surface:    #f5f5f5;
+$artid-section:    #ffffff;
+$artid-muted:      #e7eef8;
+$artid-text:       #17324d;
+$artid-text-muted: #5b6f82;
+
+@import "bootstrap/scss/variables";
+@import "bootstrap/scss/variables-dark";
+
+$artid-theme-colors: (
+	"artid":            $artid,
+	"artid-dark":       $artid-dark,
+	"artid-light":      $artid-light,
+	"artid-surface":    $artid-surface,
+	"artid-section":    $artid-section,
+	"artid-muted":      $artid-muted,
+	"artid-text":       $artid-text,
+	"artid-text-muted": $artid-text-muted
+);
+$theme-colors: map-merge($theme-colors, $artid-theme-colors);
+
+@import "bootstrap/scss/bootstrap";
+
+// =============================================================
+// Custom global rules
+// =============================================================
+
+* {
+	box-sizing: border-box;
+}
+
+html,
+body {
+	height: 100%;
+}
+
+// Esponi i token brand come custom property con i valori hex
+// (stessa source-of-truth delle SCSS var sopra, in sync con $theme-colors).
+:root {
+	--artid-primary:      #{$artid};
+	--artid-primary-dark: #{$artid-dark};
+	--artid-light:        #{$artid-light};
+	--artid-surface:      #{$artid-surface};
+	--artid-section:      #{$artid-section};
+	--artid-muted:        #{$artid-muted};
+	--artid-text:         #{$artid-text};
+	--artid-text-muted:   #{$artid-text-muted};
+
+	--artid-font-sans:  #{inspect($font-family-sans-serif)};
+	--artid-font-serif: #{inspect($font-family-serif)};
+}
+
+// Utility per applicare Lora dove serve (per default tutto è Titillium)
+.font-serif,
+.font-lora {
+	font-family: var(--artid-font-serif), serif !important;
+}
+
+.font-sans,
+.font-titillium {
+	font-family: var(--artid-font-sans), serif !important;
+}

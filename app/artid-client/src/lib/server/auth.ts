@@ -1,24 +1,21 @@
 import type { Cookies } from "@sveltejs/kit";
-import { createApiClient } from "$lib/api/client";
+import { dev } from "$app/environment";
 
 const TOKEN_COOKIE = "token";
 const TOKEN_MAX_AGE = 60 * 60 * 24 * 7;
+const API_BASE = "http://localhost:8080";
 
 type LoginResult =
 	| { ok: true; user: Record<string, unknown> }
 	| { ok: false; error: string };
 
 interface LoginPayload {
-	username: string;
+	email: string;
 	password: string;
 }
 
 export async function login(cookies: Cookies, payload: LoginPayload): Promise<LoginResult> {
-	const api = createApiClient();
-
-	// TODO: sostituire con api.POST("/api/auth/login", { body: payload })
-	// quando schema.d.ts sarà generato
-	const res = await fetch("http://localhost:8080/api/auth/login", {
+	const res = await fetch(`${API_BASE}/api/auth/login`, {
 		method: "POST",
 		headers: { "Content-Type": "application/json" },
 		body: JSON.stringify(payload),
@@ -34,7 +31,7 @@ export async function login(cookies: Cookies, payload: LoginPayload): Promise<Lo
 		path: "/",
 		httpOnly: true,
 		sameSite: "strict",
-		secure: true,
+		secure: !dev,
 		maxAge: TOKEN_MAX_AGE,
 	});
 
