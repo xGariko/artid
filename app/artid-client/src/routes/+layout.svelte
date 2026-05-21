@@ -3,8 +3,16 @@
 	import '$lib/styles/style.scss';
 	import 'bootstrap-icons/font/bootstrap-icons.css';
 	import { onMount } from 'svelte';
+	import { user } from '$lib/stores/auth';
+	import type { LayoutData } from './$types';
 
-	let { children } = $props();
+	let { children, data }: { children: import('svelte').Snippet; data: LayoutData } = $props();
+
+	user.set(data.user);
+
+	$effect.pre(() => {
+		user.set(data.user);
+	});
 
 	onMount(async () => {
 		await import('bootstrap/dist/js/bootstrap.bundle.min.js');

@@ -1,17 +1,20 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
-	import { resolve } from '$app/paths';
-	import ArtidButton from '$lib/components/ui/artid-button.svelte';
+	import ArtidNavbar from '$lib/components/layout/artid-navbar.svelte';
+	import ArtidProgress from '$lib/components/ui/artid-progress.svelte';
 
 	let { children } = $props();
 
-	async function handleLogout() {
-		await fetch('/logout', { method: 'POST' });
-		await goto(resolve('/login'));
-	}
+
 </script>
 
-	<ArtidButton label="Logout" onclick={handleLogout}/>
-	<main class="flex-grow-1 p-4 bg-light overflow-auto">
-		{@render children()}
-	</main>
+<ArtidNavbar></ArtidNavbar>
+<ArtidProgress></ArtidProgress>
+<main class="flex-grow-1 w-100 h-100 p-4 bg-artid-surface overflow-auto">
+	{@render children()}
+</main>
+
+<style>
+	main {
+			padding-top: calc(var(--artid-navbar-height) + 1.5rem) !important;
+	}
+</style>

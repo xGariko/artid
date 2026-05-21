@@ -9,34 +9,67 @@ $body-color: #17324d;
 
 // Font families
 $font-family-sans-serif: "Titillium Web", system-ui, -apple-system, "Segoe UI", Roboto,
-	"Helvetica Neue", Arial, sans-serif;
+"Helvetica Neue", Arial, sans-serif;
 $font-family-serif: "Lora", Georgia, "Times New Roman", serif;
 $font-family-base: $font-family-sans-serif;
 
 // 3. Token brand ArtID
-$artid:            #06c;
-$artid-dark:       #004080;
-$artid-light:      #dce9f5;
-$artid-surface:    #f5f5f5;
-$artid-section:    #ffffff;
-$artid-muted:      #e7eef8;
-$artid-text:       #17324d;
+$artid: #06c;
+$artid-dark: #004080;
+$artid-light: #dce9f5;
+$artid-surface: #f5f5f5;
+$artid-section: #ffffff;
+$artid-muted: #e7eef8;
+$artid-text: #17324d;
 $artid-text-muted: #5b6f82;
+$artid-border: #c5c7c9;
 
 @import "bootstrap/scss/variables";
 @import "bootstrap/scss/variables-dark";
 
+// 1) Estende $theme-colors PRIMA di `maps`, così i derivati
+//    ($theme-colors-rgb, $utilities-bg-colors, $utilities-text-colors, …)
+//    includono i token artid e generano .bg-artid-*, .text-artid-*, ecc.
 $artid-theme-colors: (
-	"artid":            $artid,
-	"artid-dark":       $artid-dark,
-	"artid-light":      $artid-light,
-	"artid-surface":    $artid-surface,
-	"artid-section":    $artid-section,
-	"artid-muted":      $artid-muted,
-	"artid-text":       $artid-text,
-	"artid-text-muted": $artid-text-muted
+        "artid": $artid,
+        "artid-dark": $artid-dark,
+        "artid-light": $artid-light,
+        "artid-surface": $artid-surface,
+        "artid-section": $artid-section,
+        "artid-muted": $artid-muted,
+        "artid-text": $artid-text,
+        "artid-text-muted": $artid-text-muted,
+        "artid-border": $artid-border
 );
 $theme-colors: map-merge($theme-colors, $artid-theme-colors);
+
+@import "bootstrap/scss/maps";
+@import "bootstrap/scss/mixins";
+@import "bootstrap/scss/utilities";
+
+// 2) Estende $utilities DOPO `utilities` ma PRIMA di `utilities/api`
+//    (che viene incluso da `bootstrap/scss/bootstrap`).
+//    → genera .w-10, .w-35, .w-60, .h-85, ecc. (step 5%)
+$custom-sizes: (
+        5: 5%, 10: 10%, 15: 15%, 20: 20%,
+        30: 30%, 35: 35%, 40: 40%, 45: 45%,
+        55: 55%, 60: 60%, 65: 65%, 70: 70%,
+        80: 80%, 85: 85%, 90: 90%, 95: 95%
+);
+
+$utilities: map-merge(
+        $utilities,
+        (
+                "width": map-merge(
+                        map-get($utilities, "width"),
+                        (values: map-merge(map-get(map-get($utilities, "width"), "values"), $custom-sizes))
+                ),
+                "height": map-merge(
+                        map-get($utilities, "height"),
+                        (values: map-merge(map-get(map-get($utilities, "height"), "values"), $custom-sizes))
+                )
+        )
+);
 
 @import "bootstrap/scss/bootstrap";
 
@@ -45,37 +78,40 @@ $theme-colors: map-merge($theme-colors, $artid-theme-colors);
 // =============================================================
 
 * {
-	box-sizing: border-box;
+  box-sizing: border-box;
 }
 
 html,
 body {
-	height: 100%;
+  height: 100%;
 }
 
 // Esponi i token brand come custom property con i valori hex
 // (stessa source-of-truth delle SCSS var sopra, in sync con $theme-colors).
 :root {
-	--artid-primary:      #{$artid};
-	--artid-primary-dark: #{$artid-dark};
-	--artid-light:        #{$artid-light};
-	--artid-surface:      #{$artid-surface};
-	--artid-section:      #{$artid-section};
-	--artid-muted:        #{$artid-muted};
-	--artid-text:         #{$artid-text};
-	--artid-text-muted:   #{$artid-text-muted};
+  --artid-primary: #{$artid};
+  --artid-primary-dark: #{$artid-dark};
+  --artid-light: #{$artid-light};
+  --artid-surface: #{$artid-surface};
+  --artid-section: #{$artid-section};
+  --artid-muted: #{$artid-muted};
+  --artid-text: #{$artid-text};
+  --artid-text-muted: #{$artid-text-muted};
+  --artid-border: #{$artid-border};
 
-	--artid-font-sans:  #{inspect($font-family-sans-serif)};
-	--artid-font-serif: #{inspect($font-family-serif)};
+  --artid-font-sans: #{inspect($font-family-sans-serif)};
+  --artid-font-serif: #{inspect($font-family-serif)};
+
+  --artid-navbar-height: 70px;
 }
 
 // Utility per applicare Lora dove serve (per default tutto è Titillium)
 .font-serif,
 .font-lora {
-	font-family: var(--artid-font-serif), serif !important;
+  font-family: var(--artid-font-serif), serif !important;
 }
 
 .font-sans,
 .font-titillium {
-	font-family: var(--artid-font-sans), serif !important;
+  font-family: var(--artid-font-sans), serif !important;
 }

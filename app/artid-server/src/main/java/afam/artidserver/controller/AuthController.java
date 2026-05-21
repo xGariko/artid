@@ -3,6 +3,7 @@ package afam.artidserver.controller;
 import afam.artidserver.model.dto.AuthResponse;
 import afam.artidserver.model.dto.LoginRequest;
 import afam.artidserver.model.dto.RegisterRequest;
+import afam.artidserver.model.dto.UserResponse;
 import afam.artidserver.model.entity.User;
 import afam.artidserver.security.JwtUtil;
 import afam.artidserver.service.UserService;
@@ -11,7 +12,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -70,6 +73,18 @@ public class AuthController {
                 saved.getMail(),
                 saved.getName(),
                 saved.getSurname()
+        ));
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<UserResponse> me(Authentication authentication) {
+        User user = userService.findByMail(authentication.getName())
+                .orElseThrow();
+        return ResponseEntity.ok(new UserResponse(
+                user.getId(),
+                user.getMail(),
+                user.getName(),
+                user.getSurname()
         ));
     }
 }

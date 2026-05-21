@@ -42,6 +42,7 @@ npm run dev        # http://localhost:5173
 | Comando               | Descrizione                            |
 |-----------------------|----------------------------------------|
 | `npm run dev`         | Dev server con HMR                     |
+| `npm run api:generate`| Aggiorna schema OpenAPI                |
 | `npm run build`       | Build di produzione                    |
 | `npm run preview`     | Preview della build locale             |
 | `npm run check`       | Type-check con `svelte-check`          |
@@ -63,6 +64,8 @@ cd app/artid-server
 | `./mvnw spring-boot:run`   | Avvia il server in dev             |
 | `./mvnw clean package`     | Build del JAR                      |
 | `./mvnw test`              | Esegue i test                      |
+
+> è consigliabile usare IntelliJ avviando `ArtidServerApplication.java` dall'ide
 
 ---
 

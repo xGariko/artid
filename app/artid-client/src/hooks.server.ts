@@ -1,5 +1,6 @@
 import type { Handle } from "@sveltejs/kit";
 import { redirect } from "@sveltejs/kit";
+import { fetchCurrentUser, getToken, logout } from "$lib/server/auth";
 
 const PUBLIC_PATHS = ["/login", "/register", "/welcome"];
 
@@ -8,20 +9,18 @@ function isPublic(pathname: string): boolean {
 }
 
 export const handle: Handle = async ({ event, resolve }) => {
-	const token = event.cookies.get("token") ?? null;
+	let token = getToken(event.cookies);
 	event.locals.token = token;
 	event.locals.user = null;
 
 	if (token) {
-		try {
-			// TODO: chiamata a Spring GET /api/auth/me con Authorization header
-			// const res = await fetch(`${API_BASE}/api/auth/me`, {
-			//   headers: { Authorization: `Bearer ${token}` }
-			// });
-			// event.locals.user = await res.json();
-		} catch {
-			event.cookies.delete("token", { path: "/" });
+		const result = await fetchCurrentUser(token);
+		if (result.ok) {
+			event.locals.user = result.user;
+		} else if (result.status === "unauthorized") {
+			logout(event.cookies);
 			event.locals.token = null;
+			token = null;
 		}
 	}
 

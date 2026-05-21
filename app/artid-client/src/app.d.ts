@@ -1,10 +1,10 @@
-import type { User } from "$lib/models/schemas";
+import type { AuthUser } from "$lib/stores/auth";
 
 declare global {
 	namespace App {
 		interface Locals {
 			token: string | null;
-			user: User | null;
+			user: AuthUser | null;
 		}
 	}
 }

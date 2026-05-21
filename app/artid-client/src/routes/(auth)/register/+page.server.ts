@@ -1,9 +1,10 @@
 import { fail, redirect } from "@sveltejs/kit";
+import { env } from "$env/dynamic/private";
 import type { Actions } from "./$types";
 import { login } from "$lib/server/auth";
 import { RegisterRequestSchema } from "$lib/models/schemas";
 
-const API_BASE = "http://localhost:8080";
+const API_BASE = env.API_BASE ?? "http://localhost:8080";
 
 type RegisterField =
 	| "name"
