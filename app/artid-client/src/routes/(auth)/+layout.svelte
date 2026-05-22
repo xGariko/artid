@@ -11,7 +11,7 @@
 		<img src="{loginRegisterIllustration}" alt="Welcome Illustration" class="mh-100 mw-100 object-fit-contain">
 	</div>
 	<div class="col-12 col-lg-6 h-100 overflow-y-auto bg-artid-light d-flex align-items-center justify-content-center">
-		<div class="m-5 w-100">
+		<div class="m-5 w-75">
 			{@render children()}
 		</div>
 	</div>

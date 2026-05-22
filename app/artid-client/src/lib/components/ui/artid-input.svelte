@@ -39,14 +39,7 @@
 {/if}
 
 <style>
-	input:-webkit-autofill,
-	input:-webkit-autofill:hover,
-	input:-webkit-autofill:focus,
-	input:-webkit-autofill:active {
-		-webkit-box-shadow: 0 0 0 1000px var(--artid-section) inset !important;
-		box-shadow: 0 0 0 1000px var(--artid-section) inset !important;
-		-webkit-text-fill-color: var(--artid-text) !important;
-		caret-color: var(--artid-text);
-		transition: background-color 9999s ease-in-out 0s;
+	input:-webkit-autofill{
+			background-color: transparent;
 	}
 </style>

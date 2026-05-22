@@ -24,7 +24,13 @@
       "Bash(curl -sI \"https://cdn.jsdelivr.net/gh/italia/spid-smart-button@gh-pages/spid-button.min.js\")",
       "Bash(curl -sI \"https://cdn.jsdelivr.net/gh/italia/spid-smart-button@gh-pages/spid-button.min.css\")",
       "Bash(curl -s \"https://cdn.jsdelivr.net/gh/italia/spid-smart-button@gh-pages/spid-button.min.js\")",
-      "Bash(grep -oE \"assetsBaseUrl[^,;}]{0,80}\")"
+      "Bash(grep -oE \"assetsBaseUrl[^,;}]{0,80}\")",
+      "Bash(where java *)",
+      "Bash(java -version)",
+      "Bash(dir \"C:\\\\Program Files\\\\Eclipse Adoptium\")",
+      "Bash(dir \"C:\\\\Program Files\\\\Java\")",
+      "WebSearch",
+      "WebFetch(domain:svelte.dev)"
     ]
   }
 }
