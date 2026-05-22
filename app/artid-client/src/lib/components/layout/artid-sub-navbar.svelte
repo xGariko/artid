@@ -17,11 +17,9 @@
 		{ label: 'Materiali', href: resolve('/resources'), icon: 'bi-folder-fill' },
 		{ label: 'Condivisioni', href: resolve('/shares'), icon: 'bi-share-fill' },
 		{ label: 'Certificazioni', href: resolve('/certifications'), icon: 'bi-patch-check-fill' },
-		{ label: 'Profile', href: resolve('/profile'), icon: 'bi-person-fill' }
+		{ label: 'Profilo', href: resolve('/profile'), icon: 'bi-person-fill' }
 	];
 
-	// Match per PREFISSO: /artid/mozart attiva ancora la sezione /artid.
-	// Si sceglie il prefisso più lungo per evitare ambiguità su rotte annidate.
 	function matchSection(path: string): BreadcrumbCrumb | undefined {
 		return sections
 			.filter((s) => path === s.href || path.startsWith(s.href + '/'))

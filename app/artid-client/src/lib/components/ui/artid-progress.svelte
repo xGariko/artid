@@ -1,9 +1,38 @@
 <script lang="ts">
-	import { loading } from '$lib/stores/spinner-loading';
+	import { loading, activeRequests } from '$lib/stores/spinner-loading';
+	import { navigating, page } from '$app/state';
+	import { resolve } from '$app/paths';
+
+	// Attiva la barra se uno qualsiasi dei segnali è attivo:
+	// - flag manuale (`loading`) per casi forzati (form submit ecc.)
+	// - counter di richieste API in corso (middleware su createApiClient)
+	// - navigazione SvelteKit in corso (load/+page.server.ts in esecuzione)
+	let active = $derived(Boolean($loading) || $activeRequests > 0 || navigating.to !== null);
+
+	// Posizionamento dinamico: la sub-navbar è nascosta sulla dashboard
+	// (vedi artid-sub-navbar.svelte). In quel caso attacchiamo la barra
+	// direttamente sotto la navbar; altrove la mettiamo sotto la sub-navbar.
+	// Usiamo SEMPRE `page.url.pathname` (path corrente) e non
+	// `navigating.to`, perché la sub-navbar visibile è quella della pagina
+	// ancora montata — quindi la barra deve allinearsi a lei finché la
+	// navigazione non si conclude.
+	const DASHBOARD = resolve('/dashboard');
+	let onDashboard = $derived(page.url.pathname === DASHBOARD);
+	let topStyle = $derived(
+		onDashboard
+			? 'var(--artid-navbar-height, 0px)'
+			: 'calc(var(--artid-navbar-height, 0px) + var(--artid-navbar-height, 0px) / 2)'
+	);
 </script>
 
-{#if $loading}
-	<div class="artid-progress" role="progressbar" aria-busy="true" aria-label="Caricamento in corso">
+{#if active}
+	<div
+		class="artid-progress"
+		role="progressbar"
+		aria-busy="true"
+		aria-label="Caricamento in corso"
+		style="top: {topStyle};"
+	>
 		<div class="artid-progress__bar"></div>
 	</div>
 {/if}
@@ -11,7 +40,6 @@
 <style>
 	.artid-progress {
 		position: fixed;
-		top: 0;
 		left: 0;
 		right: 0;
 		height: 5px;
@@ -19,6 +47,7 @@
 		overflow: hidden;
 		z-index: 2000;
 		pointer-events: none;
+		transition: top 180ms ease;
 	}
 
 	.artid-progress__bar {

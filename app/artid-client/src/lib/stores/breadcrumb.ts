@@ -1,8 +1,9 @@
 import { writable } from 'svelte/store';
+import type { ResolvedPathname } from '$app/types';
 
 export type BreadcrumbCrumb = {
 	label: string;
-	href: string;
+	href: ResolvedPathname;
 	icon?: string;     // classe bootstrap-icons (es. "bi-pencil-square")
 	iconSrc?: string;  // src di un'icona custom (svg/png)
 };
