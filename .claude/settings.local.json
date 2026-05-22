@@ -30,7 +30,17 @@
       "Bash(dir \"C:\\\\Program Files\\\\Eclipse Adoptium\")",
       "Bash(dir \"C:\\\\Program Files\\\\Java\")",
       "WebSearch",
-      "WebFetch(domain:svelte.dev)"
+      "WebFetch(domain:svelte.dev)",
+      "Bash(netstat -ano)",
+      "Bash(findstr \"LISTENING\")",
+      "Bash(findstr \":5173 :8080\")",
+      "mcp__Claude_in_Chrome__navigate",
+      "mcp__Claude_in_Chrome__browser_batch",
+      "Bash(curl -s -X POST http://localhost:8080/api/auth/register -H \"Content-Type: application/json\" -d '{\"name\":\"Test\",\"surname\":\"User\",\"email\":\"bugtest@artid.local\",\"password\":\"Password123!\",\"birthdate\":null,\"birthplace\":null,\"taxId\":null}' -w \"\\\\nHTTP:%{http_code}\\\\n\")",
+      "Bash(./mvnw.cmd compile *)",
+      "Bash(./mvnw.cmd clean *)",
+      "Bash(npm run *)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:8080/v3/api-docs)"
     ]
   }
 }

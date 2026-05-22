@@ -9,7 +9,7 @@
 	}
 </script>
 
-<nav class="w-100 bg-primary justify-content-around align-items-center position-absolute top-0 left-0 d-flex px-2">
+<nav class="w-100 bg-primary justify-content-around align-items-center position-absolute top-0 left-0 d-flex px-2 z-2">
 	<div class="row w-100">
 		<div class="col-3 d-flex align-items-center justify-content-start">
 			<img src="{ArtidLogoWhite}" alt="logo_artid" class="mh-75 h-75">

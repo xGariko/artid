@@ -15,7 +15,7 @@ $font-family-base: $font-family-sans-serif;
 
 // 3. Token brand ArtID
 $artid: #06c;
-$artid-dark: #004080;
+$artid-dark: #294766;
 $artid-light: #dce9f5;
 $artid-surface: #f5f5f5;
 $artid-section: #ffffff;
@@ -39,7 +39,7 @@ $artid-theme-colors: (
         "artid-muted": $artid-muted,
         "artid-text": $artid-text,
         "artid-text-muted": $artid-text-muted,
-        "artid-border": $artid-border
+        "artid-border": $artid-border,
 );
 $theme-colors: map-merge($theme-colors, $artid-theme-colors);
 
@@ -58,17 +58,17 @@ $custom-sizes: (
 );
 
 $utilities: map-merge(
-        $utilities,
-        (
-                "width": map-merge(
-                        map-get($utilities, "width"),
-                        (values: map-merge(map-get(map-get($utilities, "width"), "values"), $custom-sizes))
-                ),
-                "height": map-merge(
-                        map-get($utilities, "height"),
-                        (values: map-merge(map-get(map-get($utilities, "height"), "values"), $custom-sizes))
+                $utilities,
+                (
+                        "width": map-merge(
+                                        map-get($utilities, "width"),
+                                        (values: map-merge(map-get(map-get($utilities, "width"), "values"), $custom-sizes))
+                        ),
+                        "height": map-merge(
+                                        map-get($utilities, "height"),
+                                        (values: map-merge(map-get(map-get($utilities, "height"), "values"), $custom-sizes))
+                        )
                 )
-        )
 );
 
 @import "bootstrap/scss/bootstrap";
