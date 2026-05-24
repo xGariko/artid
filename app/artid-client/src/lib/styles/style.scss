@@ -115,3 +115,25 @@ body {
 .font-titillium {
   font-family: var(--artid-font-sans), serif !important;
 }
+
+// Scrollbar brand: thumb blu ArtID su track muted. Applicare sull'elemento
+// scrollabile (es. la tabella in resources/). WebKit + Firefox.
+.artid-scroll-primary {
+  scrollbar-width: thin;
+  scrollbar-color: var(--artid-primary) var(--artid-muted);
+}
+
+.artid-scroll-primary::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.artid-scroll-primary::-webkit-scrollbar-track {
+  background: var(--artid-muted);
+  border-radius: 4px;
+}
+
+.artid-scroll-primary::-webkit-scrollbar-thumb {
+  background-color: var(--artid-primary);
+  border-radius: 4px;
+}
