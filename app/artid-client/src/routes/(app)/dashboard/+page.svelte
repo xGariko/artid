@@ -4,7 +4,7 @@
 	import { cubicOut } from 'svelte/easing';
 	import { user } from '$lib/stores/auth';
 	import ArtidLogoOutlinePrimary from '$lib/assets/artid_logo_outline_primary.svg';
-	import ArtidDashboardCard from '$lib/components/dahsboard/artid-dashboard-card.svelte';
+	import ArtidDashboardCard from '$lib/components/pages/dahsboard/artid-dashboard-card.svelte';
 	import type { PageData } from './$types';
 
 	let { data }: { data: PageData } = $props();
@@ -22,7 +22,14 @@
 
 <div class="h-100 d-flex flex-column align-items-center justify-content-center">
 	<div class="w-50 h-65 d-flex flex-column justify-content-start">
-		<h1 class="mb-3 text-start">Bentornato/a, <span class="fw-bolder">{$user?.name}</span></h1>
+		{#if mounted}
+			<h1
+				class="mb-3 text-start"
+				in:fly={{ y: -24, duration: 450, easing: cubicOut }}
+			>
+				Bentornato/a, <span class="fw-bolder">{$user?.name}</span>
+			</h1>
+		{/if}
 
 		{#if mounted}
 			<div class="row g-3 mb-auto h-100">

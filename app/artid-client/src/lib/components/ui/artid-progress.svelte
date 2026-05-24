@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { loading, activeRequests } from '$lib/stores/spinner-loading';
+	import { loading, activeRequests } from '$lib/stores/loading';
 	import { navigating, page } from '$app/state';
 	import { resolve } from '$app/paths';
 
@@ -9,19 +9,24 @@
 	// - navigazione SvelteKit in corso (load/+page.server.ts in esecuzione)
 	let active = $derived(Boolean($loading) || $activeRequests > 0 || navigating.to !== null);
 
-	// Posizionamento dinamico: la sub-navbar è nascosta sulla dashboard
-	// (vedi artid-sub-navbar.svelte). In quel caso attacchiamo la barra
-	// direttamente sotto la navbar; altrove la mettiamo sotto la sub-navbar.
-	// Usiamo SEMPRE `page.url.pathname` (path corrente) e non
-	// `navigating.to`, perché la sub-navbar visibile è quella della pagina
-	// ancora montata — quindi la barra deve allinearsi a lei finché la
-	// navigazione non si conclude.
+	// Posizionamento dinamico in base alla shell visibile (path corrente,
+	// non destinazione: la barra deve allinearsi alla UI ancora montata):
+	// - pagine pubbliche (login/register/welcome) → no navbar → top: 0
+	// - /dashboard → solo navbar → top: navbar-height
+	// - altre pagine autenticate → navbar + sub-navbar → top: navbar + sub
 	const DASHBOARD = resolve('/dashboard');
-	let onDashboard = $derived(page.url.pathname === DASHBOARD);
+	const PUBLIC_PATHS = ['/login', '/register', '/welcome'];
+
+	let currentPath = $derived(page.url.pathname);
+	let onPublic = $derived(PUBLIC_PATHS.some((p) => currentPath.startsWith(p)));
+	let onDashboard = $derived(currentPath === DASHBOARD);
+
 	let topStyle = $derived(
-		onDashboard
-			? 'var(--artid-navbar-height, 0px)'
-			: 'calc(var(--artid-navbar-height, 0px) + var(--artid-navbar-height, 0px) / 2)'
+		onPublic
+			? '0px'
+			: onDashboard
+				? 'var(--artid-navbar-height, 0px)'
+				: 'calc(var(--artid-navbar-height, 0px) + var(--artid-navbar-height, 0px) / 2)'
 	);
 </script>
 

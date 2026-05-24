@@ -5,7 +5,7 @@
 	import spidIcon from '$lib/assets/spid-ico-circle.svg';
 
 	import ArtidButton from '$lib/components/ui/artid-button.svelte';
-	import { loading } from '$lib/stores/spinner-loading';
+	import { loading } from '$lib/stores/loading.ts';
 	import type { ActionData } from './$types';
 
 	let { form }: { form: ActionData } = $props();

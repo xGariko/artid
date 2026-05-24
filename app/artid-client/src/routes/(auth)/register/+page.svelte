@@ -6,7 +6,7 @@
 
 	import ArtidButton from '$lib/components/ui/artid-button.svelte';
 	import type { RegisterRequest } from '$lib/models/schemas';
-	import { loading } from '$lib/stores/spinner-loading';
+	import { loading } from '$lib/stores/loading.ts';
 	import type { ActionData } from './$types';
 
 	let { form }: { form: ActionData } = $props();
