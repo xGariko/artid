@@ -5,6 +5,7 @@ import afam.artidserver.model.entity.User;
 import afam.artidserver.service.ArtidService;
 import afam.artidserver.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;

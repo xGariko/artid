@@ -40,7 +40,15 @@
       "Bash(./mvnw.cmd compile *)",
       "Bash(./mvnw.cmd clean *)",
       "Bash(npm run *)",
-      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:8080/v3/api-docs)"
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:8080/v3/api-docs)",
+      "mcp__supabase__get_project_url",
+      "Bash(where psql *)",
+      "Bash(where pg_dump)",
+      "Read(//c/Program Files/**)",
+      "Bash(claude mcp *)",
+      "Bash(dir C:\\\\progetti\\\\artid\\\\app\\\\artid-server\\\\src\\\\main\\\\resources)",
+      "mcp__supabase__apply_migration",
+      "Bash(npx svelte-check *)"
     ]
   }
 }

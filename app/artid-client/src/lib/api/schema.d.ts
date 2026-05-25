@@ -100,6 +100,38 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/resources": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["findByUser"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/resources/{id}/file": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["downloadFile"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/profile/completion": {
         parameters: {
             query?: never;
@@ -225,6 +257,28 @@ export interface components {
             email?: string;
             name?: string;
             surname?: string;
+        };
+        ResourceResponse: {
+            /** Format: int64 */
+            id?: number;
+            /** Format: int64 */
+            idUser?: number;
+            /** Format: int64 */
+            idFile?: number | null;
+            title?: string;
+            description?: string | null;
+            favorite?: boolean;
+            /** Format: date-time */
+            createdAt?: string;
+            /** Format: date-time */
+            lastModified?: string;
+            fileName?: string | null;
+            extension?: string | null;
+            mimeType?: string | null;
+            /** Format: int64 */
+            fileSize?: number | null;
+            /** Format: int64 */
+            artidCount?: number | null;
         };
     };
     responses: never;
@@ -511,6 +565,48 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["CountResponse"];
+                };
+            };
+        };
+    };
+    findByUser: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ResourceResponse"][];
+                };
+            };
+        };
+    };
+    downloadFile: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": string;
                 };
             };
         };

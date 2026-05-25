@@ -18,6 +18,7 @@
 
 	const baseTransition = { y: 24, duration: 450, easing: cubicOut };
 	const STEP = 80;
+
 </script>
 
 <div class="h-100 d-flex flex-column align-items-center justify-content-center">

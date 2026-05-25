@@ -16,12 +16,14 @@ $font-family-base: $font-family-sans-serif;
 // 3. Token brand ArtID
 $artid: #06c;
 $artid-dark: #294766;
+$artid-subtle: rgba($artid, 0.1);
+$artid-dark-subtle: rgba($artid-dark, 0.1);
 $artid-light: #dce9f5;
 $artid-surface: #f5f5f5;
 $artid-section: #ffffff;
 $artid-muted: #e7eef8;
 $artid-text: #17324d;
-$artid-text-muted: #5b6f82;
+$artid-text-muted: #C5C7C9;
 $artid-border: #c5c7c9;
 
 @import "bootstrap/scss/variables";
@@ -32,7 +34,9 @@ $artid-border: #c5c7c9;
 //    includono i token artid e generano .bg-artid-*, .text-artid-*, ecc.
 $artid-theme-colors: (
         "artid": $artid,
+        "artid-subtle": rgba($artid, 0.1),
         "artid-dark": $artid-dark,
+        "artid-dark-subtle": rgba($artid-dark, 0.1),
         "artid-light": $artid-light,
         "artid-surface": $artid-surface,
         "artid-section": $artid-section,
@@ -90,6 +94,8 @@ body {
 // (stessa source-of-truth delle SCSS var sopra, in sync con $theme-colors).
 :root {
   --artid-primary: #{$artid};
+  --artid-primary-subtle: #{$artid-subtle};
+  --artid-primary-dark-subtle: #{$artid-dark-subtle};
   --artid-primary-dark: #{$artid-dark};
   --artid-light: #{$artid-light};
   --artid-surface: #{$artid-surface};
@@ -103,6 +109,21 @@ body {
   --artid-font-serif: #{inspect($font-family-serif)};
 
   --artid-navbar-height: 70px;
+}
+
+::-webkit-scrollbar{
+  width: 12px;
+  border-radius: 6rem;
+}
+
+::-webkit-scrollbar-track{
+  background: var(--artid-muted);
+}
+
+::-webkit-scrollbar-thumb{
+  background-color: var(--artid-primary);
+  border-radius: 20px;
+  border: 3px solid var(--artid-muted);
 }
 
 // Utility per applicare Lora dove serve (per default tutto è Titillium)
