@@ -5,7 +5,7 @@
 
 	// Attiva la barra se uno qualsiasi dei segnali è attivo:
 	// - flag manuale (`loading`) per casi forzati (form submit ecc.)
-	// - counter di richieste API in corso (middleware su createApiClient)
+	// - counter di richieste API in corso (middleware su locals.api)
 	// - navigazione SvelteKit in corso (load/+page.server.ts in esecuzione)
 	let active = $derived(Boolean($loading) || $activeRequests > 0 || navigating.to !== null);
 

@@ -1,21 +1,17 @@
 import { error } from "@sveltejs/kit";
 import type { PageServerLoad } from "./$types";
-import { createApiClient } from "$lib/api/client";
 
 export const load: PageServerLoad = async ({ locals }) => {
-	const token = locals.token;
-	if (!token) {
+	if (!locals.token) {
 		throw error(401, "Non autenticato");
 	}
 
-	const api = createApiClient(token);
-
 	const [artid, resource, certification, share, profile] = await Promise.all([
-		api.GET("/api/artids/count"),
-		api.GET("/api/resources/count"),
-		api.GET("/api/certifications/count"),
-		api.GET("/api/shares/count"),
-		api.GET("/api/profile/completion"),
+		locals.api.GET("/api/artids/count"),
+		locals.api.GET("/api/resources/count"),
+		locals.api.GET("/api/certifications/count"),
+		locals.api.GET("/api/shares/count"),
+		locals.api.GET("/api/profile/completion"),
 	]);
 
 	if (!artid.data || !resource.data || !certification.data || !share.data || !profile.data) {

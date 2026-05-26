@@ -1,10 +1,7 @@
 import { fail, redirect } from "@sveltejs/kit";
-import { env } from "$env/dynamic/private";
 import type { Actions } from "./$types";
 import { login } from "$lib/server/auth";
 import { RegisterRequestSchema } from "$lib/models/schemas";
-
-const API_BASE = env.API_BASE ?? "http://localhost:8080";
 
 type RegisterField =
 	| "name"
@@ -30,7 +27,7 @@ const FIELD_MESSAGES: Record<RegisterField, string> = {
 };
 
 export const actions: Actions = {
-	default: async ({ request, cookies }) => {
+	default: async ({ request, cookies, locals }) => {
 		const form = await request.formData();
 		const name = (form.get("name") as string)?.trim() ?? "";
 		const surname = (form.get("surname") as string)?.trim() ?? "";
@@ -71,23 +68,21 @@ export const actions: Actions = {
 			return fail(400, { errors, ...formState });
 		}
 
-		const res = await fetch(`${API_BASE}/api/auth/register`, {
-			method: "POST",
-			headers: { "Content-Type": "application/json" },
-			body: JSON.stringify({
+		const { response } = await locals.api.POST("/api/auth/register", {
+			body: {
 				name,
 				surname,
 				email,
 				password,
-				birthdate: birthdate || null,
-				birthplace: birthplace || null,
-				taxId: taxId || null,
-			}),
+				birthdate: birthdate || undefined,
+				birthplace: birthplace || undefined,
+				taxId: taxId || undefined,
+			},
 		});
 
-		if (!res.ok) {
-			const conflict = res.status === 409;
-			return fail(res.status, {
+		if (!response.ok) {
+			const conflict = response.status === 409;
+			return fail(response.status, {
 				errors: conflict
 					? ({ email: "Esiste già un account con questa email." } as FieldErrors)
 					: ({} as FieldErrors),
@@ -96,7 +91,7 @@ export const actions: Actions = {
 			});
 		}
 
-		const result = await login(cookies, { email, password });
+		const result = await login(locals.api, cookies, { email, password });
 
 		if (!result.ok) {
 			redirect(303, "/login");

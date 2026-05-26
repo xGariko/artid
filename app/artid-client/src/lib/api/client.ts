@@ -5,15 +5,17 @@ import type { paths } from "./schema";
 
 const API_BASE = env.API_BASE ?? "http://localhost:8080";
 
-export function createApiClient(token?: string | null) {
+export type ApiClient = ReturnType<typeof createClient<paths>>;
+
+// Factory usato solo da hooks.server.ts per costruire il client per-request
+// e attaccarlo a event.locals.api. Nel resto dell'app usare `locals.api`.
+export function createApiClient(token?: string | null): ApiClient {
 	const client = createClient<paths>({
 		baseUrl: API_BASE,
 		headers: token ? { Authorization: `Bearer ${token}` } : {},
 	});
 
-	// Auto-progress: ogni chiamata fatta tramite questo client incrementa
-	// il counter di richieste attive. La progress bar si attiva di
-	// conseguenza, senza che il consumer debba toccare nulla.
+	// Auto-progress: ogni chiamata incrementa il counter di richieste attive.
 	client.use({
 		onRequest({ request }) {
 			beginRequest();

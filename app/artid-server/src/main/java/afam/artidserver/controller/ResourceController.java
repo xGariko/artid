@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -49,5 +50,13 @@ public class ResourceController {
                                 "inline; filename=\"" + (file.getFileName() != null ? file.getFileName() : "file") + "\"")
                         .body(file.getBlob()))
                 .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable Long id, Authentication authentication) {
+        User user = userService.findByMail(authentication.getName()).orElseThrow();
+        return resourceService.delete(id, user.getId())
+                ? ResponseEntity.noContent().build()
+                : ResponseEntity.notFound().build();
     }
 }

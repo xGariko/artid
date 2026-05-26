@@ -7,8 +7,8 @@ import { writable } from 'svelte/store';
 export const loading = writable<boolean | null>(null);
 
 /**
- * Contatore di richieste API in corso. Incrementato dal middleware su
- * `createApiClient` (ogni chiamata) e da chiunque voglia gestire chiamate
+ * Contatore di richieste API in corso. Incrementato dal middleware del
+ * client `locals.api` (ogni chiamata) e da chiunque voglia gestire chiamate
  * fetch raw via `beginRequest`/`endRequest`.
  *
  * La progress bar si attiva automaticamente quando il counter è > 0.

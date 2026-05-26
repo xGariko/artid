@@ -66,4 +66,17 @@ public class ResourceService {
                 .filter(r -> userId.equals(r.getIdUser()) && r.getDeletedAt() == null && r.getIdFile() != null)
                 .flatMap(r -> fileDAO.findById(r.getIdFile()));
     }
+
+    public boolean delete(Long resourceId, Long userId) {
+        return resourceDAO.findById(resourceId)
+                .filter(r -> userId.equals(r.getIdUser()))
+                .map(r -> {
+                    resourceDAO.deleteById(r.getId());
+                    if (r.getIdFile() != null) {
+                        fileDAO.deleteById(r.getIdFile());
+                    }
+                    return true;
+                })
+                .orElse(false);
+    }
 }

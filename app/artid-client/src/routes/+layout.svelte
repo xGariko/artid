@@ -3,6 +3,7 @@
 	import '$lib/styles/style.scss';
 	import 'bootstrap-icons/font/bootstrap-icons.css';
 	import { onMount } from 'svelte';
+	import { Toaster } from 'svelte-sonner';
 	import { user } from '$lib/stores/auth';
 	import ArtidProgress from '$lib/components/ui/artid-progress.svelte';
 	import type { LayoutData } from './$types';
@@ -25,5 +26,6 @@
 </svelte:head>
 
 <ArtidProgress />
+<Toaster position="bottom-right" richColors />
 
 {@render children()}

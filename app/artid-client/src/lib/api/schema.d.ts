@@ -84,22 +84,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/resources/count": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["count_1"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/api/resources": {
         parameters: {
             query?: never;
@@ -124,6 +108,22 @@ export interface paths {
             cookie?: never;
         };
         get: operations["downloadFile"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/resources/count": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["count_1"];
         put?: never;
         post?: never;
         delete?: never;
@@ -196,6 +196,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/resources/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: operations["delete_1"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -247,6 +263,28 @@ export interface components {
             /** Format: int64 */
             count?: number;
         };
+        ResourceResponse: {
+            /** Format: int64 */
+            id?: number;
+            /** Format: int64 */
+            idUser?: number;
+            /** Format: int64 */
+            idFile?: number;
+            title?: string;
+            description?: string;
+            favorite?: boolean;
+            /** Format: date-time */
+            createdAt?: string;
+            /** Format: date-time */
+            lastModified?: string;
+            fileName?: string;
+            extension?: string;
+            mimeType?: string;
+            /** Format: int64 */
+            fileSize?: number;
+            /** Format: int64 */
+            artidCount?: number;
+        };
         ProfileCompletionResponse: {
             /** Format: int32 */
             percentage?: number;
@@ -257,28 +295,6 @@ export interface components {
             email?: string;
             name?: string;
             surname?: string;
-        };
-        ResourceResponse: {
-            /** Format: int64 */
-            id?: number;
-            /** Format: int64 */
-            idUser?: number;
-            /** Format: int64 */
-            idFile?: number | null;
-            title?: string;
-            description?: string | null;
-            favorite?: boolean;
-            /** Format: date-time */
-            createdAt?: string;
-            /** Format: date-time */
-            lastModified?: string;
-            fileName?: string | null;
-            extension?: string | null;
-            mimeType?: string | null;
-            /** Format: int64 */
-            fileSize?: number | null;
-            /** Format: int64 */
-            artidCount?: number | null;
         };
     };
     responses: never;
@@ -469,6 +485,48 @@ export interface operations {
             };
         };
     };
+    findByUser: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ResourceResponse"][];
+                };
+            };
+        };
+    };
+    downloadFile: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": string;
+                };
+            };
+        };
+    };
     count_1: {
         parameters: {
             query?: never;
@@ -569,27 +627,7 @@ export interface operations {
             };
         };
     };
-    findByUser: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["ResourceResponse"][];
-                };
-            };
-        };
-    };
-    downloadFile: {
+    delete_1: {
         parameters: {
             query?: never;
             header?: never;
@@ -605,9 +643,7 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content: {
-                    "*/*": string;
-                };
+                content?: never;
             };
         };
     };

@@ -48,7 +48,8 @@
       "Bash(claude mcp *)",
       "Bash(dir C:\\\\progetti\\\\artid\\\\app\\\\artid-server\\\\src\\\\main\\\\resources)",
       "mcp__supabase__apply_migration",
-      "Bash(npx svelte-check *)"
+      "Bash(npx svelte-check *)",
+      "Bash(dir C:\\\\progetti\\\\artid)"
     ]
   }
 }

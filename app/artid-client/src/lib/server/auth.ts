@@ -2,12 +2,12 @@ import type { Cookies } from "@sveltejs/kit";
 import { dev } from "$app/environment";
 import { env } from "$env/dynamic/private";
 import { createHash } from "node:crypto";
+import type { ApiClient } from "$lib/api/client";
 import type { AuthUser } from "$lib/stores/auth";
 
 const TOKEN_COOKIE = "token";
 const ME_CACHE_TTL_MS = 60_000;
 
-const API_BASE = env.API_BASE ?? "http://localhost:8080";
 const TOKEN_MAX_AGE = Number.parseInt(env.AUTH_COOKIE_MAX_AGE_SECONDS ?? "86400", 10);
 
 type LoginResult =
@@ -52,23 +52,27 @@ const cookieOptions = {
 	maxAge: TOKEN_MAX_AGE,
 };
 
-export async function login(cookies: Cookies, payload: LoginPayload): Promise<LoginResult> {
-	const res = await fetch(`${API_BASE}/api/auth/login`, {
-		method: "POST",
-		headers: { "Content-Type": "application/json" },
-		body: JSON.stringify(payload),
-	});
+export async function login(
+	api: ApiClient,
+	cookies: Cookies,
+	payload: LoginPayload,
+): Promise<LoginResult> {
+	const { data } = await api.POST("/api/auth/login", { body: payload });
 
-	if (!res.ok) {
+	if (!data?.token) {
 		return { ok: false, error: "Credenziali non valide." };
 	}
 
-	const data = await res.json();
 	cookies.set(TOKEN_COOKIE, data.token, cookieOptions);
 
 	return {
 		ok: true,
-		user: { id: data.id, email: data.email, name: data.name, surname: data.surname },
+		user: {
+			id: data.id!,
+			email: data.email!,
+			name: data.name!,
+			surname: data.surname!,
+		},
 	};
 }
 
@@ -82,7 +86,10 @@ export function getToken(cookies: Cookies): string | null {
 	return cookies.get(TOKEN_COOKIE) ?? null;
 }
 
-export async function fetchCurrentUser(token: string): Promise<CurrentUserResult> {
+export async function fetchCurrentUser(
+	api: ApiClient,
+	token: string,
+): Promise<CurrentUserResult> {
 	const key = hashToken(token);
 	const now = Date.now();
 
@@ -92,17 +99,20 @@ export async function fetchCurrentUser(token: string): Promise<CurrentUserResult
 	}
 
 	try {
-		const res = await fetch(`${API_BASE}/api/auth/me`, {
-			headers: { Authorization: `Bearer ${token}` },
-		});
-		if (res.status === 401 || res.status === 403) {
+		const { data, response } = await api.GET("/api/auth/me");
+		if (response.status === 401 || response.status === 403) {
 			meCache.delete(key);
 			return { ok: false, status: "unauthorized" };
 		}
-		if (!res.ok) {
+		if (!data) {
 			return { ok: false, status: "error" };
 		}
-		const user = (await res.json()) as AuthUser;
+		const user: AuthUser = {
+			id: data.id!,
+			email: data.email!,
+			name: data.name!,
+			surname: data.surname!,
+		};
 		pruneCache(now);
 		meCache.set(key, { user, expiresAt: now + ME_CACHE_TTL_MS });
 		return { ok: true, user };

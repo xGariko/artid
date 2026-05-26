@@ -8,7 +8,7 @@ type FieldErrors = Partial<Record<LoginField, string>>;
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export const actions: Actions = {
-	default: async ({ request, cookies }) => {
+	default: async ({ request, cookies, locals }) => {
 		const form = await request.formData();
 		const email = (form.get("email") as string)?.trim() ?? "";
 		const password = (form.get("password") as string) ?? "";
@@ -29,7 +29,7 @@ export const actions: Actions = {
 			return fail(400, { errors, email });
 		}
 
-		const result = await login(cookies, { email, password });
+		const result = await login(locals.api, cookies, { email, password });
 
 		if (!result.ok) {
 			return fail(401, {

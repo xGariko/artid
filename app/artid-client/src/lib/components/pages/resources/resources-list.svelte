@@ -1,11 +1,16 @@
 <script lang="ts">
+	import { invalidateAll } from "$app/navigation";
+	import { api } from "$lib/api/browser-client";
 	import type { components } from "$lib/api/schema";
+	import ArtidModal from "$lib/components/ui/artid-modal.svelte"
+
 	import {
 		badgeColorForExtension,
 		badgeLabelForExtension,
 		formatFileSize,
 		formatItalianDate,
 	} from "$lib/utilities";
+	import { toast } from 'svelte-sonner';
 
 	type ResourceResponse = components["schemas"]["ResourceResponse"];
 
@@ -14,6 +19,8 @@
 	// Stato locale della UI: query di ricerca e set di id selezionati.
 	let searchQuery = $state("");
 	let selectedResourceIds = $state<Set<number>>(new Set());
+
+	let askDelete = $state(false);
 
 	// Cambiando filtro sidebar il parent passa un nuovo array `resources`:
 	// resettiamo la selezione per evitare di trattenere id non più visibili.
@@ -78,8 +85,23 @@
 		alert(`Modifica ${selectedResourceIds.size} risorse`);
 	}
 
-	function deleteSelectedResources(): void {
-		alert(`Elimina ${selectedResourceIds.size} risorse`);
+	async function deleteSelectedResources(): Promise<void> {
+		askDelete = false;
+		try {
+			const results = await Promise.all(
+				[...selectedResourceIds].map((id) =>
+					api.DELETE("/api/resources/{id}", { params: { path: { id } } }),
+				),
+			);
+			await invalidateAll();
+			if (results.some((r) => r.error)) {
+				toast.error("Errore nell'eliminazione di alcune risorse");
+			} else {
+				toast.success("Risorse eliminate con successo");
+			}
+		} catch {
+			toast.error("Errore nell'eliminazione delle risorse");
+		}
 	}
 </script>
 
@@ -189,13 +211,22 @@
 		<button
 			class="btn btn-outline-danger rounded-2 px-3 d-flex align-items-center"
 			disabled={!hasSelection}
-			onclick={deleteSelectedResources}
+			onclick={()=>{askDelete = true;}}
 			aria-label="Elimina selezionati"
 		>
 			<i class="bi bi-trash"></i>
 		</button>
 	</div>
 </div>
+
+<ArtidModal
+	bind:isOpen={askDelete}
+	title="Conferma eliminazione"
+	onConfirm={deleteSelectedResources}
+	message="Una volta eliminata la risorsa non sarà recuperabile."
+	btnStyle="danger"
+/>
+
 
 <style>
 	.artid-list {
@@ -213,6 +244,10 @@
 
 	.resources-table {
 		--bs-table-hover-bg: var(--artid-primary-subtle);
+		/* Default browser è border-spacing 2px → lasciava una strisciolina bianca
+		   tra il bordo del container e l'inizio del bg dell'header. */
+		border-collapse: collapse;
+		border-spacing: 0;
 	}
 
 	/* Header sticky così resta visibile mentre si scorre la tabella. */
