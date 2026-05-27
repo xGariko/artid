@@ -1,21 +1,36 @@
 <script lang="ts">
-	let { label, btnStyle = 'primary', outline = false, icon, type = 'button', onclick }: {
-		label: string,
+	let {
+		label,
+		btnStyle = 'primary',
+		outline = false,
+		icon,
+		type = 'button',
+		onclick,
+		disabled = false,
+		ariaLabel,
+		fullWidth = true
+	}: {
+		label?: string,
 		btnStyle?: 'primary' | 'secondary' | 'success' | 'danger' | 'warning' | 'info' | 'light' | 'dark' | 'link',
 		outline?: boolean,
 		icon?: string,
 		type?: 'button' | 'submit' | 'reset',
-		onclick?: () => void
+		onclick?: () => void,
+		disabled?: boolean,
+		ariaLabel?: string,
+		fullWidth?: boolean
 	} = $props();
 </script>
 
 <button
-	class="btn btn-{outline ? 'outline-' : ''}{btnStyle} rounded-2 p-1 w-100 fw-semibold"
+	class="btn btn-{outline ? 'outline-' : ''}{btnStyle} rounded-2 px-3 py-2 {fullWidth ? 'w-100' : ''} fw-semibold"
 	onclick={() => onclick?.()}
 	type={type}
+	disabled={disabled}
+	aria-label={ariaLabel}
 >
-	<span class="d-flex align-items-center justify-content-center">
-		{#if icon}<i class="bi bi-{icon} fs-3"></i>{/if}
+	<span class="d-flex align-items-center justify-content-center gap-2">
+		{#if icon}<i class="bi bi-{icon}"></i>{/if}
 		{label}
 	</span>
 </button>

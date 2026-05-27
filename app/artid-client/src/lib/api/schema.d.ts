@@ -20,6 +20,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/resources/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: operations["update_1"];
+        post?: never;
+        delete: operations["delete_1"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/users": {
         parameters: {
             query?: never;
@@ -30,6 +46,22 @@ export interface paths {
         get: operations["getAll"];
         put?: never;
         post: operations["create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/resources": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["findByUser"];
+        put?: never;
+        post: operations["create_1"];
         delete?: never;
         options?: never;
         head?: never;
@@ -76,22 +108,6 @@ export interface paths {
             cookie?: never;
         };
         get: operations["count"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/resources": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["findByUser"];
         put?: never;
         post?: never;
         delete?: never;
@@ -180,6 +196,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/artids": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["findByUser_1"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/artids/count": {
         parameters: {
             query?: never;
@@ -191,22 +223,6 @@ export interface paths {
         put?: never;
         post?: never;
         delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/resources/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post?: never;
-        delete: operations["delete_1"];
         options?: never;
         head?: never;
         patch?: never;
@@ -237,6 +253,38 @@ export interface components {
             /** Format: date-time */
             deletedAt?: string;
         };
+        ResourceUpsertRequest: {
+            title?: string;
+            description?: string;
+            favorite?: boolean;
+            /** Format: int64 */
+            artidId?: number;
+            fileName?: string;
+            mimeType?: string;
+            fileContent?: string;
+        };
+        ResourceResponse: {
+            /** Format: int64 */
+            id?: number;
+            /** Format: int64 */
+            idUser?: number;
+            /** Format: int64 */
+            idFile?: number;
+            title?: string;
+            description?: string;
+            favorite?: boolean;
+            /** Format: date-time */
+            createdAt?: string;
+            /** Format: date-time */
+            lastModified?: string;
+            fileName?: string;
+            extension?: string;
+            mimeType?: string;
+            /** Format: int64 */
+            fileSize?: number;
+            /** Format: int64 */
+            artidCount?: number;
+        };
         RegisterRequest: {
             name?: string;
             surname?: string;
@@ -263,28 +311,6 @@ export interface components {
             /** Format: int64 */
             count?: number;
         };
-        ResourceResponse: {
-            /** Format: int64 */
-            id?: number;
-            /** Format: int64 */
-            idUser?: number;
-            /** Format: int64 */
-            idFile?: number;
-            title?: string;
-            description?: string;
-            favorite?: boolean;
-            /** Format: date-time */
-            createdAt?: string;
-            /** Format: date-time */
-            lastModified?: string;
-            fileName?: string;
-            extension?: string;
-            mimeType?: string;
-            /** Format: int64 */
-            fileSize?: number;
-            /** Format: int64 */
-            artidCount?: number;
-        };
         ProfileCompletionResponse: {
             /** Format: int32 */
             percentage?: number;
@@ -295,6 +321,20 @@ export interface components {
             email?: string;
             name?: string;
             surname?: string;
+        };
+        ArtidResponse: {
+            /** Format: int64 */
+            id?: number;
+            /** Format: int64 */
+            idUser?: number;
+            title?: string;
+            favourite?: boolean;
+            /** Format: date-time */
+            createdAt?: string;
+            /** Format: date-time */
+            lastModified?: string;
+            isPublic?: boolean;
+            isPrivate?: boolean;
         };
     };
     responses: never;
@@ -373,6 +413,52 @@ export interface operations {
             };
         };
     };
+    update_1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ResourceUpsertRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ResourceResponse"];
+                };
+            };
+        };
+    };
+    delete_1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
     getAll: {
         parameters: {
             query?: never;
@@ -413,6 +499,50 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["User"];
+                };
+            };
+        };
+    };
+    findByUser: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ResourceResponse"][];
+                };
+            };
+        };
+    };
+    create_1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ResourceUpsertRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ResourceResponse"];
                 };
             };
         };
@@ -481,26 +611,6 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["CountResponse"];
-                };
-            };
-        };
-    };
-    findByUser: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["ResourceResponse"][];
                 };
             };
         };
@@ -607,6 +717,26 @@ export interface operations {
             };
         };
     };
+    findByUser_1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ArtidResponse"][];
+                };
+            };
+        };
+    };
     count_3: {
         parameters: {
             query?: never;
@@ -624,26 +754,6 @@ export interface operations {
                 content: {
                     "*/*": components["schemas"]["CountResponse"];
                 };
-            };
-        };
-    };
-    delete_1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
             };
         };
     };

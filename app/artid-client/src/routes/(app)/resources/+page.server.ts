@@ -6,13 +6,17 @@ export const load: PageServerLoad = async ({ locals }) => {
 		throw error(401, "Non autenticato");
 	}
 
-	const { data, error: apiError } = await locals.api.GET("/api/resources");
+	const [resources, artids] = await Promise.all([
+		locals.api.GET("/api/resources"),
+		locals.api.GET("/api/artids"),
+	]);
 
-	if (apiError || !data) {
-		throw error(500, "Errore nel caricamento delle risorse");
+	if (!resources.data || !artids.data) {
+		throw error(500, "Errore nel caricamento della pagina risorse");
 	}
 
 	return {
-		resources: data,
+		resources: resources.data,
+		artids: artids.data,
 	};
 };

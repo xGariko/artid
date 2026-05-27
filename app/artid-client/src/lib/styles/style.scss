@@ -25,6 +25,7 @@ $artid-muted: #e7eef8;
 $artid-text: #17324d;
 $artid-text-muted: #C5C7C9;
 $artid-border: #c5c7c9;
+$artid-modal-overlay: #001A33;
 
 @import "bootstrap/scss/variables";
 @import "bootstrap/scss/variables-dark";
@@ -44,6 +45,7 @@ $artid-theme-colors: (
         "artid-text": $artid-text,
         "artid-text-muted": $artid-text-muted,
         "artid-border": $artid-border,
+        "artid-modal-overlay": $artid-modal-overlay,
 );
 $theme-colors: map-merge($theme-colors, $artid-theme-colors);
 
@@ -66,11 +68,17 @@ $utilities: map-merge(
                 (
                         "width": map-merge(
                                         map-get($utilities, "width"),
-                                        (values: map-merge(map-get(map-get($utilities, "width"), "values"), $custom-sizes))
+                                        (
+                                                values: map-merge(map-get(map-get($utilities, "width"), "values"), $custom-sizes),
+                                                responsive: true
+                                        )
                         ),
                         "height": map-merge(
                                         map-get($utilities, "height"),
-                                        (values: map-merge(map-get(map-get($utilities, "height"), "values"), $custom-sizes))
+                                        (
+                                                values: map-merge(map-get(map-get($utilities, "height"), "values"), $custom-sizes),
+                                                responsive: true
+                                        )
                         )
                 )
 );
@@ -104,6 +112,7 @@ body {
   --artid-text: #{$artid-text};
   --artid-text-muted: #{$artid-text-muted};
   --artid-border: #{$artid-border};
+  --artid-border-modal-overlay: #{$artid-modal-overlay};
 
   --artid-font-sans: #{inspect($font-family-sans-serif)};
   --artid-font-serif: #{inspect($font-family-serif)};

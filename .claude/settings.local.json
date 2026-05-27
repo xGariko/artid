@@ -52,7 +52,13 @@
       "Bash(dir C:\\\\progetti\\\\artid)",
       "Bash(gh auth *)",
       "PowerShell(gh auth status)",
-      "mcp__mcp-registry__search_mcp_registry"
+      "mcp__mcp-registry__search_mcp_registry",
+      "Bash(npm i *)",
+      "Bash(grep -n \"^\\\\.env\\\\|^env\\\\|\\\\.env$\" C:/progetti/artid/app/artid-server/.gitignore)",
+      "Bash(rm -f app/artid-server/src/main/java/afam/artidserver/config/MinioConfig.java app/artid-server/src/main/java/afam/artidserver/config/MinioBucketInitializer.java app/artid-server/src/main/java/afam/artidserver/service/ObjectStorageService.java app/artid-server/src/main/java/afam/artidserver/service/BlobMigrationRunner.java app/artid-server/src/main/java/afam/artidserver/model/dto/UploadIntentRequest.java app/artid-server/src/main/java/afam/artidserver/model/dto/UploadIntentResponse.java app/artid-server/docker-compose.minio.yml app/artid-server/.env.example app/artid-client/src/routes/api/resources/upload-intent/+server.ts)",
+      "Bash(rmdir app/artid-client/src/routes/api/resources/upload-intent)",
+      "Bash(ls app/artid-server/src/main/java/afam/artidserver/config/)",
+      "Bash(ls app/artid-client/src/routes/api/resources/)"
     ]
   }
 }

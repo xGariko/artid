@@ -1,17 +1,31 @@
 <script lang="ts">
 	import ArtidSidebar from "$lib/components/layout/artid-sidebar.svelte";
+	import ResourceEditor from "$lib/components/pages/resources/resource-editor.svelte";
 	import ResourcesList from "$lib/components/pages/resources/resources-list.svelte";
+	import type { components } from "$lib/ap/schema";
 	import { isRecent, resourceTypeFromMime, type ResourceType } from "$lib/utilities";
 	import type { SidebarAction, SidebarButtonGroup } from "$lib/models/sidebar-buttons";
 	import type { PageData } from "./$types";
+
+	type ResourceResponse = components["schemas"]["ResourceResponse"];
 
 	let { data }: { data: PageData } = $props();
 
 	// Valore del filtro sidebar attivo: macro-tipo ("document"|"image"|...) o raccolta ("recent"|"favourite"|"shared").
 	let activeFilterValue = $state("all");
 
+	// Editor condiviso tra "Nuovo" (sidebar) e "Modifica" (list): undefined = add mode.
+	let editorOpen = $state(false);
+	let editingResource = $state<ResourceResponse | undefined>(undefined);
+
 	function handleNewResource(): void {
-		alert(`Nuova risorsa (filtro: ${activeFilterValue})`);
+		editingResource = undefined;
+		editorOpen = true;
+	}
+
+	function handleEditRequest(resource: ResourceResponse): void {
+		editingResource = resource;
+		editorOpen = true;
 	}
 
 	// Conteggi per ciascun filtro — calcolati in un singolo pass sulle risorse.
@@ -90,5 +104,7 @@
 		bind:activeButton={activeFilterValue}
 		{sidebarActions}
 	/>
-	<ResourcesList resources={visibleResources} />
+	<ResourcesList resources={visibleResources} onEditRequest={handleEditRequest} />
 </div>
+
+<ResourceEditor bind:isOpen={editorOpen} resource={editingResource} artids={data.artids} />

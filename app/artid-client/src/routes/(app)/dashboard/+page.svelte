@@ -21,11 +21,11 @@
 
 </script>
 
-<div class="h-100 d-flex flex-column align-items-center justify-content-center">
-	<div class="w-50 h-65 d-flex flex-column justify-content-start">
+<div class="h-100 d-flex flex-column align-items-center justify-content-lg-center">
+	<div class="w-100 w-lg-50 h-lg-65 d-flex flex-column justify-content-start dashboard-content">
 		{#if mounted}
 			<h1
-				class="mb-3 text-start"
+				class="mb-3 text-start fs-3 fs-lg-1"
 				in:fly={{ y: -24, duration: 450, easing: cubicOut }}
 			>
 				Bentornato/a, <span class="fw-bolder">{$user?.name}</span>
@@ -33,7 +33,7 @@
 		{/if}
 
 		{#if mounted}
-			<div class="row g-3 mb-auto h-100">
+			<div class="row g-3 mb-lg-auto h-lg-100">
 				<div class="col-12 col-lg-8" in:fly={{ ...baseTransition, delay: 0 * STEP }}>
 					<ArtidDashboardCard
 						label="ArtID"
@@ -54,7 +54,7 @@
 				</div>
 			</div>
 
-			<div class="row g-3 h-100 mt-auto">
+			<div class="row g-3 h-lg-100 mt-3 mt-lg-auto">
 				<div class="col-12 col-lg-4" in:fly={{ ...baseTransition, delay: 2 * STEP }}>
 					<ArtidDashboardCard
 						icon="patch-check"
@@ -87,3 +87,16 @@
 		{/if}
 	</div>
 </div>
+
+<style>
+	/* Sotto lg `w-lg-50` non è attivo: senza cap le card diventerebbero larghe quanto la viewport. */
+	.dashboard-content {
+		max-width: 540px;
+	}
+
+	@media (min-width: 992px) {
+		.dashboard-content {
+			max-width: none;
+		}
+	}
+</style>

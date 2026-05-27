@@ -7,11 +7,11 @@
 </script>
 
 <div class="row mw-100 h-100">
-	<div class="col-5 d-flex flex-column align-items-center justify-content-center">
+	<div class="col-12 col-lg-5 d-flex flex-column align-items-center justify-content-center">
 		<img
 			src="{logoExtended}"
 			alt="Welcome Illustration"
-			class="mh-100 mw-100 object-fit-contain"
+			class="object-fit-contain welcome-logo"
 		>
 		<div class="d-flex flex-column gap-3 mt-5 w-50">
 			<h2 class="mt-5 mb-2 fw-bold text-center">Benvenuto</h2>
@@ -45,3 +45,9 @@
 		>
 	</div>
 </div>
+
+<style>
+    .welcome-logo{
+				max-width: 300px !important;
+		}
+</style>
