@@ -49,7 +49,10 @@
       "Bash(dir C:\\\\progetti\\\\artid\\\\app\\\\artid-server\\\\src\\\\main\\\\resources)",
       "mcp__supabase__apply_migration",
       "Bash(npx svelte-check *)",
-      "Bash(dir C:\\\\progetti\\\\artid)"
+      "Bash(dir C:\\\\progetti\\\\artid)",
+      "Bash(gh auth *)",
+      "PowerShell(gh auth status)",
+      "mcp__mcp-registry__search_mcp_registry"
     ]
   }
 }
