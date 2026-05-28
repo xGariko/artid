@@ -68,6 +68,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/resources/upload-intent": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["uploadIntent"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/auth/register": {
         parameters: {
             query?: never;
@@ -261,7 +277,7 @@ export interface components {
             artidId?: number;
             fileName?: string;
             mimeType?: string;
-            fileContent?: string;
+            objectKey?: string;
         };
         ResourceResponse: {
             /** Format: int64 */
@@ -284,6 +300,16 @@ export interface components {
             fileSize?: number;
             /** Format: int64 */
             artidCount?: number;
+        };
+        UploadIntentRequest: {
+            fileName?: string;
+            mimeType?: string;
+        };
+        UploadIntentResponse: {
+            uploadUrl?: string;
+            objectKey?: string;
+            /** Format: int32 */
+            expiresInSeconds?: number;
         };
         RegisterRequest: {
             name?: string;
@@ -543,6 +569,30 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["ResourceResponse"];
+                };
+            };
+        };
+    };
+    uploadIntent: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UploadIntentRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["UploadIntentResponse"];
                 };
             };
         };

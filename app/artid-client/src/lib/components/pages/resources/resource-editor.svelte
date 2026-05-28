@@ -113,18 +113,27 @@
 		selectedFile = event.dataTransfer?.files?.[0] ?? null;
 	}
 
-	// Legge un File in base64 (senza il prefisso "data:*;base64,") per spedirlo nel JSON.
-	function fileToBase64(file: File): Promise<string> {
-		return new Promise((resolve, reject) => {
-			const reader = new FileReader();
-			reader.onerror = () => reject(reader.error);
-			reader.onload = () => {
-				const result = reader.result as string;
-				const commaIndex = result.indexOf(',');
-				resolve(commaIndex >= 0 ? result.slice(commaIndex + 1) : result);
-			};
-			reader.readAsDataURL(file);
+	// Upload del file su MinIO via presigned URL: il browser PUT direttamente al bucket, i bytes
+	// non passano dal backend Spring. Ritorna l'objectKey che poi referenziamo nel POST/PUT
+	// della Resource.
+	async function uploadFileToStorage(file: File): Promise<string> {
+		const { data: intent, error: intentError } = await api.POST('/api/resources/upload-intent', {
+			body: { fileName: file.name, mimeType: file.type }
 		});
+		if (intentError || !intent) {
+			throw new Error('Impossibile ottenere URL di upload');
+		}
+
+		const putResp = await fetch(intent.uploadUrl, {
+			method: 'PUT',
+			headers: { 'Content-Type': file.type || 'application/octet-stream' },
+			body: file
+		});
+		if (!putResp.ok) {
+			throw new Error(`Upload fallito (${putResp.status})`);
+		}
+
+		return intent.objectKey;
 	}
 
 	async function handleSubmit(): Promise<void> {
@@ -137,6 +146,8 @@
 
 		isSaving = true;
 		try {
+			const objectKey = selectedFile ? await uploadFileToStorage(selectedFile) : undefined;
+
 			const body = {
 				title,
 				description,
@@ -144,7 +155,7 @@
 				artidId: selectedArtidId ? Number(selectedArtidId) : undefined,
 				fileName: selectedFile?.name,
 				mimeType: selectedFile?.type,
-				fileContent: selectedFile ? await fileToBase64(selectedFile) : undefined
+				objectKey
 			};
 
 			const { error: apiError } = isEditMode

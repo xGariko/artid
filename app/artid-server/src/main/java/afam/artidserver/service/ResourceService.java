@@ -6,6 +6,7 @@ import afam.artidserver.model.dto.ResourceResponse;
 import afam.artidserver.model.dto.ResourceUpsertRequest;
 import afam.artidserver.model.entity.File;
 import afam.artidserver.model.entity.Resource;
+import afam.artidserver.storage.ObjectStorageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -14,36 +15,36 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.OffsetDateTime;
-import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class ResourceService {
 
+    // objectKey atteso: UUID v4 + estensione opzionale. Bocca tutto il resto per prevenire
+    // path-traversal o key arbitrarie verso bucket non nostri (la firma del presigned non basta
+    // come difesa perché il client potrebbe inventarsi un objectKey diverso da quello che gli
+    // abbiamo dato in /upload-intent).
+    private static final Pattern OBJECT_KEY_PATTERN = Pattern.compile(
+            "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}(\\.[A-Za-z0-9]{1,16})?$"
+    );
+
     private final ResourceDAO resourceDAO;
     private final FileDAO fileDAO;
     private final JdbcTemplate jdbcTemplate;
     private final NamedParameterJdbcTemplate namedJdbcTemplate;
+    private final ObjectStorageService objectStorageService;
 
     // Proiezione lightweight per le letture: niente blob in memoria, solo metadati + dimensione
-    // calcolata via OCTET_LENGTH lato Postgres.
-    private record FileMetadata(Long id, String fileName, String extension, String mimeType, Long fileSize) {
-        static FileMetadata of(File f) {
-            return new FileMetadata(
-                    f.getId(),
-                    f.getFileName(),
-                    f.getExtension(),
-                    f.getMimeType(),
-                    f.getBlob() != null ? (long) f.getBlob().length : null
-            );
-        }
-    }
+    // calcolata via OCTET_LENGTH lato Postgres (null per i file su MinIO finché non aggiungiamo
+    // colonna file_size persistita).
+    private record FileMetadata(Long id, String fileName, String extension, String mimeType, Long fileSize) {}
 
     public long countByUser(Long userId) {
         return resourceDAO.countByIdUserAndDeletedAtIsNull(userId);
@@ -75,10 +76,10 @@ public class ResourceService {
 
     @Transactional
     public ResourceResponse create(ResourceUpsertRequest request, Long userId) {
-        if (request.fileContent() == null || request.fileContent().isBlank()) {
-            throw new IllegalArgumentException("fileContent è obbligatorio per la creazione");
+        if (request.objectKey() == null || request.objectKey().isBlank()) {
+            throw new IllegalArgumentException("objectKey è obbligatorio per la creazione");
         }
-        File savedFile = saveFile(request.fileName(), request.mimeType(), request.fileContent());
+        File savedFile = saveFile(request.fileName(), request.mimeType(), request.objectKey());
 
         Resource resource = new Resource();
         resource.setIdUser(userId);
@@ -94,7 +95,7 @@ public class ResourceService {
         if (request.artidId() != null) {
             linkArtidResource(saved.getId(), request.artidId());
         }
-        return toResponse(saved, FileMetadata.of(savedFile));
+        return toResponse(saved, fileMetaOf(savedFile));
     }
 
     @Transactional
@@ -114,11 +115,16 @@ public class ResourceService {
         // punta ancora al vecchio record e Postgres rifiuta il delete.
         FileMetadata fileMeta;
         Long oldFileIdToDelete = null;
-        if (request.fileContent() != null && !request.fileContent().isBlank()) {
+        String oldObjectKeyToDelete = null;
+        if (request.objectKey() != null && !request.objectKey().isBlank()) {
             oldFileIdToDelete = resource.getIdFile();
-            File newFile = saveFile(request.fileName(), request.mimeType(), request.fileContent());
+            if (oldFileIdToDelete != null) {
+                oldObjectKeyToDelete = fileDAO.findById(oldFileIdToDelete)
+                        .map(File::getFilePath).orElse(null);
+            }
+            File newFile = saveFile(request.fileName(), request.mimeType(), request.objectKey());
             resource.setIdFile(newFile.getId());
-            fileMeta = FileMetadata.of(newFile);
+            fileMeta = fileMetaOf(newFile);
         } else {
             fileMeta = resource.getIdFile() != null
                     ? findFilesMetadata(List.of(resource.getIdFile())).stream().findFirst().orElse(null)
@@ -134,6 +140,12 @@ public class ResourceService {
 
         if (oldFileIdToDelete != null) {
             fileDAO.deleteById(oldFileIdToDelete);
+            // L'object delete su MinIO va fuori dalla transazione DB e dopo il delete del File:
+            // se MinIO fallisse la transazione DB è già committata. La delete è idempotente
+            // lato ObjectStorageService (NoSuchKey silenziato).
+            if (oldObjectKeyToDelete != null) {
+                tryDeleteObject(oldObjectKeyToDelete);
+            }
         }
 
         return Optional.of(toResponse(saved, fileMeta));
@@ -144,11 +156,19 @@ public class ResourceService {
         return resourceDAO.findById(resourceId)
                 .filter(r -> userId.equals(r.getIdUser()))
                 .map(r -> {
+                    String objectKeyToDelete = null;
+                    if (r.getIdFile() != null) {
+                        objectKeyToDelete = fileDAO.findById(r.getIdFile())
+                                .map(File::getFilePath).orElse(null);
+                    }
                     // FK su artid_resource non ha ON DELETE CASCADE → pulizia manuale.
                     jdbcTemplate.update("DELETE FROM artid_resource WHERE id_resource = ?", r.getId());
                     resourceDAO.deleteById(r.getId());
                     if (r.getIdFile() != null) {
                         fileDAO.deleteById(r.getIdFile());
+                    }
+                    if (objectKeyToDelete != null) {
+                        tryDeleteObject(objectKeyToDelete);
                     }
                     return true;
                 })
@@ -169,13 +189,36 @@ public class ResourceService {
         );
     }
 
-    private File saveFile(String fileName, String mimeType, String base64Content) {
+    private File saveFile(String fileName, String mimeType, String objectKey) {
+        if (!OBJECT_KEY_PATTERN.matcher(objectKey).matches()) {
+            throw new IllegalArgumentException("objectKey non valido");
+        }
+        // Verifica che l'oggetto esista davvero su MinIO. Senza questo check il client potrebbe
+        // passare una key arbitraria e creare una Resource che punta al vuoto.
+        ObjectStorageService.ObjectStat stat;
+        try {
+            stat = objectStorageService.stat(objectKey);
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Oggetto non trovato su storage: " + objectKey, e);
+        }
+
         File file = new File();
         file.setFileName(fileName);
-        file.setMimeType(mimeType);
+        file.setMimeType(mimeType != null ? mimeType : stat.contentType());
         file.setExtension(extractExtension(fileName));
-        file.setBlob(Base64.getDecoder().decode(base64Content));
+        file.setFilePath(objectKey);
+        file.setBlob(null);
         return fileDAO.save(file);
+    }
+
+    private void tryDeleteObject(String objectKey) {
+        try {
+            objectStorageService.delete(objectKey);
+        } catch (Exception e) {
+            // Object già rimosso o MinIO momentaneamente irraggiungibile: non rolliamo back la
+            // transazione DB già committata. Lasciamo un "leak" sul bucket recuperabile da una
+            // GC offline che incrocia file.file_path con la lista oggetti del bucket.
+        }
     }
 
     private void linkArtidResource(Long resourceId, Long artidId) {
@@ -189,6 +232,11 @@ public class ResourceService {
         if (fileName == null) return null;
         int dot = fileName.lastIndexOf('.');
         return dot > 0 && dot < fileName.length() - 1 ? fileName.substring(dot + 1) : null;
+    }
+
+    private FileMetadata fileMetaOf(File f) {
+        Long size = f.getBlob() != null ? (long) f.getBlob().length : null;
+        return new FileMetadata(f.getId(), f.getFileName(), f.getExtension(), f.getMimeType(), size);
     }
 
     private ResourceResponse toResponse(Resource r, FileMetadata f) {
