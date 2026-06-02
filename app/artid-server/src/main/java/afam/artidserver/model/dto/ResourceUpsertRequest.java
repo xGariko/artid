@@ -7,8 +7,8 @@ public record ResourceUpsertRequest(
         Long artidId,
         String fileName,
         String mimeType,
-        // Chiave dell'oggetto MinIO già caricato via presigned PUT (vedi /upload-intent).
-        // Obbligatorio in create; opzionale in update (se assente si mantiene il file esistente).
-        String objectKey
+        // Contenuto file in base64. Obbligatorio in create; opzionale in update (se assente
+        // si mantiene il file esistente).
+        String fileContent
 ) {
 }
