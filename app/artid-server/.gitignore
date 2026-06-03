@@ -41,3 +41,5 @@ src/main/resources/application-local.properties
 # Agents
 .agents/
 .claude/
+.docs/
+app/artid-client/src/lib/api

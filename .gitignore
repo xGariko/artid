@@ -2044,3 +2044,5 @@
 /.agents
 /.claude
 .idea/
+/docs
+app/artid-client/src/lib/api

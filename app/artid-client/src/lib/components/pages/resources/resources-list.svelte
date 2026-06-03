@@ -27,7 +27,7 @@
 	let searchQuery = $state('');
 	let selectedResourceIds = $state<Set<number>>(new Set());
 
-	let askDelete = $state(false);
+	let showDeleteModal = $state(false);
 
 	// Cambiando filtro sidebar il parent passa un nuovo array `resources`:
 	// resettiamo la selezione per evitare di trattenere id non più visibili.
@@ -99,7 +99,7 @@
 	}
 
 	async function deleteSelectedResources(): Promise<void> {
-		askDelete = false;
+		showDeleteModal = false;
 		try {
 			const results = await Promise.all(
 				[...selectedResourceIds].map((id) =>
@@ -226,13 +226,13 @@
 			disabled={!hasSelection}
 			fullWidth={false}
 			ariaLabel="Elimina selezionati"
-			onclick={() => { askDelete = true; }}
+			onclick={() => { showDeleteModal = true; }}
 		/>
 	</div>
 </div>
 
 <ArtidModal
-	bind:isOpen={askDelete}
+	bind:isOpen={showDeleteModal}
 	title="Conferma eliminazione"
 	onConfirm={deleteSelectedResources}
 	message="Una volta eliminata la risorsa non sarà recuperabile."
