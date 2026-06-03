@@ -69,7 +69,8 @@
       "Bash(npm -v)",
       "Bash(mkdir -p /c/progetti/artid/docs/_docxbuild)",
       "Bash(npm init *)",
-      "Bash(python '/c/Users/Gabriele Iovino/AppData/Roaming/Claude/local-agent-mode-sessions/skills-plugin/18589a11-ea61-4eb7-b37c-66ed9229c09f/5bc5f968-51a2-43e5-934a-09a7ae51527a/skills/docx/scripts/office/validate.py' /c/progetti/artid/docs/SDD_ArtID.docx)"
+      "Bash(python '/c/Users/Gabriele Iovino/AppData/Roaming/Claude/local-agent-mode-sessions/skills-plugin/18589a11-ea61-4eb7-b37c-66ed9229c09f/5bc5f968-51a2-43e5-934a-09a7ae51527a/skills/docx/scripts/office/validate.py' /c/progetti/artid/docs/SDD_ArtID.docx)",
+      "PowerShell(npm --prefix app/artid-client run check 2>&1)"
     ]
   }
 }

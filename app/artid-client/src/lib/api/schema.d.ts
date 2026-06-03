@@ -36,6 +36,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/profile": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["profile"];
+        put: operations["updateProfile"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/users": {
         parameters: {
             query?: never;
@@ -62,22 +78,6 @@ export interface paths {
         get: operations["findByUser"];
         put?: never;
         post: operations["create_1"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/resources/upload-intent": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: operations["uploadIntent"];
         delete?: never;
         options?: never;
         head?: never;
@@ -254,7 +254,6 @@ export interface components {
             name?: string;
             surname?: string;
             mail?: string;
-            passwordHash?: string;
             /** Format: date */
             birthdate?: string;
             birthplace?: string;
@@ -268,6 +267,9 @@ export interface components {
             phone?: string;
             /** Format: date-time */
             deletedAt?: string;
+            /** Format: byte */
+            propic?: string;
+            internalShareEnabled?: boolean;
         };
         ResourceUpsertRequest: {
             title?: string;
@@ -277,7 +279,7 @@ export interface components {
             artidId?: number;
             fileName?: string;
             mimeType?: string;
-            objectKey?: string;
+            fileContent?: string;
         };
         ResourceResponse: {
             /** Format: int64 */
@@ -301,15 +303,44 @@ export interface components {
             /** Format: int64 */
             artidCount?: number;
         };
-        UploadIntentRequest: {
-            fileName?: string;
-            mimeType?: string;
+        ProfileUpdateRequest: {
+            name?: string;
+            surname?: string;
+            /** Format: date */
+            birthdate?: string;
+            birthplace?: string;
+            address?: string;
+            taxId?: string;
+            spidCode?: string;
+            biography?: string;
+            linkedinId?: string;
+            profession?: string;
+            isPublic?: boolean;
+            phone?: string;
+            /** Format: byte */
+            propic?: string;
+            internalShareEnabled?: boolean;
         };
-        UploadIntentResponse: {
-            uploadUrl?: string;
-            objectKey?: string;
-            /** Format: int32 */
-            expiresInSeconds?: number;
+        ProfileResponse: {
+            /** Format: int64 */
+            id?: number;
+            email?: string;
+            name?: string;
+            surname?: string;
+            /** Format: date */
+            birthdate?: string;
+            birthplace?: string;
+            address?: string;
+            taxId?: string;
+            spidCode?: string;
+            biography?: string;
+            linkedinId?: string;
+            profession?: string;
+            isPublic?: boolean;
+            phone?: string;
+            /** Format: byte */
+            propic?: string;
+            internalShareEnabled?: boolean;
         };
         RegisterRequest: {
             name?: string;
@@ -485,6 +516,50 @@ export interface operations {
             };
         };
     };
+    profile: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ProfileResponse"];
+                };
+            };
+        };
+    };
+    updateProfile: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ProfileUpdateRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ProfileResponse"];
+                };
+            };
+        };
+    };
     getAll: {
         parameters: {
             query?: never;
@@ -569,30 +644,6 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["ResourceResponse"];
-                };
-            };
-        };
-    };
-    uploadIntent: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["UploadIntentRequest"];
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["UploadIntentResponse"];
                 };
             };
         };

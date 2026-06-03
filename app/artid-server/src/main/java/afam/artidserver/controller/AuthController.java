@@ -62,7 +62,6 @@ public class AuthController {
         user.setPasswordHash(passwordEncoder.encode(request.getPassword()));
         user.setBirthdate(request.getBirthdate());
         user.setBirthplace(request.getBirthplace());
-        user.setTaxId(request.getTaxId());
         user.setIsPublic(false);
 
         User saved = userService.save(user);

@@ -2,7 +2,7 @@
 	import ArtidSidebar from "$lib/components/layout/artid-sidebar.svelte";
 	import ResourceEditor from "$lib/components/pages/resources/resource-editor.svelte";
 	import ResourcesList from "$lib/components/pages/resources/resources-list.svelte";
-	import type { components } from "$lib/ap/schema";
+	import type { components } from "$lib/api/schema";
 	import { isRecent, resourceTypeFromMime, type ResourceType } from "$lib/utilities";
 	import type { SidebarAction, SidebarButtonGroup } from "$lib/models/sidebar-buttons";
 	import type { PageData } from "./$types";

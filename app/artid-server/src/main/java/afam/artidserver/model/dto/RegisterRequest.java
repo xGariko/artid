@@ -12,5 +12,4 @@ public class RegisterRequest {
     private String password;
     private LocalDate birthdate;
     private String birthplace;
-    private String taxId;
 }
