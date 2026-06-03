@@ -9,11 +9,6 @@ export const UserSchema = z.object({
   birthdate: z.iso.date().nullable(),
   birthplace: z.string().max(200).nullable(),
   address: z.string().max(500).nullable(),
-  taxId: z
-    .string()
-    .regex(/^[A-Z]{6}\d{2}[A-Z]\d{2}[A-Z]\d{3}[A-Z]$/i)
-    .nullable(),
-  spidCode: z.string().max(50).nullable(),
   biography: z.string().max(5000).nullable(),
   linkedinId: z.string().max(200).nullable(),
   profession: z.string().max(200).nullable(),

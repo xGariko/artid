@@ -7,9 +7,6 @@ export const RegisterRequestSchema = z.object({
 	password: z.string().min(8).max(100),
 	birthdate: z.iso.date().optional(),
 	birthplace: z.string().max(200).optional(),
-	taxId: z
-		.string()
-		.regex(/^[A-Z]{6}\d{2}[A-Z]\d{2}[A-Z]\d{3}[A-Z]$/i)
 });
 
 export type RegisterRequest = z.infer<typeof RegisterRequestSchema>;

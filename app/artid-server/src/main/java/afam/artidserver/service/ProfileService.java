@@ -13,7 +13,6 @@ public class ProfileService {
             User::getBirthdate,
             User::getBirthplace,
             User::getAddress,
-            User::getTaxId,
             User::getBiography,
             User::getLinkedinId,
             User::getProfession,

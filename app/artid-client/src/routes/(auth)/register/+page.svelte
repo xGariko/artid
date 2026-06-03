@@ -17,8 +17,7 @@
 		email: form?.email ?? '',
 		password: '',
 		birthdate: form?.birthdate || undefined,
-		birthplace: form?.birthplace || undefined,
-		taxId: form?.taxId ?? ''
+		birthplace: form?.birthplace || undefined
 	});
 
 	let confirmPassword = $state('');
@@ -117,18 +116,6 @@
 			/>
 		</div>
 	</div>
-	<div class="row">
-		<div class="col-12 p-1">
-			<ArtidInput
-				type="text"
-				name="taxId"
-				label="Codice fiscale"
-				bind:value={userDTO.taxId}
-				error={form?.errors?.taxId}
-			/>
-		</div>
-	</div>
-
 	{#if form?.formError}
 		<div class="text-danger small text-center mt-2">{form.formError}</div>
 	{/if}

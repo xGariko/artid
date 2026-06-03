@@ -1,5 +1,6 @@
 package afam.artidserver.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
@@ -19,15 +20,13 @@ public class User {
     private String surname;
     private String mail;
 
+    @JsonIgnore
     @Column("password_hash")
     private String passwordHash;
 
     private LocalDate birthdate;
     private String birthplace;
     private String address;
-
-    @Column("tax_id")
-    private String taxId;
 
     @Column("spid_code")
     private String spidCode;
@@ -46,4 +45,9 @@ public class User {
 
     @Column("deleted_at")
     private OffsetDateTime deletedAt;
+
+    private byte[] propic;
+
+    @Column("internal_share_enabled")
+    private Boolean internalShareEnabled;
 }

@@ -10,8 +10,7 @@ type RegisterField =
 	| "password"
 	| "confirmPassword"
 	| "birthdate"
-	| "birthplace"
-	| "taxId";
+	| "birthplace";
 
 type FieldErrors = Partial<Record<RegisterField, string>>;
 
@@ -23,7 +22,6 @@ const FIELD_MESSAGES: Record<RegisterField, string> = {
 	confirmPassword: "Le password non coincidono.",
 	birthdate: "Data di nascita non valida.",
 	birthplace: "Luogo di nascita non valido.",
-	taxId: "Codice fiscale non valido.",
 };
 
 export const actions: Actions = {
@@ -36,9 +34,8 @@ export const actions: Actions = {
 		const confirmPassword = (form.get("confirmPassword") as string) ?? "";
 		const birthdate = ((form.get("birthdate") as string) ?? "").trim();
 		const birthplace = ((form.get("birthplace") as string) ?? "").trim();
-		const taxId = ((form.get("taxId") as string) ?? "").trim().toUpperCase();
 
-		const formState = { name, surname, email, birthdate, birthplace, taxId };
+		const formState = { name, surname, email, birthdate, birthplace };
 		const errors: FieldErrors = {};
 
 		const parsed = RegisterRequestSchema.safeParse({
@@ -48,7 +45,6 @@ export const actions: Actions = {
 			password,
 			birthdate: birthdate || undefined,
 			birthplace: birthplace || undefined,
-			taxId,
 		});
 
 		if (!parsed.success) {
@@ -76,7 +72,6 @@ export const actions: Actions = {
 				password,
 				birthdate: birthdate || undefined,
 				birthplace: birthplace || undefined,
-				taxId: taxId || undefined,
 			},
 		});
 
