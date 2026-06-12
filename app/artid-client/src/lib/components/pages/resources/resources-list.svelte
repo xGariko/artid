@@ -1,14 +1,12 @@
 <script lang="ts">
 	import { invalidateAll } from '$app/navigation';
 	import { api } from '$lib/api/browser-client';
-	import type { components } from '$lib/api/schema';
+	import type { ResourceResponse } from '$lib/api/types';
 	import ArtidButton from '$lib/components/ui/artid-button.svelte';
 	import ArtidModal from '$lib/components/ui/artid-modal.svelte';
 
 	import { badgeColorForExtension, badgeLabelForExtension, formatFileSize, formatItalianDate } from '$lib/utilities';
 	import { toast } from 'svelte-sonner';
-
-	type ResourceResponse = components['schemas']['ResourceResponse'];
 
 	let {
 		resources,

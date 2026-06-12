@@ -5,10 +5,8 @@
 	import ArtidInput from '$lib/components/ui/artid-input.svelte';
 	import ArtidButton from '$lib/components/ui/artid-button.svelte';
 	import 'quill/dist/quill.snow.css';
-	import type { components } from '$lib/api/schema';
+	import type { Profile } from '$lib/api/types';
 	import ArtidSpidButton from '$lib/components/ui/artid-spid-button.svelte';
-
-	type Profile = components['schemas']['ProfileResponse'];
 
 	let { profile }: { profile: Profile } = $props();
 

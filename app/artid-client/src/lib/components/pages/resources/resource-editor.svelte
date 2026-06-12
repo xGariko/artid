@@ -3,12 +3,10 @@
 	import { toast } from 'svelte-sonner';
 	import type Quill from 'quill';
 	import 'quill/dist/quill.snow.css';
-	import type { components } from '$lib/api/schema';
+	import type { ResourceResponse, ArtidResponse } from '$lib/api/types';
 	import ArtidButton from '$lib/components/ui/artid-button.svelte';
 	import ArtidEditorModal from '$lib/components/ui/artid-editor-modal.svelte';
 	import ArtidInput from '$lib/components/ui/artid-input.svelte';
-	type ResourceResponse = components['schemas']['ResourceResponse'];
-	type ArtidResponse = components['schemas']['ArtidResponse'];
 
 	let {
 		isOpen = $bindable(),

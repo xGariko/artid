@@ -79,7 +79,16 @@
       "PowerShell(Set-Location app\\\\artid-client; npm run check 2>&1 | Select-Object -Last 40; \"EXIT=$LASTEXITCODE\")",
       "PowerShell($c = Get-Command psql -ErrorAction SilentlyContinue; if \\($c\\) { \"psql: $\\($c.Source\\)\" } else { \"psql NOT FOUND\" })",
       "Bash(./mvnw.cmd -q -o compile)",
-      "Bash(./mvnw.cmd -q compile)"
+      "Bash(./mvnw.cmd -q compile)",
+      "Bash(command -v psql)",
+      "Bash(python -c \"import psycopg2; print\\('psycopg2_OK'\\)\")",
+      "Bash(python -c \"import pg8000; print\\('pg8000_OK'\\)\")",
+      "Bash(python -m pip install --quiet pg8000)",
+      "Bash(python -)",
+      "Bash(cd /c/Progetti/artid/app/artid-client && cat package.json | grep -A 20 '\"scripts\"')",
+      "Bash(xargs grep -l -i -E \"profile|birthdate|biography|linkedin|profession\")",
+      "PowerShell(& \".\\\\app\\\\artid-server\\\\mvnw.cmd\" -f \"app\\\\artid-server\\\\pom.xml\" -q -DskipTests compile)",
+      "Bash(npm --prefix app/artid-client run check)"
     ]
   }
 }
