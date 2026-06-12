@@ -6,6 +6,9 @@
 	import ArtidLogoWhite from '$lib/assets/artid_logo_white.svg';
 	import ArtidLink from '$lib/components/ui/artid-link.svelte';
 
+	// Presigned URL della foto profilo (o null): l'<img> punta diretto a Supabase.
+	let { propicUrl }: { propicUrl?: string | null } = $props();
+
 	const navLinks: { href: Pathname; label: string }[] = [
 		{ href: '/artid', label: 'ArtID' },
 		{ href: '/resources', label: 'Materiali' },
@@ -24,6 +27,7 @@
 		const resolvedHref = resolve(href);
 		return page.url.pathname === resolvedHref || page.url.pathname.startsWith(resolvedHref + '/');
 	}
+
 </script>
 
 <nav class="w-100 bg-primary justify-content-around align-items-center position-absolute top-0 left-0 d-flex px-2 z-2">
@@ -53,7 +57,11 @@
 					aria-expanded="false"
 				>
 
-					<i class="bi bi-person-fill"></i>
+					{#if propicUrl}
+						<img src={propicUrl} alt="Foto profilo" class="rounded-circle object-fit-cover d-block" style="width: 1.5rem; height: 1.5rem;" />
+					{:else}
+						<i class="bi bi-person-fill"></i>
+					{/if}
 				</button>
 
 				<ul class="dropdown-menu dropdown-menu-end shadow-sm mt-2">
@@ -102,9 +110,9 @@
 </nav>
 
 <style>
-	nav{
-			height: var(--artid-navbar-height);
-			max-height: var(--artid-navbar-height);
-			min-height: var(--artid-navbar-height);
-	}
+    nav {
+        height: var(--artid-navbar-height);
+        max-height: var(--artid-navbar-height);
+        min-height: var(--artid-navbar-height);
+    }
 </style>

@@ -9,6 +9,7 @@ import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.S3Configuration;
+import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 
 import java.net.URI;
 
@@ -55,6 +56,35 @@ public class S3Config {
         System.setProperty("aws.responseChecksumValidation", "when_required");
 
         return S3Client.builder()
+                .endpointOverride(URI.create(endpoint))
+                .region(Region.of(region))
+                .credentialsProvider(StaticCredentialsProvider.create(
+                        AwsBasicCredentials.create(accessKey, secretKey)))
+                .serviceConfiguration(S3Configuration.builder()
+                        .pathStyleAccessEnabled(true)
+                        .build())
+                .build();
+    }
+
+    // Presigner per generare GET URL firmati (SigV4) verso il bucket privato delle foto profilo:
+    // il browser scarica l'immagine direttamente da Supabase senza far passare i byte dal backend.
+    // Stessa configurazione del client (endpoint/region/credenziali/path-style). @Lazy per gli stessi
+    // motivi di s3Client (l'app parte anche senza credenziali S3 configurate).
+    @Bean
+    @Lazy
+    public S3Presigner s3Presigner(
+            @Value("${supabase.s3.endpoint}") String endpoint,
+            @Value("${supabase.s3.region}") String region,
+            @Value("${supabase.s3.access-key}") String accessKey,
+            @Value("${supabase.s3.secret-key}") String secretKey
+    ) {
+        if (isBlank(accessKey) || isBlank(secretKey)) {
+            throw new IllegalStateException(
+                    "Credenziali Supabase S3 mancanti: imposta supabase.s3.access-key e "
+                            + "supabase.s3.secret-key in application-local.properties "
+                            + "(Dashboard → Project Settings → Storage → S3 access keys).");
+        }
+        return S3Presigner.builder()
                 .endpointOverride(URI.create(endpoint))
                 .region(Region.of(region))
                 .credentialsProvider(StaticCredentialsProvider.create(

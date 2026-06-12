@@ -19,6 +19,5 @@ public class ProfileUpdateRequest {
     private Boolean isPublic;
     private String phone;
     private String businessEmail;
-    private byte[] propic;
     private boolean internalShareEnabled;
 }

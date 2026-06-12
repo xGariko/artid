@@ -55,7 +55,10 @@ public class User {
     @Column("deleted_at")
     private OffsetDateTime deletedAt;
 
-    private byte[] propic;
+    // Object key dell'immagine profilo sul bucket privato Supabase "propics" (non i byte:
+    // quelli vivono su Storage). null = nessuna foto. L'URL si ottiene firmando la key.
+    @Column("propic_path")
+    private String propicPath;
 
     @Column("internal_share_enabled")
     private Boolean internalShareEnabled;

@@ -88,7 +88,11 @@
       "Bash(cd /c/Progetti/artid/app/artid-client && cat package.json | grep -A 20 '\"scripts\"')",
       "Bash(xargs grep -l -i -E \"profile|birthdate|biography|linkedin|profession\")",
       "PowerShell(& \".\\\\app\\\\artid-server\\\\mvnw.cmd\" -f \"app\\\\artid-server\\\\pom.xml\" -q -DskipTests compile)",
-      "Bash(npm --prefix app/artid-client run check)"
+      "Bash(npm --prefix app/artid-client run check)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://localhost:8080/api/profile/avatar)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://localhost:8080/api/profile/completion)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://localhost:8080/api/profile/zzz-nope)",
+      "Read(//c/Progetti/artid/**)"
     ]
   }
 }

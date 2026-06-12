@@ -52,6 +52,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/profile/avatar": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["avatar"];
+        put: operations["uploadAvatar"];
+        post?: never;
+        delete: operations["deleteAvatar"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/users": {
         parameters: {
             query?: never;
@@ -285,8 +301,7 @@ export interface components {
             businessEmail?: string;
             /** Format: date-time */
             deletedAt?: string;
-            /** Format: byte */
-            propic?: string;
+            propicPath?: string;
             internalShareEnabled?: boolean;
         };
         ResourceUpsertRequest: {
@@ -333,8 +348,6 @@ export interface components {
             isPublic?: boolean;
             phone?: string;
             businessEmail?: string;
-            /** Format: byte */
-            propic?: string;
             internalShareEnabled?: boolean;
         };
         ProfileResponse: {
@@ -355,9 +368,11 @@ export interface components {
             isPublic?: boolean;
             phone?: string;
             businessEmail?: string;
-            /** Format: byte */
-            propic?: string;
+            propicUrl?: string;
             internalShareEnabled?: boolean;
+        };
+        AvatarResponse: {
+            url?: string;
         };
         RegisterRequest: {
             name?: string;
@@ -589,6 +604,71 @@ export interface operations {
                 content: {
                     "*/*": components["schemas"]["ProfileResponse"];
                 };
+            };
+        };
+    };
+    avatar: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["AvatarResponse"];
+                };
+            };
+        };
+    };
+    uploadAvatar: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "multipart/form-data": {
+                    /** Format: binary */
+                    file: string;
+                };
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["AvatarResponse"];
+                };
+            };
+        };
+    };
+    deleteAvatar: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };

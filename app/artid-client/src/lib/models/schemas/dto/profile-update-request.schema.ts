@@ -17,8 +17,7 @@ export const ProfileUpdateRequestSchema = z.object({
 		.regex(/^\+?[\d\s\-()]{5,20}$/)
 		.optional(),
 	businessEmail: z.email().max(254).optional(),
-	// propic: immagine codificata Base64 (il byte[] del backend). ~4M char ≈ 3MB raw.
-	propic: z.string().max(4_000_000).optional(),
+	// La foto profilo NON passa più da qui: upload/rimozione via /api/profile/avatar.
 	internalShareEnabled: z.boolean().optional(),
 });
 

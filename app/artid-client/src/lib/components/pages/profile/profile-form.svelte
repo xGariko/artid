@@ -24,8 +24,6 @@
 		phone: profile.phone ?? '',
 		businessEmail: profile.businessEmail ?? '',
 		isPublic: profile.isPublic ?? false,
-		// propic = byte[] lato Spring → stringa Base64 in JSON.
-		propic: profile.propic ?? '',
 		internalShareEnabled: profile.internalShareEnabled ?? false
 	});
 
@@ -45,7 +43,6 @@
 		phone: profile.phone ?? '',
 		businessEmail: profile.businessEmail ?? '',
 		isPublic: profile.isPublic ?? false,
-		propic: profile.propic ?? '',
 		internalShareEnabled: profile.internalShareEnabled ?? false
 	});
 
@@ -64,13 +61,18 @@
 		model.phone !== baseline.phone ||
 		model.businessEmail !== baseline.businessEmail ||
 		model.isPublic !== baseline.isPublic ||
-		model.propic !== baseline.propic ||
 		model.internalShareEnabled !== baseline.internalShareEnabled
 	);
 
 	let fieldErrors = $state<Record<string, string>>({});
 	let isSaving = $state(false);
 	let propicInput: HTMLInputElement | null = $state(null);
+
+	// Avatar: gestito a parte dal resto del form. Upload/rimozione immediati verso
+	// /api/profile/avatar (multipart), NON dal bottone "Salva". `avatarUrl` è il presigned
+	// URL corrente (vuoto = nessuna foto); aggiornato in locale per feedback immediato.
+	let avatarUrl = $state(profile.propicUrl ?? '');
+	let avatarBusy = $state(false);
 
 	// Div che Quill trasforma in editor + istanza Quill.
 	let bioContainer = $state<HTMLDivElement | undefined>(undefined);
@@ -128,43 +130,67 @@
 		return plain ? model.biography : undefined;
 	}
 
-	// La propic arriva come Base64 grezzo: deduco il MIME dai primi byte per il data URL.
-	function propicSrc(b64: string): string {
-		let mime = 'image/jpeg';
-		if (b64.startsWith('iVBORw0KGgo')) mime = 'image/png';
-		else if (b64.startsWith('R0lGOD')) mime = 'image/gif';
-		else if (b64.startsWith('UklGR')) mime = 'image/webp';
-		return `data:${mime};base64,${b64}`;
-	}
-
-	// Legge un File come Base64 puro (senza prefisso "data:*;base64,") per spedirlo nel JSON.
-	function fileToBase64(file: File): Promise<string> {
-		return new Promise((resolve, reject) => {
-			const reader = new FileReader();
-			reader.onerror = () => reject(reader.error);
-			reader.onload = () => {
-				const result = reader.result as string;
-				const comma = result.indexOf(',');
-				resolve(comma >= 0 ? result.slice(comma + 1) : result);
-			};
-			reader.readAsDataURL(file);
-		});
-	}
-
+	// Upload immediato della foto su /api/profile/avatar (multipart). Passa da openapi-fetch:
+	// il bodySerializer costruisce un FormData, così il client non serializza in JSON e il
+	// browser imposta il boundary multipart. `file` è tipizzato come stringa (binary) nello
+	// schema → cast necessario per passargli il File vero.
 	async function handlePropicPick(event: Event): Promise<void> {
 		const input = event.currentTarget as HTMLInputElement;
 		const file = input.files?.[0];
+		input.value = ''; // consente di riselezionare lo stesso file
 		if (!file) return;
 		if (!file.type.startsWith('image/')) {
 			toast.error('Seleziona un file immagine');
 			return;
 		}
-		if (file.size > 2 * 1024 * 1024) {
-			toast.error('Immagine troppo grande (max 2MB)');
+		if (file.size > 5 * 1024 * 1024) {
+			toast.error('Immagine troppo grande (max 5MB)');
 			return;
 		}
-		model.propic = await fileToBase64(file);
-		input.value = ''; // consente di riselezionare lo stesso file
+
+		avatarBusy = true;
+		try {
+			const { data } = await api.PUT('/api/profile/avatar', {
+				// body tipizzato come { file: string } dallo schema → cast per il File reale.
+				// Il serializer ignora il body e usa il File dalla closure, costruendo il FormData
+				// (così openapi-fetch non serializza in JSON e il browser mette il boundary).
+				body: { file: file as unknown as string },
+				bodySerializer: () => {
+					const fd = new FormData();
+					fd.append('file', file);
+					return fd;
+				}
+			});
+			if (!data?.url) {
+				toast.error('Errore nel caricamento della foto');
+				return;
+			}
+			avatarUrl = data.url;
+			toast.success('Foto profilo aggiornata');
+			invalidateAll(); // rinfresca l'avatar in navbar
+		} catch (e) {
+			toast.error(e instanceof Error ? e.message : 'Errore di rete');
+		} finally {
+			avatarBusy = false;
+		}
+	}
+
+	async function removePropic(): Promise<void> {
+		avatarBusy = true;
+		try {
+			const { response } = await api.DELETE('/api/profile/avatar');
+			if (!response.ok) {
+				toast.error('Errore nella rimozione della foto');
+				return;
+			}
+			avatarUrl = '';
+			toast.success('Foto profilo rimossa');
+			invalidateAll();
+		} catch (e) {
+			toast.error(e instanceof Error ? e.message : 'Errore di rete');
+		} finally {
+			avatarBusy = false;
+		}
 	}
 
 	async function save(): Promise<void> {
@@ -186,9 +212,6 @@
 				phone: model.phone || undefined,
 				businessEmail: model.businessEmail || undefined,
 				isPublic: model.isPublic,
-				// Rimando indietro la propic corrente così il PUT non la azzera;
-				// '' (rimossa) → undefined → il backend la pulisce.
-				propic: model.propic || undefined,
 				internalShareEnabled: model.internalShareEnabled
 			};
 
@@ -229,10 +252,11 @@
 					class="propic-btn rounded-circle border border-artid-border d-flex align-items-center justify-content-center overflow-hidden p-0"
 					style="width: 8rem; height: 8rem;"
 					onclick={() => propicInput?.click()}
+					disabled={avatarBusy}
 					aria-label="Cambia foto profilo"
 				>
-					{#if model.propic}
-						<img src={propicSrc(model.propic)} alt="Foto profilo" class="w-100 h-100 object-fit-cover" />
+					{#if avatarUrl}
+						<img src={avatarUrl} alt="Foto profilo" class="w-100 h-100 object-fit-cover" />
 					{:else}
 						<i class="bi bi-person fs-1 text-primary"></i>
 					{/if}
@@ -251,14 +275,16 @@
 						type="button"
 						class="btn btn-link btn-sm p-0 text-decoration-none"
 						onclick={() => propicInput?.click()}
+						disabled={avatarBusy}
 					>
-						{model.propic ? 'Cambia foto' : 'Carica foto'}
+						{avatarBusy ? 'Caricamento…' : avatarUrl ? 'Cambia foto' : 'Carica foto'}
 					</button>
-					{#if model.propic}
+					{#if avatarUrl}
 						<button
 							type="button"
 							class="btn btn-link btn-sm p-0 text-decoration-none text-danger"
-							onclick={() => (model.propic = '')}
+							onclick={removePropic}
+							disabled={avatarBusy}
 						>
 							Rimuovi
 						</button>

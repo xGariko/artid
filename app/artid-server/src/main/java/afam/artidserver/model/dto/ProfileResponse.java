@@ -24,10 +24,11 @@ public class ProfileResponse {
     private Boolean isPublic;
     private String phone;
     private String businessEmail;
-    private byte[] propic;
+    // Presigned GET URL della foto profilo (null se assente): l'<img> punta diretto a Supabase.
+    private String propicUrl;
     private Boolean internalShareEnabled;
 
-    public static ProfileResponse from(User user) {
+    public static ProfileResponse from(User user, String propicUrl) {
         return new ProfileResponse(
                 user.getId(),
                 user.getMail(),
@@ -44,7 +45,7 @@ public class ProfileResponse {
                 user.getIsPublic(),
                 user.getPhone(),
                 user.getBusinessEmail(),
-                user.getPropic(),
+                propicUrl,
                 user.getInternalShareEnabled()
         );
     }

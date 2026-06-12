@@ -13,10 +13,9 @@ public interface UserDAO extends ListCrudRepository<User, Long> {
 
     /**
      * Lookup di autenticazione: gira nell'hot path (filtro JWT) a OGNI richiesta autenticata.
-     * Esclude di proposito la colonna {@code propic} (immagine profilo in BYTEA): caricarla a
-     * ogni richiesta significherebbe trascinare l'immagine dal DB remoto anche per un semplice
-     * count. Le colonne non selezionate restano null sull'entity; l'immagine si carica
-     * esplicitamente solo dove serve davvero (pagina profilo). "user" è parola riservata → quotata.
+     * Non seleziona {@code propic_path}: l'avatar si risolve a parte (vedi {@link #findPropicPathById}),
+     * non serve nel principal. Le colonne non selezionate restano null sull'entity.
+     * "user" è parola riservata → quotata.
      */
     @Query("""
             SELECT id, name, surname, mail, password_hash, birthdate, birthplace, address,
@@ -26,4 +25,12 @@ public interface UserDAO extends ListCrudRepository<User, Long> {
             WHERE mail = :mail
             """)
     Optional<User> findByMailForAuth(@Param("mail") String mail);
+
+    /**
+     * Carica SOLO la object key dell'avatar (propic_path) di un utente. Query dedicata e
+     * minimale per la navbar (presente su ogni pagina): evita di trascinare l'intera riga
+     * utente dove serve solo l'immagine. "user" è parola riservata → quotata. null → Optional vuoto.
+     */
+    @Query("SELECT propic_path FROM \"user\" WHERE id = :id")
+    Optional<String> findPropicPathById(@Param("id") Long id);
 }
