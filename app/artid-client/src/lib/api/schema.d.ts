@@ -59,7 +59,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get: operations["avatar"];
+        get?: never;
         put: operations["uploadAvatar"];
         post?: never;
         delete: operations["deleteAvatar"];
@@ -603,26 +603,6 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["ProfileResponse"];
-                };
-            };
-        };
-    };
-    avatar: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["AvatarResponse"];
                 };
             };
         };

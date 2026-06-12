@@ -65,6 +65,8 @@ public class AuthController {
         user.setBirthdate(request.getBirthdate());
         user.setBirthplace(request.getBirthplace());
         user.setIsPublic(false);
+        // internal_share_enabled è NOT NULL sul DB: senza default esplicito l'INSERT fallisce.
+        user.setInternalShareEnabled(false);
 
         User saved = userService.save(user);
         String token = jwtUtil.generateToken(saved.getMail());
