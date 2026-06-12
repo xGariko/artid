@@ -180,6 +180,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/dashboard/summary": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["summary"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/certifications/count": {
         parameters: {
             query?: never;
@@ -258,7 +274,6 @@ export interface components {
             birthdate?: string;
             birthplace?: string;
             address?: string;
-            taxId?: string;
             spidCode?: string;
             biography?: string;
             linkedinId?: string;
@@ -277,9 +292,6 @@ export interface components {
             favorite?: boolean;
             /** Format: int64 */
             artidId?: number;
-            fileName?: string;
-            mimeType?: string;
-            fileContent?: string;
         };
         ResourceResponse: {
             /** Format: int64 */
@@ -310,8 +322,6 @@ export interface components {
             birthdate?: string;
             birthplace?: string;
             address?: string;
-            taxId?: string;
-            spidCode?: string;
             biography?: string;
             linkedinId?: string;
             profession?: string;
@@ -331,8 +341,6 @@ export interface components {
             birthdate?: string;
             birthplace?: string;
             address?: string;
-            taxId?: string;
-            spidCode?: string;
             biography?: string;
             linkedinId?: string;
             profession?: string;
@@ -350,7 +358,6 @@ export interface components {
             /** Format: date */
             birthdate?: string;
             birthplace?: string;
-            taxId?: string;
         };
         AuthResponse: {
             token?: string;
@@ -371,6 +378,18 @@ export interface components {
         ProfileCompletionResponse: {
             /** Format: int32 */
             percentage?: number;
+        };
+        DashboardSummaryResponse: {
+            /** Format: int64 */
+            artidCount?: number;
+            /** Format: int64 */
+            resourceCount?: number;
+            /** Format: int64 */
+            certificationCount?: number;
+            /** Format: int64 */
+            shareCount?: number;
+            /** Format: int32 */
+            profileCompletion?: number;
         };
         UserResponse: {
             /** Format: int64 */
@@ -479,9 +498,13 @@ export interface operations {
             };
             cookie?: never;
         };
-        requestBody: {
+        requestBody?: {
             content: {
-                "application/json": components["schemas"]["ResourceUpsertRequest"];
+                "multipart/form-data": {
+                    request?: components["schemas"]["ResourceUpsertRequest"];
+                    /** Format: binary */
+                    file?: string;
+                };
             };
         };
         responses: {
@@ -631,9 +654,13 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody: {
+        requestBody?: {
             content: {
-                "application/json": components["schemas"]["ResourceUpsertRequest"];
+                "multipart/form-data": {
+                    request?: components["schemas"]["ResourceUpsertRequest"];
+                    /** Format: binary */
+                    file?: string;
+                };
             };
         };
         responses: {
@@ -774,6 +801,26 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["ProfileCompletionResponse"];
+                };
+            };
+        };
+    };
+    summary: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["DashboardSummaryResponse"];
                 };
             };
         };

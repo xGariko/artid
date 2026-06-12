@@ -4,11 +4,12 @@ import afam.artidserver.model.dto.ProfileCompletionResponse;
 import afam.artidserver.model.dto.ProfileResponse;
 import afam.artidserver.model.dto.ProfileUpdateRequest;
 import afam.artidserver.model.entity.User;
+import afam.artidserver.security.AuthenticatedUser;
 import afam.artidserver.service.ProfileService;
 import afam.artidserver.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -24,16 +25,20 @@ public class ProfileController {
     private final UserService userService;
 
     @GetMapping
-    public ResponseEntity<ProfileResponse> profile(Authentication authentication) {
-        User user = userService.findByMail(authentication.getName()).orElseThrow();
+    public ResponseEntity<ProfileResponse> profile(@AuthenticationPrincipal AuthenticatedUser principal) {
+        // Unico punto che mostra l'immagine profilo: qui carichiamo la riga COMPLETA
+        // (inclusa propic) con una query esplicita. Il principal dell'hot path ne è privo.
+        User user = userService.findById(principal.getId()).orElseThrow();
         return ResponseEntity.ok(ProfileResponse.from(user));
     }
 
     @PutMapping
-    public ResponseEntity<ProfileResponse> updateProfile(Authentication authentication,
+    public ResponseEntity<ProfileResponse> updateProfile(@AuthenticationPrincipal AuthenticatedUser principal,
                                                          @RequestBody ProfileUpdateRequest request) {
-        // L'utente da aggiornare è SEMPRE quello del token, mai un id dal client.
-        User user = userService.findByMail(authentication.getName()).orElseThrow();
+        // L'utente da aggiornare è SEMPRE quello del token (mai un id dal client). Carichiamo
+        // la riga completa: il principal dell'hot path è privo di propic e un save() su di esso
+        // azzererebbe l'immagine esistente quando il client non la rispedisce.
+        User user = userService.findById(principal.getId()).orElseThrow();
 
         user.setName(request.getName());
         user.setSurname(request.getSurname());
@@ -56,8 +61,7 @@ public class ProfileController {
     }
 
     @GetMapping("/completion")
-    public ResponseEntity<ProfileCompletionResponse> completion(Authentication authentication) {
-        User user = userService.findByMail(authentication.getName()).orElseThrow();
-        return ResponseEntity.ok(new ProfileCompletionResponse(profileService.completionPercentage(user)));
+    public ResponseEntity<ProfileCompletionResponse> completion(@AuthenticationPrincipal AuthenticatedUser principal) {
+        return ResponseEntity.ok(new ProfileCompletionResponse(profileService.completionPercentage(principal.getUser())));
     }
 }

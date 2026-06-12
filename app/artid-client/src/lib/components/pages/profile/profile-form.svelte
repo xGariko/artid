@@ -7,6 +7,7 @@
 	import type Quill from 'quill';
 	import 'quill/dist/quill.snow.css';
 	import type { components } from '$lib/api/schema';
+	import ArtidSpidButton from '$lib/components/ui/artid-spid-button.svelte';
 
 	type Profile = components['schemas']['ProfileResponse'];
 
@@ -67,7 +68,6 @@
 
 	// Div che Quill trasforma in editor + istanza Quill.
 	let bioContainer = $state<HTMLDivElement | undefined>(undefined);
-	let quill = $state.raw<Quill | null>(null);
 
 	const err = (field: string) => fieldErrors[field];
 
@@ -79,7 +79,6 @@
 	// window/document, quindi niente SSR.
 	$effect(() => {
 		if (!bioContainer) {
-			quill = null;
 			return;
 		}
 		const node = bioContainer;
@@ -111,7 +110,6 @@
 				const html = instance.root.innerHTML;
 				if (html !== model.biography) model.biography = html;
 			});
-			quill = instance;
 		})();
 		return () => {
 			cancelled = true;
@@ -212,11 +210,11 @@
 	}
 </script>
 
-<div class="bg-artid-section h-100 mh-100 overflow-y-auto w-75 rounded-3 border border-artid-border p-4 d-flex flex-column gap-3">
+<div class="bg-artid-section h-100 mh-100 overflow-y-auto w-md-75 w-100 rounded-3 border border-artid-border p-4 d-flex flex-column gap-3">
 	<div class="row flex-grow-1">
 		<!-- Propic -->
 		<div class="col-12 col-md-2 d-flex flex-column align-items-center gap-2">
-			<div class="position-absolute">
+			<div class="position-md-absolute">
 				<button
 					type="button"
 					class="propic-btn rounded-circle border border-artid-border d-flex align-items-center justify-content-center overflow-hidden p-0"
@@ -298,7 +296,6 @@
 				</div>
 			</div>
 
-
 			<div class="row">
 				<div class="col-12 col-md-6 p-1">
 					<ArtidInput name="address" label="Indirizzo" bind:value={model.address} error={err('address')} />
@@ -357,14 +354,34 @@
 	</div>
 
 	<!-- Action bar -->
-	<div class="d-flex align-items-center justify-content-end gap-3 border-top border-artid-border pt-3">
-		<div style="width: 12rem;">
+	<div class="d-flex align-items-center justify-content-between gap-3 border-top border-artid-border pt-3">
+		<div class="d-flex gap-3">
 			<ArtidButton
 				label={isSaving ? 'Salvataggio…' : 'Salva'}
 				icon="check-lg"
 				btnStyle="success"
 				disabled={isSaving || !isDirty}
 				onclick={save}
+				fullWidth={false}
+			/>
+			<ArtidButton
+				label="Cambia password"
+				icon="pencil-square"
+				btnStyle="primary"
+				onclick={()=>{}}
+				fullWidth={false}
+			/>
+
+			<ArtidSpidButton
+				label="Associa SPID"
+			/>
+		</div>
+		<div>
+			<ArtidButton
+				label="Chiudi account"
+				btnStyle="danger"
+				onclick={()=>{}}
+				fullWidth={false}
 			/>
 		</div>
 	</div>

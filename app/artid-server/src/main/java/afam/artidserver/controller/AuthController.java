@@ -5,6 +5,7 @@ import afam.artidserver.model.dto.LoginRequest;
 import afam.artidserver.model.dto.RegisterRequest;
 import afam.artidserver.model.dto.UserResponse;
 import afam.artidserver.model.entity.User;
+import afam.artidserver.security.AuthenticatedUser;
 import afam.artidserver.security.JwtUtil;
 import afam.artidserver.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -32,12 +34,12 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@RequestBody LoginRequest request) {
-        authenticationManager.authenticate(
+        // authenticate() carica già l'utente (via CustomUserDetailsService) e verifica la
+        // password: riusiamo quel principal invece di rifare una findByMail.
+        Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
         );
-
-        User user = userService.findByMail(request.getEmail())
-                .orElseThrow();
+        User user = ((AuthenticatedUser) authentication.getPrincipal()).getUser();
 
         String token = jwtUtil.generateToken(user.getMail());
         return ResponseEntity.ok(new AuthResponse(
@@ -76,9 +78,9 @@ public class AuthController {
     }
 
     @GetMapping("/me")
-    public ResponseEntity<UserResponse> me(Authentication authentication) {
-        User user = userService.findByMail(authentication.getName())
-                .orElseThrow();
+    public ResponseEntity<UserResponse> me(@AuthenticationPrincipal AuthenticatedUser principal) {
+        // L'utente è già stato caricato dal filtro JWT: nessuna query qui.
+        User user = principal.getUser();
         return ResponseEntity.ok(new UserResponse(
                 user.getId(),
                 user.getMail(),

@@ -1,8 +1,8 @@
 package afam.artidserver.controller;
 
-import afam.artidserver.model.dto.CountResponse;
+import afam.artidserver.model.dto.DashboardSummaryResponse;
 import afam.artidserver.security.AuthenticatedUser;
-import afam.artidserver.service.CertificationService;
+import afam.artidserver.service.DashboardService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -11,14 +11,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/certifications")
+@RequestMapping("/api/dashboard")
 @RequiredArgsConstructor
-public class CertificationController {
+public class DashboardController {
 
-    private final CertificationService certificationService;
+    private final DashboardService dashboardService;
 
-    @GetMapping("/count")
-    public ResponseEntity<CountResponse> count(@AuthenticationPrincipal AuthenticatedUser principal) {
-        return ResponseEntity.ok(new CountResponse(certificationService.countByUser(principal.getId())));
+    @GetMapping("/summary")
+    public ResponseEntity<DashboardSummaryResponse> summary(@AuthenticationPrincipal AuthenticatedUser principal) {
+        return ResponseEntity.ok(dashboardService.summary(principal.getUser()));
     }
 }

@@ -6,23 +6,19 @@ export const load: PageServerLoad = async ({ locals }) => {
 		throw error(401, "Non autenticato");
 	}
 
-	const [artid, resource, certification, share, profile] = await Promise.all([
-		locals.api.GET("/api/artids/count"),
-		locals.api.GET("/api/resources/count"),
-		locals.api.GET("/api/certifications/count"),
-		locals.api.GET("/api/shares/count"),
-		locals.api.GET("/api/profile/completion"),
-	]);
+	// Un solo round-trip: il backend aggrega i conteggi in un'unica transazione read-only,
+	// invece di 5 richieste HTTP separate (ognuna con la propria autenticazione).
+	const { data } = await locals.api.GET("/api/dashboard/summary");
 
-	if (!artid.data || !resource.data || !certification.data || !share.data || !profile.data) {
+	if (!data) {
 		throw error(500, "Errore nel caricamento della dashboard");
 	}
 
 	return {
-		artidCount: artid.data.count ?? 0,
-		resourceCount: resource.data.count ?? 0,
-		certificationCount: certification.data.count ?? 0,
-		shareCount: share.data.count ?? 0,
-		profileCompletion: profile.data.percentage ?? 0,
+		artidCount: data.artidCount ?? 0,
+		resourceCount: data.resourceCount ?? 0,
+		certificationCount: data.certificationCount ?? 0,
+		shareCount: data.shareCount ?? 0,
+		profileCompletion: data.profileCompletion ?? 0,
 	};
 };

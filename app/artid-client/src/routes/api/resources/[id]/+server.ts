@@ -1,5 +1,8 @@
 import { error } from "@sveltejs/kit";
+import { env } from "$env/dynamic/private";
 import type { RequestHandler } from "./$types";
+
+const API_BASE = env.API_BASE ?? "http://localhost:8080";
 
 export const DELETE: RequestHandler = async ({ params, locals }) => {
 	if (!locals.token) {
@@ -35,22 +38,25 @@ export const PUT: RequestHandler = async ({ params, request, locals }) => {
 		throw error(400, "ID non valido");
 	}
 
-	const body = await request.json();
+	// Inoltra il multipart a Spring (vedi /api/resources POST per i dettagli sullo streaming).
+	const upstream = await fetch(`${API_BASE}/api/resources/${id}`, {
+		method: "PUT",
+		headers: {
+			Authorization: `Bearer ${locals.token}`,
+			"content-type": request.headers.get("content-type") ?? "application/octet-stream",
+		},
+		body: request.body,
+		duplex: "half",
+	} as RequestInit & { duplex: "half" });
 
-	const result = await locals.api.PUT("/api/resources/{id}", {
-		params: { path: { id } },
-		body,
-	});
-	const response = result.response;
-
-	if (response.status === 404) {
+	if (upstream.status === 404) {
 		throw error(404, "Risorsa non trovata");
 	}
-	if (!result.data) {
-		throw error(response.status, "Errore nell'aggiornamento della risorsa");
+	if (!upstream.ok) {
+		throw error(upstream.status, "Errore nell'aggiornamento della risorsa");
 	}
 
-	return new Response(JSON.stringify(result.data), {
+	return new Response(await upstream.text(), {
 		status: 200,
 		headers: { "content-type": "application/json" },
 	});

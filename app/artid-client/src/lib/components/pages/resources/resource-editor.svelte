@@ -3,7 +3,6 @@
 	import { toast } from 'svelte-sonner';
 	import type Quill from 'quill';
 	import 'quill/dist/quill.snow.css';
-	import { api } from '$lib/api/browser-client';
 	import type { components } from '$lib/api/schema';
 	import ArtidButton from '$lib/components/ui/artid-button.svelte';
 	import ArtidEditorModal from '$lib/components/ui/artid-editor-modal.svelte';
@@ -113,20 +112,6 @@
 		selectedFile = event.dataTransfer?.files?.[0] ?? null;
 	}
 
-	// Legge un File in base64 (senza il prefisso "data:*;base64,") per spedirlo nel JSON.
-	function fileToBase64(file: File): Promise<string> {
-		return new Promise((resolve, reject) => {
-			const reader = new FileReader();
-			reader.onerror = () => reject(reader.error);
-			reader.onload = () => {
-				const result = reader.result as string;
-				const commaIndex = result.indexOf(',');
-				resolve(commaIndex >= 0 ? result.slice(commaIndex + 1) : result);
-			};
-			reader.readAsDataURL(file);
-		});
-	}
-
 	async function handleSubmit(): Promise<void> {
 		if (isSaving) return;
 
@@ -137,24 +122,23 @@
 
 		isSaving = true;
 		try {
-			const body = {
-				title,
-				description,
-				favorite,
-				artidId: selectedArtidId ? Number(selectedArtidId) : undefined,
-				fileName: selectedFile?.name,
-				mimeType: selectedFile?.type,
-				fileContent: selectedFile ? await fileToBase64(selectedFile) : undefined
-			};
+			// multipart/form-data: i metadati sono campi semplici, il file è la part `file`.
+			// Niente più base64: il browser invia i byte grezzi al proxy SvelteKit, che li
+			// inoltra a Spring → S3. Usiamo fetch nativo perché openapi-fetch serializza in JSON.
+			const formData = new FormData();
+			formData.append('title', title);
+			formData.append('description', description ?? '');
+			formData.append('favorite', String(favorite));
+			if (selectedArtidId) formData.append('artidId', selectedArtidId);
+			if (selectedFile) formData.append('file', selectedFile);
 
-			const { error: apiError } = isEditMode
-				? await api.PUT('/api/resources/{id}', {
-					params: { path: { id: resource!.id! } },
-					body
-				})
-				: await api.POST('/api/resources', { body });
+			const url = isEditMode ? `/api/resources/${resource!.id}` : '/api/resources';
+			const response = await fetch(url, {
+				method: isEditMode ? 'PUT' : 'POST',
+				body: formData
+			});
 
-			if (apiError) {
+			if (!response.ok) {
 				toast.error(isEditMode ? 'Errore nell\'aggiornamento del materiale' : 'Errore nella creazione del materiale');
 				return;
 			}
@@ -190,7 +174,7 @@
 
 		<div class="row g-3">
 			<div class="col-12 col-md-6">
-				<ArtidInput name="resource-title" label="Titolo" bind:value={title} />
+				<ArtidInput name="resource-title" label="Titolo" bind:value={title}/>
 			</div>
 			<div class="col-12 col-md-6">
 				<!-- Span wrapper: select[disabled] non firea hover events, il title vive sullo span. -->
@@ -263,7 +247,7 @@
 				icon="check2"
 				btnStyle="success"
 				fullWidth={false}
-				disabled={isSaving}
+				disabled={isSaving || title.length === 0 || !selectedFile}
 				onclick={handleSubmit}
 			/>
 		</div>

@@ -70,7 +70,16 @@
       "Bash(mkdir -p /c/progetti/artid/docs/_docxbuild)",
       "Bash(npm init *)",
       "Bash(python '/c/Users/Gabriele Iovino/AppData/Roaming/Claude/local-agent-mode-sessions/skills-plugin/18589a11-ea61-4eb7-b37c-66ed9229c09f/5bc5f968-51a2-43e5-934a-09a7ae51527a/skills/docx/scripts/office/validate.py' /c/progetti/artid/docs/SDD_ArtID.docx)",
-      "PowerShell(npm --prefix app/artid-client run check 2>&1)"
+      "PowerShell(npm --prefix app/artid-client run check 2>&1)",
+      "PowerShell(Get-CimInstance Win32_Process -Filter \"Name = 'java.exe'\" | Select-Object ProcessId, CreationDate, @{N='CmdLine';E={$_.CommandLine.Substring\\(0,[Math]::Min\\(120,$_.CommandLine.Length\\)\\)}} | Format-Table -AutoSize -Wrap)",
+      "Bash(Get-ChildItem -Path \"C:\\\\Progetti\\\\artid\\\\app\\\\artid-server\" -Recurse -Directory)",
+      "Bash(Select-Object -First 20)",
+      "Bash(npm list *)",
+      "Bash(where mvn *)",
+      "PowerShell(Set-Location app\\\\artid-client; npm run check 2>&1 | Select-Object -Last 40; \"EXIT=$LASTEXITCODE\")",
+      "PowerShell($c = Get-Command psql -ErrorAction SilentlyContinue; if \\($c\\) { \"psql: $\\($c.Source\\)\" } else { \"psql NOT FOUND\" })",
+      "Bash(./mvnw.cmd -q -o compile)",
+      "Bash(./mvnw.cmd -q compile)"
     ]
   }
 }
