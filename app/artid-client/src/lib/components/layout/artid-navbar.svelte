@@ -6,9 +6,6 @@
 	import ArtidLogoWhite from '$lib/assets/artid_logo_white.svg';
 	import ArtidLink from '$lib/components/ui/artid-link.svelte';
 
-	// Presigned URL della foto profilo (o null): l'<img> punta diretto a Supabase.
-	let { propicUrl }: { propicUrl?: string | null } = $props();
-
 	const navLinks: { href: Pathname; label: string }[] = [
 		{ href: '/artid', label: 'ArtID' },
 		{ href: '/resources', label: 'Materiali' },
@@ -48,6 +45,8 @@
 			</button>
 
 			<div class="dropdown">
+
+
 				<button
 					type="button"
 					class="btn btn-light rounded-pill text-primary fs-5"
@@ -56,12 +55,7 @@
 					data-bs-display="static"
 					aria-expanded="false"
 				>
-
-					{#if propicUrl}
-						<img src={propicUrl} alt="Foto profilo" class="rounded-circle object-fit-cover d-block" style="width: 1.5rem; height: 1.5rem;" />
-					{:else}
-						<i class="bi bi-person-fill"></i>
-					{/if}
+					<i class="bi bi-person-fill"></i>
 				</button>
 
 				<ul class="dropdown-menu dropdown-menu-end shadow-sm mt-2">

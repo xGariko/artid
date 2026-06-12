@@ -105,4 +105,4 @@
 	<ResourcesList resources={visibleResources} onEditRequest={handleEditRequest} />
 </div>
 
-<ResourceEditor bind:isOpen={editorOpen} resource={editingResource} artids={data.artids} />
+<ResourceEditor bind:isOpen={editorOpen} resource={editingResource} artids={data.artids}/>

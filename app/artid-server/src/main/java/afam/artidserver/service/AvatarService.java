@@ -15,7 +15,6 @@ import org.springframework.web.server.ResponseStatusException;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.time.Duration;
-import java.util.Optional;
 
 /**
  * Foto profilo su Supabase Storage (bucket privato "propics"). Il DB tiene solo la object key
@@ -44,11 +43,6 @@ public class AvatarService {
     public String presignKey(String key) {
         if (key == null || key.isBlank()) return null;
         return storageService.presignGet(bucket, key, Duration.ofSeconds(presignTtlSeconds));
-    }
-
-    /** Presigned GET URL dell'avatar dell'utente, vuoto se non ha foto. Fa una query dedicata. */
-    public Optional<String> presignedUrlFor(Long userId) {
-        return userDAO.findPropicPathById(userId).map(this::presignKey);
     }
 
     /**

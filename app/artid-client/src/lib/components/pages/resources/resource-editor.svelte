@@ -15,6 +15,7 @@
 	}: {
 		isOpen: boolean;
 		resource?: ResourceResponse;
+		file?: File;
 		artids?: ArtidResponse[];
 	} = $props();
 
@@ -245,7 +246,7 @@
 				icon="check2"
 				btnStyle="success"
 				fullWidth={false}
-				disabled={isSaving || title.length === 0 || !selectedFile}
+				disabled={isSaving || title.length === 0 || (!selectedFile && !isEditMode)}
 				onclick={handleSubmit}
 			/>
 		</div>

@@ -76,12 +76,6 @@ public class ProfileController {
 
     // --- Foto profilo (bucket privato "propics", servita via presigned URL) ---
 
-    @GetMapping("/avatar")
-    public ResponseEntity<AvatarResponse> avatar(@AuthenticationPrincipal AuthenticatedUser principal) {
-        // Query dedicata e minimale (sola object key) + firma: la navbar la usa su ogni pagina.
-        return ResponseEntity.ok(new AvatarResponse(avatarService.presignedUrlFor(principal.getId()).orElse(null)));
-    }
-
     @PutMapping(value = "/avatar", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<AvatarResponse> uploadAvatar(@AuthenticationPrincipal AuthenticatedUser principal,
                                                        @RequestParam("file") MultipartFile file) {

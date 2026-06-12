@@ -92,7 +92,9 @@
       "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://localhost:8080/api/profile/avatar)",
       "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://localhost:8080/api/profile/completion)",
       "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://localhost:8080/api/profile/zzz-nope)",
-      "Read(//c/Progetti/artid/**)"
+      "Read(//c/Progetti/artid/**)",
+      "PowerShell(Get-Item \"app\\\\artid-server\\\\src\\\\main\\\\resources\\\\application-local.properties\", \"app\\\\artid-server\\\\target\\\\classes\\\\application-local.properties\" | Select-Object FullName, LastWriteTime; Compare-Object \\(Get-Content \"app\\\\artid-server\\\\src\\\\main\\\\resources\\\\application-local.properties\"\\) \\(Get-Content \"app\\\\artid-server\\\\target\\\\classes\\\\application-local.properties\"\\))",
+      "PowerShell(if \\($?\\) { \"deleted +layout.server.ts\" })"
     ]
   }
 }
