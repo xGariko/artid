@@ -94,7 +94,7 @@
 	]);
 
 	const sidebarActions: SidebarAction[] = [
-		{ label: "Nuovo", icon: "plus", callback: handleNewResource, type: "button" },
+		{ label: "Nuovo", icon: "plus-lg", callback: handleNewResource, type: "button" },
 	];
 </script>
 

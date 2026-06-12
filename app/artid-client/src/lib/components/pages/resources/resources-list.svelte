@@ -5,12 +5,7 @@
 	import ArtidButton from '$lib/components/ui/artid-button.svelte';
 	import ArtidModal from '$lib/components/ui/artid-modal.svelte';
 
-	import {
-		badgeColorForExtension,
-		badgeLabelForExtension,
-		formatFileSize,
-		formatItalianDate
-	} from '$lib/utilities';
+	import { badgeColorForExtension, badgeLabelForExtension, formatFileSize, formatItalianDate } from '$lib/utilities';
 	import { toast } from 'svelte-sonner';
 
 	type ResourceResponse = components['schemas']['ResourceResponse'];
@@ -67,6 +62,14 @@
 			nextSelection.add(resourceId);
 		}
 		selectedResourceIds = nextSelection;
+	}
+
+	// La riga è cliccabile: replichiamo il toggle anche da tastiera (Invio/Spazio).
+	function handleRowKeydown(event: KeyboardEvent, resourceId: number | undefined): void {
+		if (event.key === 'Enter' || event.key === ' ') {
+			event.preventDefault();
+			toggleResourceSelection(resourceId);
+		}
 	}
 
 	function toggleAllFilteredSelection(): void {
@@ -130,77 +133,77 @@
 	</div>
 
 	<div class="flex-grow-1 overflow-y-auto rounded-3 border border-artid-border">
-		<table class="table table-hover align-middle mb-0 resources-table">
-			<thead>
-			<tr class="text-artid-text-muted small">
-				<th class="ps-3" style="width: 3rem;">
+		<!-- Intestazione: stessa griglia delle righe, sticky con z-index basso per non coprire le modali. -->
+		<div
+			class="row g-0 align-items-center px-3 py-2 sticky-header bg-artid-muted border-bottom border-artid-border text-artid-text small fw-semibold text-nowrap"
+		>
+			<div class="col-1">
+				<input
+					type="checkbox"
+					class="form-check-input"
+					checked={areAllFilteredSelected}
+					onchange={toggleAllFilteredSelection}
+					aria-label="Seleziona tutto"
+				/>
+			</div>
+			<div class="col-3">Nome</div>
+			<div class="col-2">Dimensioni</div>
+			<div class="col-2">Creato</div>
+			<div class="col-2">Modificato</div>
+			<div class="col-1">Collegato</div>
+			<div class="col-1 text-center">Preferito</div>
+		</div>
+
+		{#each filteredResources as resource (resource.id)}
+			{@const isResourceSelected = resource.id != null && selectedResourceIds.has(resource.id)}
+			<div
+				class="row g-0 align-items-center px-3 py-2 border-bottom border-artid-border resource-row"
+				class:selected={isResourceSelected}
+				role="button"
+				tabindex="0"
+				onclick={() => toggleResourceSelection(resource.id)}
+				onkeydown={(event) => handleRowKeydown(event, resource.id)}
+			>
+				<div class="col-1 d-flex align-items-center gap-2">
 					<input
 						type="checkbox"
-						class="form-check-input"
-						checked={areAllFilteredSelected}
-						onchange={toggleAllFilteredSelection}
-						aria-label="Seleziona tutto"
+						class="form-check-input flex-shrink-0"
+						checked={isResourceSelected}
+						onchange={() => toggleResourceSelection(resource.id)}
+						onclick={(event) => event.stopPropagation()}
+						aria-label={`Seleziona ${resource.title}`}
 					/>
-				</th>
-				<th>Nome</th>
-				<th>Dimensioni</th>
-				<th>Creato</th>
-				<th>Modificato</th>
-				<th>Collegato</th>
-				<th class="pe-3 text-center">Preferito</th>
-			</tr>
-			</thead>
-			<tbody>
-			{#each filteredResources as resource (resource.id)}
-				{@const isResourceSelected = resource.id != null && selectedResourceIds.has(resource.id)}
-				<tr
-					class:selected={isResourceSelected}
-					onclick={() => toggleResourceSelection(resource.id)}
-				>
-					<td class="ps-3">
-						<input
-							type="checkbox"
-							class="form-check-input"
-							checked={isResourceSelected}
-							onchange={() => toggleResourceSelection(resource.id)}
-							onclick={(event) => event.stopPropagation()}
-							aria-label={`Seleziona ${resource.title}`}
-						/>
-					</td>
-					<td>
-						<div class="d-flex align-items-center gap-3">
-								<span
-									class="badge-type fw-bold text-white"
-									style:background-color={badgeColorForExtension(resource.extension)}
-								>
-									{badgeLabelForExtension(resource.extension)}
-								</span>
-							<span class="fw-medium">{resource.title}</span>
-						</div>
-					</td>
-					<td class="text-artid-text">{formatFileSize(resource.fileSize)}</td>
-					<td class="text-artid-text">{formatItalianDate(resource.createdAt)}</td>
-					<td class="text-artid-text">{formatItalianDate(resource.lastModified)}</td>
-					<td class="text-artid-text">
-						{resource.artidCount ?? 0}
-						<span class="text-artid-text-muted ms-1">ArtID</span>
-					</td>
-					<td class="pe-3 text-center">
-						<i
-							class="bi bi-star{resource.favorite ? '-fill text-warning' : ' text-artid-text-muted'} fs-5"
-						></i>
-					</td>
-				</tr>
-			{/each}
-			</tbody>
-			{#if filteredResources.length === 0}
-				<caption class="text-center text-artid-text-muted py-5">
-					<i class="bi bi-folder2-open fs-2 d-block mb-2"></i>
-					Nessun materiale trovato
-				</caption>
-			{/if}
+					<span
+						class="badge-type fw-bold text-white"
+						style:background-color={badgeColorForExtension(resource.extension)}
+					>
+						{badgeLabelForExtension(resource.extension)}
+					</span>
+				</div>
+				<div class="col-3 pe-3 text-truncate fw-medium text-artid-text resource-title" title={resource.title}>
+					{resource.title}
+				</div>
+				<div class="col-2 text-artid-text">{formatFileSize(resource.fileSize)}</div>
+				<div class="col-2 text-artid-text text-nowrap">{formatItalianDate(resource.createdAt)}</div>
+				<div class="col-2 text-artid-text text-nowrap">{formatItalianDate(resource.lastModified)}</div>
+				<div class="col-1 text-artid-text text-nowrap">
+					{resource.artidCount ?? 0}
+					<span class="text-artid-text-muted ms-1">ArtID</span>
+				</div>
+				<div class="col-1 text-center">
+					<i
+						class="bi bi-star{resource.favorite ? '-fill text-warning' : ' text-artid-text-muted'} fs-5"
+					></i>
+				</div>
+			</div>
+		{/each}
 
-		</table>
+		{#if filteredResources.length === 0}
+			<div class="text-center text-artid-text-muted py-5">
+				<i class="bi bi-folder2-open fs-2 d-block mb-2"></i>
+				Nessun materiale trovato
+			</div>
+		{/if}
 	</div>
 
 	<div class="d-flex align-items-center gap-2">
@@ -254,42 +257,33 @@
         box-shadow: 0 0 0 0.2rem var(--artid-primary-subtle);
     }
 
-    .resources-table {
-        --bs-table-hover-bg: var(--artid-primary-subtle);
-        /* Default browser è border-spacing 2px → lasciava una strisciolina bianca
-					 tra il bordo del container e l'inizio del bg dell'header. */
-        border-collapse: collapse;
-        border-spacing: 0;
-    }
-
-    /* Header sticky così resta visibile mentre si scorre la tabella. */
-    .resources-table thead th {
+    /* Header sticky: resta sopra le righe ma sotto le modali (z-index basso). */
+    .sticky-header {
         position: sticky;
         top: 0;
         z-index: 1;
-        background-color: var(--artid-muted);
-        border-bottom: 1px solid var(--artid-border);
-        font-weight: 600;
-        font-size: 0.8rem;
-        padding: 0.6rem 0.5rem;
-        vertical-align: middle;
-        white-space: nowrap;
     }
 
-    .resources-table tbody td {
-        padding: 0.75rem 0.5rem;
-        vertical-align: middle;
-    }
-
-    .resources-table tbody tr {
-        border-left: 3px solid transparent;
+    /* Righe cliccabili con feedback hover (sostituisce .table-hover). */
+    .resource-row {
+				transition: 0.2s ease all;
         cursor: pointer;
-        transition: border-color 0.15s ease-in-out;
     }
 
-    .resources-table tbody tr.selected {
-        border-left-color: var(--artid-primary);
-        background-color: var(--artid-primary-subtle);
+    .resource-row:hover {
+        transition: 0.2s ease all;
+        background-color: var(--artid-surface);
+    }
+
+    /* Riga selezionata: tinta brand, evidenziata anche in hover. */
+    .resource-row.selected {
+        transition: 0.2s ease all;
+        box-shadow: inset 6px 0px 0px -3px var(--artid-primary);
+    }
+
+    /* Consente al titolo di troncare con ellissi dentro la colonna flex. */
+    .resource-title {
+        min-width: 0;
     }
 
     .badge-type {

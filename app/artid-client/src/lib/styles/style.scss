@@ -145,3 +145,7 @@ body {
 .font-titillium {
   font-family: var(--artid-font-sans), serif !important;
 }
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
