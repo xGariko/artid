@@ -47,6 +47,8 @@ public class ProfileController {
         user.setAddress(request.getAddress());
         user.setBiography(request.getBiography());
         user.setLinkedinId(request.getLinkedinId());
+        user.setFacebookId(request.getFacebookId());
+        user.setInstagramId(request.getInstagramId());
         user.setProfession(request.getProfession());
         user.setPhone(request.getPhone());
         user.setPropic(request.getPropic());

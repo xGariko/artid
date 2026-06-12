@@ -277,6 +277,8 @@ export interface components {
             spidCode?: string;
             biography?: string;
             linkedinId?: string;
+            facebookId?: string;
+            instagramId?: string;
             profession?: string;
             isPublic?: boolean;
             phone?: string;
@@ -324,6 +326,8 @@ export interface components {
             address?: string;
             biography?: string;
             linkedinId?: string;
+            facebookId?: string;
+            instagramId?: string;
             profession?: string;
             isPublic?: boolean;
             phone?: string;
@@ -343,6 +347,8 @@ export interface components {
             address?: string;
             biography?: string;
             linkedinId?: string;
+            facebookId?: string;
+            instagramId?: string;
             profession?: string;
             isPublic?: boolean;
             phone?: string;

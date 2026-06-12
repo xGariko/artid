@@ -20,8 +20,8 @@ public interface UserDAO extends ListCrudRepository<User, Long> {
      */
     @Query("""
             SELECT id, name, surname, mail, password_hash, birthdate, birthplace, address,
-                   spid_code, biography, linkedin_id, profession, is_public, phone,
-                   deleted_at, internal_share_enabled
+                   spid_code, biography, linkedin_id, facebook_id, instagram_id, profession,
+                   is_public, phone, deleted_at, internal_share_enabled
             FROM "user"
             WHERE mail = :mail
             """)

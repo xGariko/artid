@@ -11,6 +11,8 @@ export const UserSchema = z.object({
   address: z.string().max(500).nullable(),
   biography: z.string().max(5000).nullable(),
   linkedinId: z.string().max(200).nullable(),
+  facebookId: z.string().max(200).nullable(),
+  instagramId: z.string().max(200).nullable(),
   profession: z.string().max(200).nullable(),
   isPublic: z.boolean().default(false),
   phone: z

@@ -4,7 +4,6 @@
 	import { api } from '$lib/api/browser-client';
 	import ArtidInput from '$lib/components/ui/artid-input.svelte';
 	import ArtidButton from '$lib/components/ui/artid-button.svelte';
-	import type Quill from 'quill';
 	import 'quill/dist/quill.snow.css';
 	import type { components } from '$lib/api/schema';
 	import ArtidSpidButton from '$lib/components/ui/artid-spid-button.svelte';
@@ -21,6 +20,8 @@
 		address: profile.address ?? '',
 		biography: profile.biography ?? '',
 		linkedinId: profile.linkedinId ?? '',
+		facebookId: profile.facebookId ?? '',
+		instagramId: profile.instagramId ?? '',
 		profession: profile.profession ?? '',
 		phone: profile.phone ?? '',
 		isPublic: profile.isPublic ?? false,
@@ -39,6 +40,8 @@
 		address: profile.address ?? '',
 		biography: profile.biography ?? '',
 		linkedinId: profile.linkedinId ?? '',
+		facebookId: profile.facebookId ?? '',
+		instagramId: profile.instagramId ?? '',
 		profession: profile.profession ?? '',
 		phone: profile.phone ?? '',
 		isPublic: profile.isPublic ?? false,
@@ -55,6 +58,8 @@
 		model.address !== baseline.address ||
 		model.biography !== baseline.biography ||
 		model.linkedinId !== baseline.linkedinId ||
+		model.facebookId !== baseline.facebookId ||
+		model.instagramId !== baseline.instagramId ||
 		model.profession !== baseline.profession ||
 		model.phone !== baseline.phone ||
 		model.isPublic !== baseline.isPublic ||
@@ -174,6 +179,8 @@
 				address: model.address || undefined,
 				biography: bioForSave(),
 				linkedinId: model.linkedinId || undefined,
+				facebookId: model.facebookId || undefined,
+				instagramId: model.instagramId || undefined,
 				profession: model.profession || undefined,
 				phone: model.phone || undefined,
 				isPublic: model.isPublic,
@@ -260,9 +267,9 @@
 		</div>
 
 		<!-- Dati -->
-		<div class="col-12 col-md-10 d-flex flex-column">
+		<div class="col-12 col-md-10 d-flex flex-column row">
 			<div class="row">
-				<div class="col-12 col-md-4 p-1">
+				<div class="col-12 col-xl-4 p-1">
 					<ArtidInput name="name" label="Nome" bind:value={model.name} error={err('name')} />
 				</div>
 				<div class="col-12 col-md-4 p-1">
@@ -305,11 +312,21 @@
 				</div>
 			</div>
 
+			<hr class="mt-3">
+
 			<div class="row">
-				<div class="col-12 p-1">
+				<div class="col-12 col-md-4 p-1">
 					<ArtidInput name="linkedinId" label="LinkedIn" bind:value={model.linkedinId} error={err('linkedinId')} />
 				</div>
+				<div class="col-12 col-md-4 p-1">
+					<ArtidInput name="facebookId" label="Facebook" bind:value={model.facebookId} error={err('facebookId')} />
+				</div>
+				<div class="col-12 col-md-4 p-1">
+					<ArtidInput name="instagramId" label="Instagram" bind:value={model.instagramId} error={err('instagramId')} />
+				</div>
 			</div>
+
+			<hr class="mt-3">
 
 			<div class="row">
 				<div class="col-12 p-1">
@@ -354,8 +371,10 @@
 	</div>
 
 	<!-- Action bar -->
-	<div class="d-flex align-items-center justify-content-between gap-3 border-top border-artid-border pt-3">
-		<div class="d-flex gap-3">
+	<!-- flex-wrap: su viewport stretti i bottoni vanno a capo invece di traboccare.
+	     Su desktop stanno su una riga, quindi justify-content-between resta invariato. -->
+	<div class="d-flex flex-wrap align-items-center justify-content-between gap-3 border-top border-artid-border pt-3">
+		<div class="d-flex flex-wrap gap-3">
 			<ArtidButton
 				label={isSaving ? 'Salvataggio…' : 'Salva'}
 				icon="check-lg"

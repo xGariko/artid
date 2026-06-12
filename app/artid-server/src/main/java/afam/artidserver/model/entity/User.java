@@ -36,6 +36,12 @@ public class User {
     @Column("linkedin_id")
     private String linkedinId;
 
+    @Column("facebook_id")
+    private String facebookId;
+
+    @Column("instagram_id")
+    private String instagramId;
+
     private String profession;
 
     @Column("is_public")

@@ -15,6 +15,8 @@ public class ProfileService {
             User::getAddress,
             User::getBiography,
             User::getLinkedinId,
+            User::getFacebookId,
+            User::getInstagramId,
             User::getProfession,
             User::getPhone
     );
