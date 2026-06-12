@@ -51,6 +51,7 @@ public class ProfileController {
         user.setInstagramId(request.getInstagramId());
         user.setProfession(request.getProfession());
         user.setPhone(request.getPhone());
+        user.setBusinessEmail(request.getBusinessEmail());
         user.setPropic(request.getPropic());
         user.setInternalShareEnabled(request.isInternalShareEnabled());
         if (request.getIsPublic() != null) {

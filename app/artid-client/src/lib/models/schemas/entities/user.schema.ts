@@ -19,6 +19,7 @@ export const UserSchema = z.object({
     .string()
     .regex(/^\+?[\d\s\-()]{5,20}$/)
     .nullable(),
+  businessEmail: z.email().nullable(),
   deletedAt: z.iso.datetime().nullable(),
 });
 

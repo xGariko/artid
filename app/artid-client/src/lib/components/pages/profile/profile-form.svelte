@@ -22,6 +22,7 @@
 		instagramId: profile.instagramId ?? '',
 		profession: profile.profession ?? '',
 		phone: profile.phone ?? '',
+		businessEmail: profile.businessEmail ?? '',
 		isPublic: profile.isPublic ?? false,
 		// propic = byte[] lato Spring → stringa Base64 in JSON.
 		propic: profile.propic ?? '',
@@ -42,6 +43,7 @@
 		instagramId: profile.instagramId ?? '',
 		profession: profile.profession ?? '',
 		phone: profile.phone ?? '',
+		businessEmail: profile.businessEmail ?? '',
 		isPublic: profile.isPublic ?? false,
 		propic: profile.propic ?? '',
 		internalShareEnabled: profile.internalShareEnabled ?? false
@@ -60,6 +62,7 @@
 		model.instagramId !== baseline.instagramId ||
 		model.profession !== baseline.profession ||
 		model.phone !== baseline.phone ||
+		model.businessEmail !== baseline.businessEmail ||
 		model.isPublic !== baseline.isPublic ||
 		model.propic !== baseline.propic ||
 		model.internalShareEnabled !== baseline.internalShareEnabled
@@ -181,6 +184,7 @@
 				instagramId: model.instagramId || undefined,
 				profession: model.profession || undefined,
 				phone: model.phone || undefined,
+				businessEmail: model.businessEmail || undefined,
 				isPublic: model.isPublic,
 				// Rimando indietro la propic corrente così il PUT non la azzera;
 				// '' (rimossa) → undefined → il backend la pulisce.
@@ -302,11 +306,14 @@
 			</div>
 
 			<div class="row">
-				<div class="col-12 col-md-6 p-1">
+				<div class="col-12 col-md-4 p-1">
 					<ArtidInput name="address" label="Indirizzo" bind:value={model.address} error={err('address')} />
 				</div>
-				<div class="col-12 col-md-6 p-1">
+				<div class="col-12 col-md-4 p-1">
 					<ArtidInput type="tel" name="phone" label="Telefono" bind:value={model.phone} error={err('phone')} />
+				</div>
+				<div class="col-12 col-md-4 p-1">
+					<ArtidInput type="email" name="businessEmail" label="Email aziendale" bind:value={model.businessEmail} error={err('businessEmail')} />
 				</div>
 			</div>
 

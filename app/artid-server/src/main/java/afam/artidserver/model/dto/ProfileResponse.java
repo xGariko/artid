@@ -23,6 +23,7 @@ public class ProfileResponse {
     private String profession;
     private Boolean isPublic;
     private String phone;
+    private String businessEmail;
     private byte[] propic;
     private Boolean internalShareEnabled;
 
@@ -42,6 +43,7 @@ public class ProfileResponse {
                 user.getProfession(),
                 user.getIsPublic(),
                 user.getPhone(),
+                user.getBusinessEmail(),
                 user.getPropic(),
                 user.getInternalShareEnabled()
         );

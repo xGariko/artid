@@ -49,6 +49,9 @@ public class User {
 
     private String phone;
 
+    @Column("business_email")
+    private String businessEmail;
+
     @Column("deleted_at")
     private OffsetDateTime deletedAt;
 

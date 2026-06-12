@@ -18,7 +18,8 @@ public class ProfileService {
             User::getFacebookId,
             User::getInstagramId,
             User::getProfession,
-            User::getPhone
+            User::getPhone,
+            User::getBusinessEmail
     );
 
     public int completionPercentage(User user) {

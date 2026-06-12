@@ -282,6 +282,7 @@ export interface components {
             profession?: string;
             isPublic?: boolean;
             phone?: string;
+            businessEmail?: string;
             /** Format: date-time */
             deletedAt?: string;
             /** Format: byte */
@@ -331,6 +332,7 @@ export interface components {
             profession?: string;
             isPublic?: boolean;
             phone?: string;
+            businessEmail?: string;
             /** Format: byte */
             propic?: string;
             internalShareEnabled?: boolean;
@@ -352,6 +354,7 @@ export interface components {
             profession?: string;
             isPublic?: boolean;
             phone?: string;
+            businessEmail?: string;
             /** Format: byte */
             propic?: string;
             internalShareEnabled?: boolean;
