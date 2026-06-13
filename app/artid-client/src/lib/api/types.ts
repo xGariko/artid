@@ -23,3 +23,4 @@ export type DashboardSummary = Schemas["DashboardSummaryResponse"];
 export type AuthResponse = Schemas["AuthResponse"];
 export type UserResponse = Schemas["UserResponse"];
 export type CountResponse = Schemas["CountResponse"];
+export type PublicProfile = Schemas["PublicProfileResponse"];

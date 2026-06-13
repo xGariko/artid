@@ -98,7 +98,9 @@
       "Bash(where pdftotext *)",
       "Bash(pip show *)",
       "Bash(pdftotext -layout \"Object Design Document.pdf\" \"odd_reference.txt\")",
-      "Bash(node -e \"console.log\\('docx version:', require\\('docx/package.json'\\).version\\)\")"
+      "Bash(node -e \"console.log\\('docx version:', require\\('docx/package.json'\\).version\\)\")",
+      "PowerShell(git -C C:\\\\progetti\\\\artid diff -- app/artid-client/src/lib/components/layout/artid-navbar.svelte)",
+      "PowerShell(git -C C:\\\\progetti\\\\artid log -S \"bootstrap.bundle\" --oneline --all -- app/artid-client; Write-Output \"---- ricerca generica nel working tree ----\"; git -C C:\\\\progetti\\\\artid grep -n \"bootstrap.bundle\" $\\(git -C C:\\\\progetti\\\\artid rev-list --all\\) -- app/artid-client 2>$null | Select-Object -First 10)"
     ]
   }
 }

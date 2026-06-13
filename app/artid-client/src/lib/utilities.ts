@@ -96,3 +96,23 @@ export function isRecent(isoDate: string | null | undefined, days?: number): boo
 	if (!isoDate) return false;
 	return new Date(isoDate).getTime() >= recentThresholdTimestamp(days);
 }
+
+// Iniziali per l'avatar di un profilo (es. "Valeria Seidita" → "VS"). Fallback "?".
+export function initialsFor(name: string | null | undefined, surname: string | null | undefined): string {
+	const firstInitial = (name ?? "").trim().charAt(0);
+	const secondInitial = (surname ?? "").trim().charAt(0);
+	return `${firstInitial}${secondInitial}`.toUpperCase() || "?";
+}
+
+// Palette avatar: tinte distinte e leggibili su testo bianco (in linea con quelle dei badge).
+const AVATAR_PALETTE = ["#6f5bd0", "#e08a3c", "#4f9d69", "#3f8ee6", "#d85ab0", "#5dd3d0"];
+
+// Colore avatar deterministico: lo stesso seed (es. nome completo) dà sempre lo stesso colore.
+export function avatarColorFor(seed: string | null | undefined): string {
+	const text = (seed ?? "").trim();
+	let hash = 0;
+	for (let index = 0; index < text.length; index++) {
+		hash = (hash * 31 + text.charCodeAt(index)) | 0;
+	}
+	return AVATAR_PALETTE[Math.abs(hash) % AVATAR_PALETTE.length];
+}

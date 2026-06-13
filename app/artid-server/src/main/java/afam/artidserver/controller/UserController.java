@@ -1,5 +1,6 @@
 package afam.artidserver.controller;
 
+import afam.artidserver.model.dto.PublicProfileResponse;
 import afam.artidserver.model.entity.User;
 import afam.artidserver.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +15,16 @@ import java.util.List;
 public class UserController {
 
     private final UserService userService;
+
+    /**
+     * Catalogo pubblico per la pagina "Explore": cerca profili pubblici per nome/cognome,
+     * professione o titolo di un ArtID pubblico. Query vuota → intero catalogo pubblico.
+     */
+    @GetMapping("/search")
+    public ResponseEntity<List<PublicProfileResponse>> search(
+            @RequestParam(value = "query", required = false, defaultValue = "") String query) {
+        return ResponseEntity.ok(userService.searchPublicProfiles(query));
+    }
 
     @GetMapping
     public List<User> getAll() {
