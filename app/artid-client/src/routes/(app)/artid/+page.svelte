@@ -113,7 +113,7 @@
 	]);
 
 	const sidebarActions: SidebarAction[] = [
-		{ label: 'Nuovo ArtID', icon: 'plus', callback: handleNewArtid, type: 'button' }
+		{ label: 'Nuovo ArtID', icon: 'plus-lg', callback: handleNewArtid, type: 'button' }
 	];
 
 	let title = $state('');

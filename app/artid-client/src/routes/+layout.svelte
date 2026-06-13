@@ -2,7 +2,6 @@
 	import favicon from '$lib/assets/favicon.svg';
 	import '$lib/styles/style.scss';
 	import 'bootstrap-icons/font/bootstrap-icons.css';
-	import { onMount } from 'svelte';
 	import { Toaster } from 'svelte-sonner';
 	import { user } from '$lib/stores/auth';
 	import ArtidProgress from '$lib/components/ui/artid-progress.svelte';
@@ -14,10 +13,6 @@
 
 	$effect.pre(() => {
 		user.set(data.user);
-	});
-
-	onMount(async () => {
-		await import('bootstrap/dist/js/bootstrap.bundle.min.js');
 	});
 </script>
 
