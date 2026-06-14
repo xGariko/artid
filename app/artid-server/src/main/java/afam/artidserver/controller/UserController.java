@@ -1,5 +1,6 @@
 package afam.artidserver.controller;
 
+import afam.artidserver.model.dto.PublicProfileDetailResponse;
 import afam.artidserver.model.dto.PublicProfileResponse;
 import afam.artidserver.model.entity.User;
 import afam.artidserver.service.UserService;
@@ -24,6 +25,18 @@ public class UserController {
     public ResponseEntity<List<PublicProfileResponse>> search(
             @RequestParam(value = "query", required = false, defaultValue = "") String query) {
         return ResponseEntity.ok(userService.searchPublicProfiles(query));
+    }
+
+    /**
+     * Dettaglio pubblico di un profilo (pagina Explore → /explore/[id]). Accessibile senza login.
+     * 404 se l'utente non esiste, non è pubblico o è eliminato: la vista espone solo dati e
+     * contenuti marcati pubblici.
+     */
+    @GetMapping("/{id}/public")
+    public ResponseEntity<PublicProfileDetailResponse> publicProfile(@PathVariable Long id) {
+        return userService.getPublicProfileDetail(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
     @GetMapping

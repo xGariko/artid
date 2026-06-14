@@ -24,3 +24,6 @@ export type AuthResponse = Schemas["AuthResponse"];
 export type UserResponse = Schemas["UserResponse"];
 export type CountResponse = Schemas["CountResponse"];
 export type PublicProfile = Schemas["PublicProfileResponse"];
+export type PublicProfileDetail = Schemas["PublicProfileDetailResponse"];
+export type PublicArtidSummary = Schemas["PublicArtidSummaryResponse"];
+export type PublicCertification = Schemas["PublicCertificationResponse"];

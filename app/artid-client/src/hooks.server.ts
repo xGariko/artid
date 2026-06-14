@@ -1,6 +1,6 @@
 import type { Handle } from "@sveltejs/kit";
 import { redirect } from "@sveltejs/kit";
-import { fetchCurrentUser, getToken, logout } from "$lib/server/auth";
+import { fetchCurrentUser, getToken, logout } from "$lib/auth.ts";
 import { createApiClient } from "$lib/api/client";
 
 // Pagine "auth-only": accessibili senza login, ma se sei loggato vieni rimandato in dashboard.

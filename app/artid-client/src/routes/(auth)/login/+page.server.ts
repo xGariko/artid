@@ -1,6 +1,6 @@
 import { fail, redirect } from "@sveltejs/kit";
 import type { Actions } from "./$types";
-import { login } from "$lib/server/auth";
+import { login } from "$lib/auth.ts";
 
 type LoginField = "email" | "password";
 type FieldErrors = Partial<Record<LoginField, string>>;

@@ -132,6 +132,38 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/users/{id}/public": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["publicProfile"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/users/search": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["search"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/shares/count": {
         parameters: {
             query?: never;
@@ -394,6 +426,43 @@ export interface components {
         LoginRequest: {
             email?: string;
             password?: string;
+        };
+        PublicArtidSummaryResponse: {
+            /** Format: int64 */
+            id?: number;
+            title?: string;
+            /** Format: date-time */
+            createdAt?: string;
+            /** Format: int64 */
+            resourceCount?: number;
+        };
+        PublicCertificationResponse: {
+            /** Format: int64 */
+            id?: number;
+            title?: string;
+        };
+        PublicProfileDetailResponse: {
+            /** Format: int64 */
+            id?: number;
+            name?: string;
+            surname?: string;
+            profession?: string;
+            location?: string;
+            avatarUrl?: string;
+            verified?: boolean;
+            linkedinId?: string;
+            businessEmail?: string;
+            certifications?: components["schemas"]["PublicCertificationResponse"][];
+            artids?: components["schemas"]["PublicArtidSummaryResponse"][];
+        };
+        PublicProfileResponse: {
+            /** Format: int64 */
+            id?: number;
+            name?: string;
+            surname?: string;
+            profession?: string;
+            /** Format: int64 */
+            publicArtidCount?: number;
         };
         CountResponse: {
             /** Format: int64 */
@@ -788,6 +857,50 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["AuthResponse"];
+                };
+            };
+        };
+    };
+    publicProfile: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["PublicProfileDetailResponse"];
+                };
+            };
+        };
+    };
+    search: {
+        parameters: {
+            query?: {
+                query?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["PublicProfileResponse"][];
                 };
             };
         };

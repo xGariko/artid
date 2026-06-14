@@ -1,11 +1,11 @@
 <script lang="ts">
 	import type { PublicProfile } from '$lib/api/types';
 	import ExploreProfileCard from './explore-profile-card.svelte';
+	import ExplorePagination from './explore-pagination.svelte';
 
 	let { profiles, hasSearched }: { profiles: PublicProfile[]; hasSearched: boolean } = $props();
 
 	const PAGE_SIZE = 10;
-	const MAX_PAGE_BUTTONS = 5;
 
 	let currentPage = $state(1);
 
@@ -19,17 +19,6 @@
 	const pageProfiles = $derived(
 		profiles.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE)
 	);
-
-	// Finestra scorrevole di numeri pagina centrata sulla pagina corrente.
-	const pageNumbers = $derived.by(() => {
-		if (totalPages <= MAX_PAGE_BUTTONS) {
-			return Array.from({ length: totalPages }, (_, index) => index + 1);
-		}
-		const half = Math.floor(MAX_PAGE_BUTTONS / 2);
-		const end = Math.min(totalPages, Math.max(currentPage + half, MAX_PAGE_BUTTONS));
-		const start = Math.max(1, end - MAX_PAGE_BUTTONS + 1);
-		return Array.from({ length: end - start + 1 }, (_, index) => start + index);
-	});
 
 	function goToPage(targetPage: number): void {
 		currentPage = Math.min(Math.max(targetPage, 1), totalPages);
@@ -46,41 +35,7 @@
 			{/each}
 		</div>
 
-		{#if totalPages > 1}
-			<nav class="mt-auto pt-4" aria-label="Paginazione risultati">
-				<ul class="pagination justify-content-center mb-0">
-					<li class="page-item" class:disabled={currentPage === 1}>
-						<button
-							type="button"
-							class="page-link"
-							aria-label="Pagina precedente"
-							onclick={() => goToPage(currentPage - 1)}
-						>
-							<i class="bi bi-chevron-left"></i>
-						</button>
-					</li>
-
-					{#each pageNumbers as pageNumber (pageNumber)}
-						<li class="page-item" class:active={pageNumber === currentPage}>
-							<button type="button" class="page-link" onclick={() => goToPage(pageNumber)}>
-								{pageNumber}
-							</button>
-						</li>
-					{/each}
-
-					<li class="page-item" class:disabled={currentPage === totalPages}>
-						<button
-							type="button"
-							class="page-link"
-							aria-label="Pagina successiva"
-							onclick={() => goToPage(currentPage + 1)}
-						>
-							<i class="bi bi-chevron-right"></i>
-						</button>
-					</li>
-				</ul>
-			</nav>
-		{/if}
+		<ExplorePagination {currentPage} {totalPages} onChange={goToPage} class="mt-auto pt-4" />
 	{:else}
 		<div
 			class="flex-grow-1 d-flex flex-column align-items-center justify-content-center text-artid-text-muted text-center px-3"

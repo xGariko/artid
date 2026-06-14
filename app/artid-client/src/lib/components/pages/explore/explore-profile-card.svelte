@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { goto } from '$app/navigation';
+	import { resolve } from '$app/paths';
 	import type { PublicProfile } from '$lib/api/types';
 	import { avatarColorFor, initialsFor } from '$lib/utilities';
 
@@ -7,10 +9,24 @@
 	const fullName = $derived(`${profile.name ?? ''} ${profile.surname ?? ''}`.trim());
 	const initials = $derived(initialsFor(profile.name, profile.surname));
 	const avatarColor = $derived(avatarColorFor(fullName));
+
+	function openProfile(): void {
+		if (profile.id == null) return;
+		goto(resolve('/explore/[id]', { id: String(profile.id) }));
+	}
 </script>
 
 <div
 	class="bg-artid-section border border-artid-border rounded-3 p-3 h-100 d-flex flex-column align-items-center text-center explore-profile-card"
+	role="button"
+	tabindex="0"
+	onclick={openProfile}
+	onkeydown={(event) => {
+		if (event.key === 'Enter' || event.key === ' ') {
+			event.preventDefault();
+			openProfile();
+		}
+	}}
 >
 	<div
 		class="rounded-circle d-flex align-items-center justify-content-center text-white fw-bold fs-4 explore-profile-card__avatar"

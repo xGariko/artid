@@ -42,6 +42,8 @@ public class SecurityConfig {
                         .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                         // Catalogo pubblico (pagina Explore): ricerca profili pubblici senza login.
                         .requestMatchers(HttpMethod.GET, "/api/users/search").permitAll()
+                        // Dettaglio profilo pubblico (Explore → /explore/[id]): aperto senza login.
+                        .requestMatchers(HttpMethod.GET, "/api/users/*/public").permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);

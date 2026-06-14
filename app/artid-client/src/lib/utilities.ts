@@ -15,6 +15,18 @@ export function formatItalianDate(isoDate: string | null | undefined): string {
 	return ITALIAN_DATE_FORMATTER.format(new Date(isoDate));
 }
 
+const ITALIAN_DATE_FORMATTER_LONG = new Intl.DateTimeFormat("it-IT", {
+	day: "numeric",
+	month: "long",
+	year: "numeric",
+});
+
+// Formatta una data ISO in italiano per esteso (es. "12 maggio 2026"). "—" se assente.
+export function formatItalianDateLong(isoDate: string | null | undefined): string {
+	if (!isoDate) return "—";
+	return ITALIAN_DATE_FORMATTER_LONG.format(new Date(isoDate));
+}
+
 // Formatta una dimensione in byte come stringa human-readable (kb/mb/gb).
 export function formatFileSize(bytes: number | null | undefined): string {
 	if (bytes == null) return "—";

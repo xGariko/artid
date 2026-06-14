@@ -45,10 +45,6 @@
 				{/each}
 			</div>
 			<div class="col-6 col-lg-4 d-flex align-items-center justify-content-end gap-2">
-				<button class="btn btn-light rounded-pill text-primary fs-5" title="notifications">
-					<i class="bi bi-bell-fill"></i>
-				</button>
-
 				<div class="dropdown">
 
 

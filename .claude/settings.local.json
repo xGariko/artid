@@ -100,7 +100,22 @@
       "Bash(pdftotext -layout \"Object Design Document.pdf\" \"odd_reference.txt\")",
       "Bash(node -e \"console.log\\('docx version:', require\\('docx/package.json'\\).version\\)\")",
       "PowerShell(git -C C:\\\\progetti\\\\artid diff -- app/artid-client/src/lib/components/layout/artid-navbar.svelte)",
-      "PowerShell(git -C C:\\\\progetti\\\\artid log -S \"bootstrap.bundle\" --oneline --all -- app/artid-client; Write-Output \"---- ricerca generica nel working tree ----\"; git -C C:\\\\progetti\\\\artid grep -n \"bootstrap.bundle\" $\\(git -C C:\\\\progetti\\\\artid rev-list --all\\) -- app/artid-client 2>$null | Select-Object -First 10)"
+      "PowerShell(git -C C:\\\\progetti\\\\artid log -S \"bootstrap.bundle\" --oneline --all -- app/artid-client; Write-Output \"---- ricerca generica nel working tree ----\"; git -C C:\\\\progetti\\\\artid grep -n \"bootstrap.bundle\" $\\(git -C C:\\\\progetti\\\\artid rev-list --all\\) -- app/artid-client 2>$null | Select-Object -First 10)",
+      "WebFetch(domain:astah.net)",
+      "mcp__astah-mcp__hasProject",
+      "mcp__astah-mcp__getCurrentDiagram",
+      "mcp__astah-mcp__getDiagramIdsInProject",
+      "mcp__astah-mcp__convertPlantUMLToAstah",
+      "mcp__astah-mcp__convertAstahDiagramToPlantUML",
+      "mcp__astah-mcp__removeModel",
+      "mcp__astah-mcp__openDiagram",
+      "mcp__astah-mcp__getPresentationModelsInCurrentDiagram",
+      "mcp__astah-mcp__getModelByPresentationId",
+      "mcp__astah-mcp__createMessage",
+      "mcp__astah-mcp__openProject",
+      "mcp__astah-mcp__saveAsProject",
+      "mcp__astah-mcp__getModelByIdOrQualifiedName",
+      "mcp__astah-mcp__setLifelineType"
     ]
   }
 }
