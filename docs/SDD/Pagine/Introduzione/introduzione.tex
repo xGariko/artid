@@ -1,0 +1,68 @@
+% ==========================================
+\section{Introduzione}
+% ==========================================
+\subsection{Obiettivi del sistema}
+Il progetto ``ArtID'' nasce con lo scopo di ingegnerizzare e rilasciare una piattaforma software centralizzata espressamente dedicata agli studenti delle istituzioni appartenenti al comparto AFAM (Alta Formazione Artistica, Musicale e Coreutica). L'applicativo si propone come l'ambiente digitale di riferimento per la creazione, la personalizzazione e l'integrazione dell'identità digitale e del percorso formativo-artistico dei discenti.
+
+L'obiettivo cardine del sistema consiste nella digitalizzazione standardizzata, nella valorizzazione e nella centralizzazione del patrimonio artistico e accademico individuale. Lo strumento mira a superare la frammentazione delle informazioni, aggregando in un unico ecosistema protetto sia i dati anagrafici dello studente, sia le sue certificazioni, sia la produzione artistica multimediale generata durante la carriera. Il sistema si rivolge primariamente agli studenti in qualità di amministratori unici del proprio portfolio, e secondariamente a una platea di attori esterni (commissioni d'esame, direttori artistici e istituzioni partner) abilitati alla consultazione selettiva del materiale condiviso. 
+
+Nello specifico, il sistema persegue i seguenti traguardi strategici e operativi:
+
+\begin{itemize}[itemsep=-8pt]
+    \item \textbf{Centralizzazione e Unificazione:} Abbattere la dispersione dei dati eliminando la necessità di ricorrere a molteplici repository commerciali esterni o a supporti fisici locali, offrendo un unico punto di persistenza governato dall'istituzione AFAM.
+    \item \textbf{Autonomia e Flessibilità Configurativa:} Garantire all'utente finale la piena sovranità sui propri dati, permettendo la strutturazione di portfolio dinamici e la modulazione granulare dei livelli di visibilità dei contenuti in base al contesto d'uso.
+    \item \textbf{Disseminazione Sicura e Controllata:} Abilitare canali di condivisione esterni protetti e monitorabili, capaci di fornire metriche analitiche oggettive circa l'avvenuta consultazione dei materiali condivisi.
+    \item \textbf{Compliance e Scalabilità Architetturale:} Configurare un'infrastruttura tecnologica aderente alle vigenti normative in materia di protezione dei dati personali (GDPR) e predisposta nativamente per future integrazioni con i nodi di identità federata nazionali ed europei.
+\end{itemize}
+
+\subsection{Obiettivi di progettazione}
+
+\subsubsection{Affidabilità, Robustezza e Continuità del Servizio}
+\begin{itemize}
+    \item \textbf{Disponibilità e Uptime:} Il sistema e il DBMS devono essere costantemente in esecuzione all'interno del nodo AFAM in cui sono installati, per permettere agli utenti di interagire con il sistema principale in ogni momento. È tuttavia tollerabile un periodo di inattività di pochi minuti al giorno all'infuori degli orari di picco (scolastici e/o lavorativi) per permettere interventi di manutenzione. L'uptime deve essere il più vicino possibile al 100\%.
+    \item \textbf{Gestione della Connettività ed Errori:} Il sistema deve essere in grado di rispondere adeguatamente a una perdita di connessione, inizialmente ritentando il collegamento. Se il problema persiste, deve segnalarlo all'utente e assicurare la coerenza e la persistenza dei dati immagazzinati anche in caso di errore. In caso di interruzione, il sistema deve permettere all'utente di riprendere il lavoro dal punto in cui si era interrotto.
+\end{itemize}
+
+\subsubsection{Sicurezza e Integrità dei Dati}
+\begin{itemize}
+    \item \textbf{Protezione e Sviluppo Sicuro:} Il sistema deve essere protetto da vulnerabilità note, adottando le pratiche conosciute per uno sviluppo sicuro. Non deve permettere all'utente di inserire input invalidi o sintatticamente scorretti, implementando meccanismi di validazione e sanificazione dell'input e l'uso di query parametrizzate.
+    \item \textbf{Crittografia delle Credenziali:} Le password degli utenti devono essere memorizzate criptate all'interno del database.
+    \item \textbf{Transazionalità:} Le richieste al DBMS devono essere gestite in modo transazionale per garantire l'integrità dei dati.
+\end{itemize}
+
+\subsubsection{Prestazioni ed Efficienza}
+\begin{itemize}
+    \item \textbf{Tempi di Risposta:} Il sistema deve poter rispondere alle richieste dell'utente entro cinque secondi, non considerando il tempo di trasferimento dei file multimediali.
+    \item \textbf{Ottimizzazione del DBMS:} Il sistema deve effettuare il minimo numero possibile di interrogazioni al DBMS per rispondere a una data richiesta.
+\end{itemize}
+
+\subsubsection{Usabilità ed Esperienza Utente}
+\begin{itemize}
+    \item \textbf{Interfaccia Intuitiva:} L'utilizzo del sistema deve essere intuitivo e immediato, pensato anche per utenti dalle scarse competenze tecnologiche. Il sistema deve minimizzare dove possibile le interazioni con l'utente necessarie per portare a termine una data operazione.
+\end{itemize}
+
+\subsubsection{Estendibilità e Manutenibilità}
+\begin{itemize}
+    \item \textbf{Modularità dell'Identità Digitale:} Il sistema deve essere progettato per essere in grado di accogliere diversi moduli di identità federata (SPID/eIDAS) senza alterare la logica di business.
+\end{itemize}
+
+\subsection{Definizioni}
+
+\arrayrulecolor{SlateGray} % Cambia il colore delle linee della tabella
+\begin{tabularx}{\textwidth}{|c|X|}
+\hline
+\headerTabella{Proprieta}{Descrizione}
+\rigaTabella{Membro AFAM}{Individuo autenticato che utilizza il software.}
+\rigaTabella{Guest}{Individuo esterno all'istituzione AFAM o individuo non autenticato che interagisce con il software.}
+\rigaTabella{Materiale}{Qualsiasi file che faccia parte della produzione artistica dello studente,
+                        come registrazioni audio, video, spartiti e curriculum utili a rappresentarne le competenze e l’esperienza.}
+\rigaTabella{ArtID}{Contenitore dinamico che contiene i materiali del membro AFAM e che può essere condiviso con altri membri AFAM o con utenti esterni.}
+\rigaTabella{Condivisione interna}{Condivisione di un ArtID da un Membro a un altro.}
+\rigaTabella{Condivisione esterna o Link}{Condivisione di un ArtID tramite link tra un Membro e un Guest.}
+\rigaTabella{DBMS}{Sistema per la gestione dei dati permanenti degli ArtID e dei Membri}
+\rigaTabella{Codice OTP}{Codice numerico monouso generato dal sistema e inviato al Membro tramite posta elettronica.\newline
+                        \`E formato da 6 cifre ed ha una validità temporale limitata (5 minuti dalla generazione), oltre la quale decade e non può più essere utilizzato.\newline
+                        Garantisce che l'indirizzo email fornito dal Membro in fase di registrazione sia reale, attivo e sotto il suo diretto controllo.}
+\rigaTabella{Modale}{Elemento dell'interfaccia grafica che compare in sovrimpressione rispetto alla schermata corrente, disabilitando temporaneamente l'interazione con l'applicazione sottostante. Il Membro è obbligato a interagire con la modale (ad esempio per confermare un'azione o inserire un dato puntuale) prima di poter tornare alla schermata principale.\newline
+                    Qualora il linguaggio di programmazione o il framework di sviluppo scelto per la fase di implementazione non dovesse supportare nativamente la creazione di modali, quest'ultime verranno visualizzate e gestite come \textbf{schermate intere a pieno schermo}.}
+\end{tabularx}

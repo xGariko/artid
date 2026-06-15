@@ -1,0 +1,103 @@
+% ==========================================
+\section{Introduzione}
+% ==========================================
+
+\subsection{Prestazioni e costi}
+Per la realizzazione di ArtID sono state impiegate esclusivamente \textbf{tecnologie e librerie open source}, minimizzando i tempi e i costi di sviluppo e di esercizio e ottenendo al contempo prestazioni adeguate al dominio applicativo.
+
+A differenza di sistemi che richiedono hardware specializzato, ArtID è pensata come \textbf{applicazione web} e non necessita di risorse di calcolo dedicate: il carico è dominato da operazioni di I/O verso il database e verso lo storage. Il livello di Front-End è distribuibile su piattaforma serverless (Vercel, tramite l'adapter dedicato), il livello di Back-End gira su una JVM standard e la persistenza relazionale è affidata a PostgreSQL; i contenuti binari sono delegati al servizio di object storage AWS S3, evitando i costi e la complessità di un'infrastruttura di archiviazione proprietaria.
+
+\subsection{Tempi di risposta}
+I tempi di risposta delle operazioni CRUD sono nell'ordine di pochi secondi e tendono a crescere con l'aumentare dei dati nel database; sono mitigati da indicizzazione, conteggi aggregati e pooling delle connessioni. I tempi di caricamento e download dei file dipendono dalla loro dimensione e dal round-trip verso l'object storage; per il download dei file multimediali si impiegano URL firmati (presigned), così che i byte transitino direttamente tra browser e storage senza gravare sul nodo Back-End. ArtID non presenta latenze imprevedibili: tutte le operazioni hanno un costo sostanzialmente deterministico, funzione della dimensione dei contenuti.
+
+\subsection{Overview del sistema}
+Il sistema si divide in due package principali:
+\begin{itemize}[itemsep=-6pt]
+    \item \textbf{Front-End:} implementa il lato \textbf{View} del modello MVC adottato in fase di analisi, con una parte di \textbf{Controller} il cui obiettivo è prevenire che utenti non esperti effettuino involontariamente operazioni non consentite.
+    \item \textbf{Back-End:} implementa il lato \textbf{Controller} vero e proprio e il lato \textbf{Model} del modello MVC adottato in fase di analisi.
+\end{itemize}
+
+\subsection{Sviluppo Front-End}
+L'interfaccia di ArtID privilegia semplicità e immediatezza: grazie a un layout lineare, essenziale e responsive, consente la migliore interazione possibile anche a un'utenza priva di competenze tecniche avanzate. Ove possibile, errori e messaggi rivolti all'utente sono resi non bloccanti — tramite notifiche toast — per non interrompere il flusso di lavoro.
+
+L'applicazione è sviluppata con \textbf{SvelteKit} (Svelte 5, modalità Runes) e \textbf{Bootstrap}, con rendering ibrido lato server (SSR) e lato client (CSR). SvelteKit adotta un modello di routing e rendering basato su file.
+
+\subsubsection{Librerie Front-End}
+\arrayrulecolor{SlateGray}
+\begin{tabularx}{\textwidth}{|c|c|X|}
+\hline
+\headerTabellaLib{Libreria}{Versione}{Ruolo}
+\rigaTabellaLib{svelte}{5.x}{Libreria UI a componenti reattivi (modalità Runes).}
+\rigaTabellaLib{@sveltejs/adapter-vercel}{6.x}{Adapter di build per il deployment su Vercel.}
+\rigaTabellaLib{vite}{8.x}{Build tool e dev server con Hot Module Replacement.}
+\rigaTabellaLib{bootstrap}{5.3}{Framework CSS responsive.}
+\rigaTabellaLib{@sveltestrap/sveltestrap}{7.x}{Componenti Bootstrap idiomatici per Svelte.}
+\rigaTabellaLib{bootstrap-icons}{1.13}{Set di icone vettoriali.}
+\rigaTabellaLib{sass}{1.x}{Preprocessore CSS.}
+\rigaTabellaLib{zod}{4.x}{Validazione e derivazione dei tipi a runtime (schemi di dominio e DTO).}
+\rigaTabellaLib{openapi-fetch}{0.17}{Client HTTP tipizzato sullo schema OpenAPI del back-end.}
+\rigaTabellaLib{openapi-typescript}{7.x}{Generazione dei tipi TypeScript dallo schema OpenAPI (dev).}
+\rigaTabellaLib{quill}{2.x}{Editor di testo ricco per le descrizioni dei materiali.}
+\rigaTabellaLib{svelte-sonner}{1.x}{Notifiche toast non bloccanti.}
+\end{tabularx}
+
+\subsection{Sviluppo Back-End}
+
+Lo sviluppo lato server adotta \textbf{Spring Boot 4} su \textbf{Java 17}, con architettura a strati (controller → service → dao) che separa nettamente l'esposizione delle API, la logica di business e l'accesso ai dati. Le API sono REST e \textbf{stateless}: ogni richiesta è autenticata in modo indipendente tramite token JWT, abilitando la scalabilità orizzontale del lato Back-End del sistema.
+La persistenza relazionale è gestita con \textbf{Spring Data JDBC} e, dove servono query o aggregazioni puntuali, con JdbcTemplate/NamedParameterJdbcTemplate; i contenuti binari sono delegati a un object storage S3-compatibile. La specifica \textbf{OpenAPI} (springdoc) costituisce il contratto condiviso dal quale il client genera i propri tipi, garantendo coerenza end-to-end. La sicurezza è gestita da Spring Security (filtro JWT, codifica BCrypt); il boilerplate è ridotto con Lombok.
+
+\subsubsection{Librerie Back-End}
+
+\arrayrulecolor{SlateGray}
+\begin{tabularx}{\textwidth}{|c|c|X|}
+\hline
+\headerTabellaLib{Libreria}{Versione}{Ruolo}
+\rigaTabellaLib{spring-boot-starter-web}{4.0}{MVC REST, server embedded, serializzazione JSON.}
+\rigaTabellaLib{spring-boot-starter-data-jdbc}{4.0}{Repository e mapping relazionale (Spring Data JDBC).}
+\rigaTabellaLib{spring-boot-starter-jdbc}{4.0}{JdbcTemplate, datasource e gestione delle transazioni.}
+\rigaTabellaLib{spring-boot-starter-security}{4.0}{Autenticazione, autorizzazione e catena di filtri.}
+\rigaTabellaLib{postgresql}{runtime}{Driver JDBC per PostgreSQL.}
+\rigaTabellaLib{jjwt (api/impl/jackson)}{0.12.6}{Generazione e verifica dei token JWT.}
+\rigaTabellaLib{springdoc-openapi-starter-webmvc-ui}{2.8.8}{Esposizione della specifica OpenAPI e Swagger UI.}
+\rigaTabellaLib{software.amazon.awssdk:s3}{2.31}{Client S3 per l'object storage (Supabase Storage).}
+\rigaTabellaLib{lombok}{—}{Riduzione del boilerplate (@Data, @RequiredArgsConstructor).}
+\rigaTabellaLib{spring-boot-devtools}{runtime}{Hot reload in fase di sviluppo.}
+\end{tabularx}
+
+% ==================
+% DOCS
+% ==================
+
+\subsection{Linee guida per la documentazione delle interfacce}
+Le interfacce sono realizzate con \textbf{SvelteKit} e \textbf{Bootstrap}, con l'obiettivo di offrire schermate essenziali, coerenti e immediate. 
+
+La componentizzazione (organizzata nella cartella \texttt{lib/components} e suddivisa in primitive UI, componenti di pagina ed elementi di layout) favorisce il riuso e l'uniformità visiva, mentre l'impiego di stili condivisi assicura un design moderno e responsive su dispositivi desktop.
+
+\subsection{Linee guida per la documentazione del DBMS}
+Il DBMS scelto è \textbf{PostgreSQL}, nel deployment corrente erogato come servizio gestito da \textbf{Supabase}. 
+
+\noindent
+Le caratteristiche principali della gestione dei dati includono:
+\begin{itemize}
+    \item \textbf{Interazione e Sicurezza:} Avviene tramite Spring Data JDBC e query parametrizzate come protezione da SQL injection, nel rispetto delle proprietà ACID.
+    \item \textbf{Controllo degli Accessi:} L'accesso al database è mediato esclusivamente dal nodo Back-End, che si connette con un'utenza dedicata; il client non interroga mai direttamente il database.
+\end{itemize}
+
+\noindent
+Per il dettaglio dello schema entità-relazione e del modello relazionale si rimanda al \textit{System Design Document} (§3.6).
+
+\subsection{Linee guida per la documentazione dello storage dei file}
+Per la persistenza dei contenuti binari (materiali, attestati e immagini di profilo) è impiegato un servizio di \textbf{object storage S3-compatibile} — nel deployment corrente \textbf{Supabase Storage} — interrogato tramite l'\textit{AWS SDK for Java v2}. La comunicazione avviene su HTTPS verso un servizio specializzato esterno, mantenendo il sistema modulare e scalabile e sgravando il DBMS dalla gestione dei BLOB.
+
+\subsubsection*{Gestione e Sicurezza dei File}
+\begin{itemize}
+    \item \textbf{Identificazione:} Ogni file è identificato da una \textit{object key} opaca (UUID) scollegata dal nome originale, così da evitare collisioni e \textit{path traversal}.
+    \item \textbf{Metadati:} Le informazioni del file (nome, estensione, tipo MIME, dimensione) risiedono nella tabella \texttt{file}, mentre i byte sono conservati nel bucket.
+    \item \textbf{Accesso:} Il download di oggetti privati avviene tramite URL firmati a scadenza short-term.
+    \item \textbf{Disaccoppiamento:} L'intera interazione è incapsulata nella classe \texttt{StorageService}, garantendo che un eventuale cambio di provider non impatti la logica di business.
+    \item \textbf{Consistenza:} La pulizia degli oggetti è coordinata con le transazioni del database. Un upload viene rimosso in caso di rollback e la cancellazione fisica avviene solo a commit avvenuto, evitando file orfani o riferimenti incoerenti.
+\end{itemize}
+
+
+
+% \subsection{Linee guida per la documentazione delle interfacce}
