@@ -4,17 +4,18 @@
 	import ArtidEditorModal from '$lib/components/ui/artid-editor-modal.svelte';
 	import ArtidInput from '$lib/components/ui/artid-input.svelte';
 	import type { SidebarAction, SidebarButtonGroup } from '$lib/models/sidebar-buttons';
-	import { isRecent } from '$lib/utilities';
+	import { isRecent, type ArtIdFilterType } from '$lib/utilities';
 	import { toast } from 'svelte-sonner';
 	import type { PageData } from './$types';
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
 	import { api } from '$lib/api/browser-client';
+	import ArtidCard from '$lib/components/pages/artid/artid-card.svelte';
 
 	let { data }: { data: PageData } = $props();
 
 	// Valore del filtro sidebar attivo: raccolta ("recent"|"favourite").
-	let activeFilterValue = $state('all');
+	let activeFilterValue: ArtIdFilterType = $state('all');
 
 	let isOpen = $state(false);
 	let isSaving = $state(false);
@@ -142,9 +143,14 @@
 	<div
 		class="bg-artid-section h-100 w-60 rounded-3 border border-artid-border p-3 d-flex flex-column gap-3 artid-list"
 	>
+	<div class="row">
+
 		{#each visibleArtids as artid (artid.id)}
-			<div>{artid.title}</div>
+		<div class="col-3">
+			<ArtidCard artid={artid} filter={activeFilterValue}/>
+		</div>
 		{/each}
+	</div>
 		<a href={resolve('/(app)/artid/details/[id]', { id: '1' })}>Vai a dettagli</a>
 	</div>
 </div>
