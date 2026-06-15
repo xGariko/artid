@@ -117,7 +117,12 @@
       "mcp__astah-mcp__getModelByIdOrQualifiedName",
       "mcp__astah-mcp__setLifelineType",
       "Bash(node -e \"const p=require\\('./package.json'\\); console.log\\('svelte', \\(p.devDependencies?.svelte||p.dependencies?.svelte\\)\\); console.log\\('kit', \\(p.devDependencies?.['@sveltejs/kit']||p.dependencies?.['@sveltejs/kit']\\)\\)\")",
-      "Bash(node -e \"const p=require\\('./package.json'\\); console.log\\(JSON.stringify\\(p.scripts,null,2\\)\\)\")"
+      "Bash(node -e \"const p=require\\('./package.json'\\); console.log\\(JSON.stringify\\(p.scripts,null,2\\)\\)\")",
+      "Bash(./mvnw -q -o compile)",
+      "Bash(./mvnw -q compile)",
+      "Bash(echo \"EXIT=$?\")",
+      "PowerShell(python \"$env:TEMP\\\\artid_seed_upload.py\")",
+      "PowerShell(npm run check --prefix app/artid-client 2>&1)"
     ]
   }
 }

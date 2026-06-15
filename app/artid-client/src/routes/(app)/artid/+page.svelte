@@ -143,7 +143,7 @@
 		class="bg-artid-section h-100 w-60 rounded-3 border border-artid-border p-3 d-flex flex-column gap-3 artid-list"
 	>
 		{#each visibleArtids as artid (artid.id)}
-			<div>{artid.title}</div>
+			<a href={resolve("/(app)/artid/details/[id]", {id: String(artid.id)})}>{artid.title}</a>
 		{/each}
 		<a href={resolve('/(app)/artid/details/[id]', { id: '1' })}>Vai a dettagli</a>
 	</div>

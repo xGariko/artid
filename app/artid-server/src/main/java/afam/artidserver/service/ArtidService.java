@@ -63,6 +63,7 @@ public class ArtidService {
                 a.getId(),
                 a.getIdUser(),
                 a.getTitle(),
+                a.getDescription(),
                 a.getFavourite(),
                 a.getCreatedAt(),
                 a.getLastModified(),
