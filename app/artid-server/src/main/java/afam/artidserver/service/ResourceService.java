@@ -57,8 +57,21 @@ public class ResourceService {
     }
 
     public List<ResourceResponse> findByUser(Long userId) {
-        List<Resource> resources = resourceDAO.findAllByIdUserAndDeletedAtIsNullOrderByLastModifiedDesc(userId);
+        return toResponses(resourceDAO.findAllByIdUserAndDeletedAtIsNullOrderByLastModifiedDesc(userId));
+    }
 
+    /**
+     * Materiali collegati a un ArtID. La proprietà è verificata nella query (vedi
+     * {@link afam.artidserver.dao.ResourceDAO#findByArtidForUser}): se l'ArtID non è dell'utente
+     * loggato la lista è vuota, e comunque tornano solo materiali suoi → niente accesso a dati altrui.
+     */
+    public List<ResourceResponse> findByArtid(Long artidId, Long userId) {
+        return toResponses(resourceDAO.findByArtidForUser(artidId, userId));
+    }
+
+    // Mappa una lista di Resource in ResourceResponse, recuperando i metadati dei file collegati
+    // in un'unica query batch (niente N+1).
+    private List<ResourceResponse> toResponses(List<Resource> resources) {
         List<Long> fileIds = resources.stream()
                 .map(Resource::getIdFile)
                 .filter(Objects::nonNull)

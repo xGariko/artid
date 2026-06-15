@@ -28,7 +28,14 @@
 
 	let currentPath  = $derived(page.url.pathname);
 	let section      = $derived(matchSection(currentPath));
-	let extras       = $derived($breadcrumb);
+	// Solo i crumb che sono antenati (o uguali) del path corrente, ordinati per
+	// profondità: così i crumb annidati si compongono e quelli "stantii" di route
+	// sorelle non vengono mostrati durante le transizioni.
+	let extras       = $derived(
+		[...$breadcrumb.values()]
+			.filter((c) => currentPath === c.href || currentPath.startsWith(c.href + '/'))
+			.sort((a, b) => a.href.length - b.href.length)
+	);
 	let visibleLinks = $derived(
 		section ? [dashboard, section, ...extras] : [dashboard, ...extras]
 	);

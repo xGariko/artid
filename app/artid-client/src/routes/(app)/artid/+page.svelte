@@ -9,6 +9,7 @@
 	import type { PageData } from './$types';
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
+	import { api } from '$lib/api/browser-client';
 
 	let { data }: { data: PageData } = $props();
 
@@ -26,17 +27,29 @@
 	async function createNewArtid(): Promise<void> {
 		if (isSaving) return;
 
-		if (title.length <= 0) {
+		const trimmed = title.trim();
+		if (trimmed.length <= 0) {
 			toast.error("Inserisci il nome dell'artid");
 			return;
 		}
 
 		isSaving = true;
 		try {
-			isOpen = false;
+			// POST same-origin → proxy /api/artids → Spring (id_user = utente loggato).
+			const { data, error: err } = await api.POST('/api/artids', {
+				body: { title: trimmed }
+			});
 
-			// redirect to artidDetails
-			await goto(resolve(`/(app)/artid/details/[idArtid]`, { idArtid: '1' }));
+			if (err || !data?.id) {
+				toast.error("Errore nella creazione dell'ArtID");
+				return;
+			}
+
+			isOpen = false;
+			title = '';
+
+			// redirect al dettaglio dell'ArtID appena creato
+			await goto(resolve('/(app)/artid/details/[id]', { id: String(data.id) }));
 		} catch (e) {
 			toast.error(e instanceof Error ? e.message : 'Errore di rete');
 		} finally {
@@ -132,7 +145,7 @@
 		{#each visibleArtids as artid (artid.id)}
 			<div>{artid.title}</div>
 		{/each}
-		<a href={resolve('/(app)/artid/details/[idArtid]', { idArtid: '1' })}>Vai a dettagli</a>
+		<a href={resolve('/(app)/artid/details/[id]', { id: '1' })}>Vai a dettagli</a>
 	</div>
 </div>
 

@@ -1,5 +1,11 @@
 <script>
 	import ArtidButton from '$lib/components/ui/artid-button.svelte';
+	import { goto } from '$app/navigation';
+	import { resolve } from '$app/paths';
+	import { page } from '$app/state';
+	
+
+	const id = $derived(page.params.id);
 </script>
 
 <div class="w-100 h-100 d-flex flex-column align-items-center gap-4 p-5">
@@ -29,6 +35,7 @@
 						fullWidth={false}
 						btnStyle="secondary"
 						outline={true}
+						onclick={()=>{goto(resolve("/(app)/artid/details/[id]/preview", {id: String(id)}))}}
 					/>
 					<ArtidButton
 						label="Condividi"

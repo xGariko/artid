@@ -115,7 +115,9 @@
       "mcp__astah-mcp__openProject",
       "mcp__astah-mcp__saveAsProject",
       "mcp__astah-mcp__getModelByIdOrQualifiedName",
-      "mcp__astah-mcp__setLifelineType"
+      "mcp__astah-mcp__setLifelineType",
+      "Bash(node -e \"const p=require\\('./package.json'\\); console.log\\('svelte', \\(p.devDependencies?.svelte||p.dependencies?.svelte\\)\\); console.log\\('kit', \\(p.devDependencies?.['@sveltejs/kit']||p.dependencies?.['@sveltejs/kit']\\)\\)\")",
+      "Bash(node -e \"const p=require\\('./package.json'\\); console.log\\(JSON.stringify\\(p.scripts,null,2\\)\\)\")"
     ]
   }
 }
