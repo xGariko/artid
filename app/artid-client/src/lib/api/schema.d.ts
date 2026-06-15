@@ -52,6 +52,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/profile/avatar": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: operations["uploadAvatar"];
+        post?: never;
+        delete: operations["deleteAvatar"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/users": {
         parameters: {
             query?: never;
@@ -116,6 +132,38 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/users/{id}/public": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["publicProfile"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/users/search": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["search"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/shares/count": {
         parameters: {
             query?: never;
@@ -172,6 +220,22 @@ export interface paths {
             cookie?: never;
         };
         get: operations["completion"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/dashboard/summary": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["summary"];
         put?: never;
         post?: never;
         delete?: never;
@@ -258,17 +322,18 @@ export interface components {
             birthdate?: string;
             birthplace?: string;
             address?: string;
-            taxId?: string;
             spidCode?: string;
             biography?: string;
             linkedinId?: string;
+            facebookId?: string;
+            instagramId?: string;
             profession?: string;
             isPublic?: boolean;
             phone?: string;
+            businessEmail?: string;
             /** Format: date-time */
             deletedAt?: string;
-            /** Format: byte */
-            propic?: string;
+            propicPath?: string;
             internalShareEnabled?: boolean;
         };
         ResourceUpsertRequest: {
@@ -277,9 +342,6 @@ export interface components {
             favorite?: boolean;
             /** Format: int64 */
             artidId?: number;
-            fileName?: string;
-            mimeType?: string;
-            fileContent?: string;
         };
         ResourceResponse: {
             /** Format: int64 */
@@ -310,15 +372,14 @@ export interface components {
             birthdate?: string;
             birthplace?: string;
             address?: string;
-            taxId?: string;
-            spidCode?: string;
             biography?: string;
             linkedinId?: string;
+            facebookId?: string;
+            instagramId?: string;
             profession?: string;
             isPublic?: boolean;
             phone?: string;
-            /** Format: byte */
-            propic?: string;
+            businessEmail?: string;
             internalShareEnabled?: boolean;
         };
         ProfileResponse: {
@@ -331,16 +392,19 @@ export interface components {
             birthdate?: string;
             birthplace?: string;
             address?: string;
-            taxId?: string;
-            spidCode?: string;
             biography?: string;
             linkedinId?: string;
+            facebookId?: string;
+            instagramId?: string;
             profession?: string;
             isPublic?: boolean;
             phone?: string;
-            /** Format: byte */
-            propic?: string;
+            businessEmail?: string;
+            propicUrl?: string;
             internalShareEnabled?: boolean;
+        };
+        AvatarResponse: {
+            url?: string;
         };
         RegisterRequest: {
             name?: string;
@@ -350,7 +414,6 @@ export interface components {
             /** Format: date */
             birthdate?: string;
             birthplace?: string;
-            taxId?: string;
         };
         AuthResponse: {
             token?: string;
@@ -364,6 +427,43 @@ export interface components {
             email?: string;
             password?: string;
         };
+        PublicArtidSummaryResponse: {
+            /** Format: int64 */
+            id?: number;
+            title?: string;
+            /** Format: date-time */
+            createdAt?: string;
+            /** Format: int64 */
+            resourceCount?: number;
+        };
+        PublicCertificationResponse: {
+            /** Format: int64 */
+            id?: number;
+            title?: string;
+        };
+        PublicProfileDetailResponse: {
+            /** Format: int64 */
+            id?: number;
+            name?: string;
+            surname?: string;
+            profession?: string;
+            location?: string;
+            avatarUrl?: string;
+            verified?: boolean;
+            linkedinId?: string;
+            businessEmail?: string;
+            certifications?: components["schemas"]["PublicCertificationResponse"][];
+            artids?: components["schemas"]["PublicArtidSummaryResponse"][];
+        };
+        PublicProfileResponse: {
+            /** Format: int64 */
+            id?: number;
+            name?: string;
+            surname?: string;
+            profession?: string;
+            /** Format: int64 */
+            publicArtidCount?: number;
+        };
         CountResponse: {
             /** Format: int64 */
             count?: number;
@@ -371,6 +471,18 @@ export interface components {
         ProfileCompletionResponse: {
             /** Format: int32 */
             percentage?: number;
+        };
+        DashboardSummaryResponse: {
+            /** Format: int64 */
+            artidCount?: number;
+            /** Format: int64 */
+            resourceCount?: number;
+            /** Format: int64 */
+            certificationCount?: number;
+            /** Format: int64 */
+            shareCount?: number;
+            /** Format: int32 */
+            profileCompletion?: number;
         };
         UserResponse: {
             /** Format: int64 */
@@ -479,9 +591,13 @@ export interface operations {
             };
             cookie?: never;
         };
-        requestBody: {
+        requestBody?: {
             content: {
-                "application/json": components["schemas"]["ResourceUpsertRequest"];
+                "multipart/form-data": {
+                    request?: components["schemas"]["ResourceUpsertRequest"];
+                    /** Format: binary */
+                    file?: string;
+                };
             };
         };
         responses: {
@@ -560,6 +676,51 @@ export interface operations {
             };
         };
     };
+    uploadAvatar: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "multipart/form-data": {
+                    /** Format: binary */
+                    file: string;
+                };
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["AvatarResponse"];
+                };
+            };
+        };
+    };
+    deleteAvatar: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
     getAll: {
         parameters: {
             query?: never;
@@ -631,9 +792,13 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody: {
+        requestBody?: {
             content: {
-                "application/json": components["schemas"]["ResourceUpsertRequest"];
+                "multipart/form-data": {
+                    request?: components["schemas"]["ResourceUpsertRequest"];
+                    /** Format: binary */
+                    file?: string;
+                };
             };
         };
         responses: {
@@ -692,6 +857,50 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["AuthResponse"];
+                };
+            };
+        };
+    };
+    publicProfile: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["PublicProfileDetailResponse"];
+                };
+            };
+        };
+    };
+    search: {
+        parameters: {
+            query?: {
+                query?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["PublicProfileResponse"][];
                 };
             };
         };
@@ -774,6 +983,26 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["ProfileCompletionResponse"];
+                };
+            };
+        };
+    };
+    summary: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["DashboardSummaryResponse"];
                 };
             };
         };

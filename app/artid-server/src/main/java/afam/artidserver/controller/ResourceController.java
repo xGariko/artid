@@ -3,21 +3,22 @@ package afam.artidserver.controller;
 import afam.artidserver.model.dto.CountResponse;
 import afam.artidserver.model.dto.ResourceResponse;
 import afam.artidserver.model.dto.ResourceUpsertRequest;
-import afam.artidserver.model.entity.User;
+import afam.artidserver.security.AuthenticatedUser;
 import afam.artidserver.service.ResourceService;
-import afam.artidserver.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -27,59 +28,54 @@ import java.util.List;
 public class ResourceController {
 
     private final ResourceService resourceService;
-    private final UserService userService;
 
     @GetMapping("/count")
-    public ResponseEntity<CountResponse> count(Authentication authentication) {
-        User user = userService.findByMail(authentication.getName()).orElseThrow();
-        return ResponseEntity.ok(new CountResponse(resourceService.countByUser(user.getId())));
+    public ResponseEntity<CountResponse> count(@AuthenticationPrincipal AuthenticatedUser principal) {
+        return ResponseEntity.ok(new CountResponse(resourceService.countByUser(principal.getId())));
     }
 
     @GetMapping
-    public ResponseEntity<List<ResourceResponse>> findByUser(Authentication authentication) {
-        User user = userService.findByMail(authentication.getName()).orElseThrow();
-        return ResponseEntity.ok(resourceService.findByUser(user.getId()));
+    public ResponseEntity<List<ResourceResponse>> findByUser(@AuthenticationPrincipal AuthenticatedUser principal) {
+        return ResponseEntity.ok(resourceService.findByUser(principal.getId()));
     }
 
     @GetMapping("/{id}/file")
-    public ResponseEntity<byte[]> downloadFile(@PathVariable Long id, Authentication authentication) {
-        User user = userService.findByMail(authentication.getName()).orElseThrow();
-        return resourceService.findFileByResourceId(id, user.getId())
+    public ResponseEntity<byte[]> downloadFile(@PathVariable Long id, @AuthenticationPrincipal AuthenticatedUser principal) {
+        return resourceService.findDownloadable(id, principal.getId())
                 .map(file -> ResponseEntity.ok()
-                        .contentType(file.getMimeType() != null
-                                ? MediaType.parseMediaType(file.getMimeType())
+                        .contentType(file.mimeType() != null
+                                ? MediaType.parseMediaType(file.mimeType())
                                 : MediaType.APPLICATION_OCTET_STREAM)
                         .header("Content-Disposition",
-                                "inline; filename=\"" + (file.getFileName() != null ? file.getFileName() : "file") + "\"")
-                        .body(file.getBlob()))
+                                "inline; filename=\"" + (file.fileName() != null ? file.fileName() : "file") + "\"")
+                        .body(file.content()))
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    @PostMapping
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ResourceResponse> create(
-            @RequestBody ResourceUpsertRequest request,
-            Authentication authentication
+            @ModelAttribute ResourceUpsertRequest request,
+            @RequestPart(value = "file", required = false) MultipartFile file,
+            @AuthenticationPrincipal AuthenticatedUser principal
     ) {
-        User user = userService.findByMail(authentication.getName()).orElseThrow();
-        return ResponseEntity.ok(resourceService.create(request, user.getId()));
+        return ResponseEntity.ok(resourceService.create(request, file, principal.getId()));
     }
 
-    @PutMapping("/{id}")
+    @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ResourceResponse> update(
             @PathVariable Long id,
-            @RequestBody ResourceUpsertRequest request,
-            Authentication authentication
+            @ModelAttribute ResourceUpsertRequest request,
+            @RequestPart(value = "file", required = false) MultipartFile file,
+            @AuthenticationPrincipal AuthenticatedUser principal
     ) {
-        User user = userService.findByMail(authentication.getName()).orElseThrow();
-        return resourceService.update(id, request, user.getId())
+        return resourceService.update(id, request, file, principal.getId())
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id, Authentication authentication) {
-        User user = userService.findByMail(authentication.getName()).orElseThrow();
-        return resourceService.delete(id, user.getId())
+    public ResponseEntity<Void> delete(@PathVariable Long id, @AuthenticationPrincipal AuthenticatedUser principal) {
+        return resourceService.delete(id, principal.getId())
                 ? ResponseEntity.noContent().build()
                 : ResponseEntity.notFound().build();
     }

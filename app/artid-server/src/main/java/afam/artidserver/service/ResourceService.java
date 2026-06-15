@@ -6,15 +6,22 @@ import afam.artidserver.model.dto.ResourceResponse;
 import afam.artidserver.model.dto.ResourceUpsertRequest;
 import afam.artidserver.model.entity.File;
 import afam.artidserver.model.entity.Resource;
+import afam.artidserver.storage.StorageService;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.time.OffsetDateTime;
-import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -28,22 +35,22 @@ public class ResourceService {
 
     private final ResourceDAO resourceDAO;
     private final FileDAO fileDAO;
+    private final StorageService storageService;
     private final JdbcTemplate jdbcTemplate;
     private final NamedParameterJdbcTemplate namedJdbcTemplate;
 
-    // Proiezione lightweight per le letture: niente blob in memoria, solo metadati + dimensione
-    // calcolata via OCTET_LENGTH lato Postgres.
+    private static final Logger logger = LoggerFactory.getLogger(ResourceService.class);
+
+    // Proiezione lightweight per le letture: solo metadati, niente byte. La dimensione ora
+    // arriva dalla colonna file_size (i byte vivono su S3).
     private record FileMetadata(Long id, String fileName, String extension, String mimeType, Long fileSize) {
         static FileMetadata of(File f) {
-            return new FileMetadata(
-                    f.getId(),
-                    f.getFileName(),
-                    f.getExtension(),
-                    f.getMimeType(),
-                    f.getBlob() != null ? (long) f.getBlob().length : null
-            );
+            return new FileMetadata(f.getId(), f.getFileName(), f.getExtension(), f.getMimeType(), f.getFileSize());
         }
     }
+
+    /** File scaricabile: metadati + contenuto recuperato da S3. */
+    public record DownloadableFile(String fileName, String mimeType, byte[] content) {}
 
     public long countByUser(Long userId) {
         return resourceDAO.countByIdUserAndDeletedAtIsNull(userId);
@@ -67,18 +74,20 @@ public class ResourceService {
                 .toList();
     }
 
-    public Optional<File> findFileByResourceId(Long resourceId, Long userId) {
+    public Optional<DownloadableFile> findDownloadable(Long resourceId, Long userId) {
         return resourceDAO.findById(resourceId)
                 .filter(r -> userId.equals(r.getIdUser()) && r.getDeletedAt() == null && r.getIdFile() != null)
-                .flatMap(r -> fileDAO.findById(r.getIdFile()));
+                .flatMap(r -> fileDAO.findById(r.getIdFile()))
+                .filter(f -> f.getFilePath() != null)
+                .map(f -> new DownloadableFile(f.getFileName(), f.getMimeType(), storageService.download(f.getFilePath())));
     }
 
     @Transactional
-    public ResourceResponse create(ResourceUpsertRequest request, Long userId) {
-        if (request.fileContent() == null || request.fileContent().isBlank()) {
-            throw new IllegalArgumentException("fileContent è obbligatorio per la creazione");
+    public ResourceResponse create(ResourceUpsertRequest request, MultipartFile file, Long userId) {
+        if (file == null || file.isEmpty()) {
+            throw new IllegalArgumentException("Il file è obbligatorio per la creazione");
         }
-        File savedFile = saveFile(request.fileName(), request.mimeType(), request.fileContent());
+        File savedFile = saveFile(file);
 
         Resource resource = new Resource();
         resource.setIdUser(userId);
@@ -98,7 +107,7 @@ public class ResourceService {
     }
 
     @Transactional
-    public Optional<ResourceResponse> update(Long resourceId, ResourceUpsertRequest request, Long userId) {
+    public Optional<ResourceResponse> update(Long resourceId, ResourceUpsertRequest request, MultipartFile file, Long userId) {
         Optional<Resource> existing = resourceDAO.findById(resourceId)
                 .filter(r -> userId.equals(r.getIdUser()) && r.getDeletedAt() == null);
         if (existing.isEmpty()) return Optional.empty();
@@ -109,14 +118,19 @@ public class ResourceService {
         resource.setFavorite(Boolean.TRUE.equals(request.favorite()));
         resource.setLastModified(OffsetDateTime.now());
 
-        // Se il file viene sostituito teniamo da parte il vecchio id e lo cancelliamo solo
-        // DOPO aver salvato resource col nuovo id_file. Altrimenti la FK resource→file
-        // punta ancora al vecchio record e Postgres rifiuta il delete.
+        // Se il file viene sostituito, teniamo da parte vecchio id e object key. Il record File
+        // vecchio va cancellato solo DOPO aver salvato resource col nuovo id_file, altrimenti la
+        // FK resource→file punta ancora al vecchio record e Postgres rifiuta il delete. L'oggetto
+        // su S3 lo eliminiamo solo a commit avvenuto: se la transazione fallisce il file resta.
         FileMetadata fileMeta;
         Long oldFileIdToDelete = null;
-        if (request.fileContent() != null && !request.fileContent().isBlank()) {
+        String oldObjectKeyToDelete = null;
+        if (file != null && !file.isEmpty()) {
             oldFileIdToDelete = resource.getIdFile();
-            File newFile = saveFile(request.fileName(), request.mimeType(), request.fileContent());
+            oldObjectKeyToDelete = oldFileIdToDelete != null
+                    ? fileDAO.findById(oldFileIdToDelete).map(File::getFilePath).orElse(null)
+                    : null;
+            File newFile = saveFile(file);
             resource.setIdFile(newFile.getId());
             fileMeta = FileMetadata.of(newFile);
         } else {
@@ -134,6 +148,7 @@ public class ResourceService {
 
         if (oldFileIdToDelete != null) {
             fileDAO.deleteById(oldFileIdToDelete);
+            deleteObjectAfterCommit(oldObjectKeyToDelete);
         }
 
         return Optional.of(toResponse(saved, fileMeta));
@@ -148,7 +163,9 @@ public class ResourceService {
                     jdbcTemplate.update("DELETE FROM artid_resource WHERE id_resource = ?", r.getId());
                     resourceDAO.deleteById(r.getId());
                     if (r.getIdFile() != null) {
+                        String objectKey = fileDAO.findById(r.getIdFile()).map(File::getFilePath).orElse(null);
                         fileDAO.deleteById(r.getIdFile());
+                        deleteObjectAfterCommit(objectKey);
                     }
                     return true;
                 })
@@ -157,7 +174,7 @@ public class ResourceService {
 
     private List<FileMetadata> findFilesMetadata(List<Long> ids) {
         return namedJdbcTemplate.query(
-                "SELECT id, file_name, extension, mime_type, OCTET_LENGTH(blob) AS file_size FROM file WHERE id IN (:ids)",
+                "SELECT id, file_name, extension, mime_type, file_size FROM file WHERE id IN (:ids)",
                 new MapSqlParameterSource("ids", ids),
                 (rs, rowNum) -> new FileMetadata(
                         rs.getLong("id"),
@@ -169,13 +186,64 @@ public class ResourceService {
         );
     }
 
-    private File saveFile(String fileName, String mimeType, String base64Content) {
+    /**
+     * Carica i byte su S3 e registra il record File con la object key. Se la transazione
+     * dovesse fare rollback, l'oggetto appena caricato viene rimosso per non lasciare orfani.
+     */
+    private File saveFile(MultipartFile multipartFile) {
+        String objectKey = storageService.newObjectKey(multipartFile.getOriginalFilename());
+        try {
+            storageService.upload(objectKey, multipartFile.getInputStream(),
+                    multipartFile.getSize(), multipartFile.getContentType());
+        } catch (IOException e) {
+            throw new UncheckedIOException("Errore lettura del file in upload", e);
+        }
+        deleteObjectOnRollback(objectKey);
+
         File file = new File();
-        file.setFileName(fileName);
-        file.setMimeType(mimeType);
-        file.setExtension(extractExtension(fileName));
-        file.setBlob(Base64.getDecoder().decode(base64Content));
+        file.setFilePath(objectKey);
+        file.setFileName(multipartFile.getOriginalFilename());
+        file.setMimeType(multipartFile.getContentType());
+        file.setExtension(extractExtension(multipartFile.getOriginalFilename()));
+        file.setFileSize(multipartFile.getSize());
         return fileDAO.save(file);
+    }
+
+    // Cancella l'oggetto S3 solo dopo il commit della transazione (file sostituito o eliminato).
+    private void deleteObjectAfterCommit(String objectKey) {
+        if (objectKey == null) return;
+        if (!TransactionSynchronizationManager.isSynchronizationActive()) {
+            safeDelete(objectKey);
+            return;
+        }
+        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+            @Override
+            public void afterCommit() {
+                safeDelete(objectKey);
+            }
+        });
+    }
+
+    // Rimuove l'oggetto appena caricato se la transazione fa rollback (evita orfani su S3).
+    private void deleteObjectOnRollback(String objectKey) {
+        if (objectKey == null || !TransactionSynchronizationManager.isSynchronizationActive()) return;
+        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+            @Override
+            public void afterCompletion(int status) {
+                if (status == STATUS_ROLLED_BACK) {
+                    safeDelete(objectKey);
+                }
+            }
+        });
+    }
+
+    // La pulizia S3 è best-effort: un fallimento non deve propagarsi (il DB è già committato).
+    private void safeDelete(String objectKey) {
+        try {
+            storageService.delete(objectKey);
+        } catch (RuntimeException e) {
+            logger.warn("Impossibile eliminare l'oggetto S3 '{}': {}", objectKey, e.getMessage());
+        }
     }
 
     private void linkArtidResource(Long resourceId, Long artidId) {

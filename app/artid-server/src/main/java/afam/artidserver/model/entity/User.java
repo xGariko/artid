@@ -36,6 +36,12 @@ public class User {
     @Column("linkedin_id")
     private String linkedinId;
 
+    @Column("facebook_id")
+    private String facebookId;
+
+    @Column("instagram_id")
+    private String instagramId;
+
     private String profession;
 
     @Column("is_public")
@@ -43,10 +49,16 @@ public class User {
 
     private String phone;
 
+    @Column("business_email")
+    private String businessEmail;
+
     @Column("deleted_at")
     private OffsetDateTime deletedAt;
 
-    private byte[] propic;
+    // Object key dell'immagine profilo sul bucket privato Supabase "propics" (non i byte:
+    // quelli vivono su Storage). null = nessuna foto. L'URL si ottiene firmando la key.
+    @Column("propic_path")
+    private String propicPath;
 
     @Column("internal_share_enabled")
     private Boolean internalShareEnabled;

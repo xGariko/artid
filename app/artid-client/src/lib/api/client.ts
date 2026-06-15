@@ -1,6 +1,6 @@
 import createClient from "openapi-fetch";
 import { env } from "$env/dynamic/private";
-import { beginRequest, endRequest } from "$lib/stores/loading.ts";
+import { beginRequest, endRequest } from "$lib/stores/loading";
 import type { paths } from "./schema";
 
 const API_BASE = env.API_BASE ?? "http://localhost:8080";

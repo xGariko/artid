@@ -1,6 +1,6 @@
 import { fail, redirect } from "@sveltejs/kit";
 import type { Actions } from "./$types";
-import { login } from "$lib/server/auth";
+import { login } from "$lib/auth.ts";
 import { RegisterRequestSchema } from "$lib/models/schemas";
 
 type RegisterField =

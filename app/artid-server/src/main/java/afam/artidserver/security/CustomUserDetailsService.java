@@ -3,13 +3,10 @@ package afam.artidserver.security;
 import afam.artidserver.dao.UserDAO;
 import afam.artidserver.model.entity.User;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -19,13 +16,12 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        User user = userDAO.findByMail(email)
+        // Query leggera (senza l'immagine propic): è l'hot path eseguito a ogni richiesta.
+        User user = userDAO.findByMailForAuth(email)
                 .orElseThrow(() -> new UsernameNotFoundException("Utente non trovato: " + email));
 
-        return new org.springframework.security.core.userdetails.User(
-                user.getMail(),
-                user.getPasswordHash(),
-                List.of(new SimpleGrantedAuthority("ROLE_USER"))
-        );
+        // Restituiamo l'utente come principal: i controller lo riusano nella stessa
+        // richiesta senza una seconda findByMail.
+        return new AuthenticatedUser(user);
     }
 }

@@ -18,13 +18,17 @@ public class ProfileResponse {
     private String address;
     private String biography;
     private String linkedinId;
+    private String facebookId;
+    private String instagramId;
     private String profession;
     private Boolean isPublic;
     private String phone;
-    private byte[] propic;
+    private String businessEmail;
+    // Presigned GET URL della foto profilo (null se assente): l'<img> punta diretto a Supabase.
+    private String propicUrl;
     private Boolean internalShareEnabled;
 
-    public static ProfileResponse from(User user) {
+    public static ProfileResponse from(User user, String propicUrl) {
         return new ProfileResponse(
                 user.getId(),
                 user.getMail(),
@@ -35,10 +39,13 @@ public class ProfileResponse {
                 user.getAddress(),
                 user.getBiography(),
                 user.getLinkedinId(),
+                user.getFacebookId(),
+                user.getInstagramId(),
                 user.getProfession(),
                 user.getIsPublic(),
                 user.getPhone(),
-                user.getPropic(),
+                user.getBusinessEmail(),
+                propicUrl,
                 user.getInternalShareEnabled()
         );
     }

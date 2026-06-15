@@ -13,9 +13,11 @@ public class ProfileUpdateRequest {
     private String address;
     private String biography;
     private String linkedinId;
+    private String facebookId;
+    private String instagramId;
     private String profession;
     private Boolean isPublic;
     private String phone;
-    private byte[] propic;
+    private String businessEmail;
     private boolean internalShareEnabled;
 }

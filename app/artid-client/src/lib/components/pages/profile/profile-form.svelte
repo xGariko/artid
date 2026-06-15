@@ -4,11 +4,9 @@
 	import { api } from '$lib/api/browser-client';
 	import ArtidInput from '$lib/components/ui/artid-input.svelte';
 	import ArtidButton from '$lib/components/ui/artid-button.svelte';
-	import type Quill from 'quill';
 	import 'quill/dist/quill.snow.css';
-	import type { components } from '$lib/api/schema';
-
-	type Profile = components['schemas']['ProfileResponse'];
+	import type { Profile } from '$lib/api/types';
+	import ArtidSpidButton from '$lib/components/ui/artid-spid-button.svelte';
 
 	let { profile }: { profile: Profile } = $props();
 
@@ -20,11 +18,12 @@
 		address: profile.address ?? '',
 		biography: profile.biography ?? '',
 		linkedinId: profile.linkedinId ?? '',
+		facebookId: profile.facebookId ?? '',
+		instagramId: profile.instagramId ?? '',
 		profession: profile.profession ?? '',
 		phone: profile.phone ?? '',
+		businessEmail: profile.businessEmail ?? '',
 		isPublic: profile.isPublic ?? false,
-		// propic = byte[] lato Spring → stringa Base64 in JSON.
-		propic: profile.propic ?? '',
 		internalShareEnabled: profile.internalShareEnabled ?? false
 	});
 
@@ -38,10 +37,12 @@
 		address: profile.address ?? '',
 		biography: profile.biography ?? '',
 		linkedinId: profile.linkedinId ?? '',
+		facebookId: profile.facebookId ?? '',
+		instagramId: profile.instagramId ?? '',
 		profession: profile.profession ?? '',
 		phone: profile.phone ?? '',
+		businessEmail: profile.businessEmail ?? '',
 		isPublic: profile.isPublic ?? false,
-		propic: profile.propic ?? '',
 		internalShareEnabled: profile.internalShareEnabled ?? false
 	});
 
@@ -54,10 +55,12 @@
 		model.address !== baseline.address ||
 		model.biography !== baseline.biography ||
 		model.linkedinId !== baseline.linkedinId ||
+		model.facebookId !== baseline.facebookId ||
+		model.instagramId !== baseline.instagramId ||
 		model.profession !== baseline.profession ||
 		model.phone !== baseline.phone ||
+		model.businessEmail !== baseline.businessEmail ||
 		model.isPublic !== baseline.isPublic ||
-		model.propic !== baseline.propic ||
 		model.internalShareEnabled !== baseline.internalShareEnabled
 	);
 
@@ -65,9 +68,14 @@
 	let isSaving = $state(false);
 	let propicInput: HTMLInputElement | null = $state(null);
 
+	// Avatar: gestito a parte dal resto del form. Upload/rimozione immediati verso
+	// /api/profile/avatar (multipart), NON dal bottone "Salva". `avatarUrl` è il presigned
+	// URL corrente (vuoto = nessuna foto); aggiornato in locale per feedback immediato.
+	let avatarUrl = $state(profile.propicUrl ?? '');
+	let avatarBusy = $state(false);
+
 	// Div che Quill trasforma in editor + istanza Quill.
 	let bioContainer = $state<HTMLDivElement | undefined>(undefined);
-	let quill = $state.raw<Quill | null>(null);
 
 	const err = (field: string) => fieldErrors[field];
 
@@ -79,7 +87,6 @@
 	// window/document, quindi niente SSR.
 	$effect(() => {
 		if (!bioContainer) {
-			quill = null;
 			return;
 		}
 		const node = bioContainer;
@@ -111,7 +118,6 @@
 				const html = instance.root.innerHTML;
 				if (html !== model.biography) model.biography = html;
 			});
-			quill = instance;
 		})();
 		return () => {
 			cancelled = true;
@@ -124,43 +130,67 @@
 		return plain ? model.biography : undefined;
 	}
 
-	// La propic arriva come Base64 grezzo: deduco il MIME dai primi byte per il data URL.
-	function propicSrc(b64: string): string {
-		let mime = 'image/jpeg';
-		if (b64.startsWith('iVBORw0KGgo')) mime = 'image/png';
-		else if (b64.startsWith('R0lGOD')) mime = 'image/gif';
-		else if (b64.startsWith('UklGR')) mime = 'image/webp';
-		return `data:${mime};base64,${b64}`;
-	}
-
-	// Legge un File come Base64 puro (senza prefisso "data:*;base64,") per spedirlo nel JSON.
-	function fileToBase64(file: File): Promise<string> {
-		return new Promise((resolve, reject) => {
-			const reader = new FileReader();
-			reader.onerror = () => reject(reader.error);
-			reader.onload = () => {
-				const result = reader.result as string;
-				const comma = result.indexOf(',');
-				resolve(comma >= 0 ? result.slice(comma + 1) : result);
-			};
-			reader.readAsDataURL(file);
-		});
-	}
-
+	// Upload immediato della foto su /api/profile/avatar (multipart). Passa da openapi-fetch:
+	// il bodySerializer costruisce un FormData, così il client non serializza in JSON e il
+	// browser imposta il boundary multipart. `file` è tipizzato come stringa (binary) nello
+	// schema → cast necessario per passargli il File vero.
 	async function handlePropicPick(event: Event): Promise<void> {
 		const input = event.currentTarget as HTMLInputElement;
 		const file = input.files?.[0];
+		input.value = ''; // consente di riselezionare lo stesso file
 		if (!file) return;
 		if (!file.type.startsWith('image/')) {
 			toast.error('Seleziona un file immagine');
 			return;
 		}
-		if (file.size > 2 * 1024 * 1024) {
-			toast.error('Immagine troppo grande (max 2MB)');
+		if (file.size > 5 * 1024 * 1024) {
+			toast.error('Immagine troppo grande (max 5MB)');
 			return;
 		}
-		model.propic = await fileToBase64(file);
-		input.value = ''; // consente di riselezionare lo stesso file
+
+		avatarBusy = true;
+		try {
+			const { data } = await api.PUT('/api/profile/avatar', {
+				// body tipizzato come { file: string } dallo schema → cast per il File reale.
+				// Il serializer ignora il body e usa il File dalla closure, costruendo il FormData
+				// (così openapi-fetch non serializza in JSON e il browser mette il boundary).
+				body: { file: file as unknown as string },
+				bodySerializer: () => {
+					const fd = new FormData();
+					fd.append('file', file);
+					return fd;
+				}
+			});
+			if (!data?.url) {
+				toast.error('Errore nel caricamento della foto');
+				return;
+			}
+			avatarUrl = data.url;
+			toast.success('Foto profilo aggiornata');
+			invalidateAll(); // rinfresca l'avatar in navbar
+		} catch (e) {
+			toast.error(e instanceof Error ? e.message : 'Errore di rete');
+		} finally {
+			avatarBusy = false;
+		}
+	}
+
+	async function removePropic(): Promise<void> {
+		avatarBusy = true;
+		try {
+			const { response } = await api.DELETE('/api/profile/avatar');
+			if (!response.ok) {
+				toast.error('Errore nella rimozione della foto');
+				return;
+			}
+			avatarUrl = '';
+			toast.success('Foto profilo rimossa');
+			invalidateAll();
+		} catch (e) {
+			toast.error(e instanceof Error ? e.message : 'Errore di rete');
+		} finally {
+			avatarBusy = false;
+		}
 	}
 
 	async function save(): Promise<void> {
@@ -176,12 +206,12 @@
 				address: model.address || undefined,
 				biography: bioForSave(),
 				linkedinId: model.linkedinId || undefined,
+				facebookId: model.facebookId || undefined,
+				instagramId: model.instagramId || undefined,
 				profession: model.profession || undefined,
 				phone: model.phone || undefined,
+				businessEmail: model.businessEmail || undefined,
 				isPublic: model.isPublic,
-				// Rimando indietro la propic corrente così il PUT non la azzera;
-				// '' (rimossa) → undefined → il backend la pulisce.
-				propic: model.propic || undefined,
 				internalShareEnabled: model.internalShareEnabled
 			};
 
@@ -212,20 +242,21 @@
 	}
 </script>
 
-<div class="bg-artid-section h-100 mh-100 overflow-y-auto w-75 rounded-3 border border-artid-border p-4 d-flex flex-column gap-3">
+<div class="bg-artid-section h-100 mh-100 overflow-y-auto w-md-75 w-100 rounded-3 border border-artid-border p-4 d-flex flex-column gap-3">
 	<div class="row flex-grow-1">
 		<!-- Propic -->
 		<div class="col-12 col-md-2 d-flex flex-column align-items-center gap-2">
-			<div class="position-absolute">
+			<div class="position-md-absolute">
 				<button
 					type="button"
 					class="propic-btn rounded-circle border border-artid-border d-flex align-items-center justify-content-center overflow-hidden p-0"
 					style="width: 8rem; height: 8rem;"
 					onclick={() => propicInput?.click()}
+					disabled={avatarBusy}
 					aria-label="Cambia foto profilo"
 				>
-					{#if model.propic}
-						<img src={propicSrc(model.propic)} alt="Foto profilo" class="w-100 h-100 object-fit-cover" />
+					{#if avatarUrl}
+						<img src={avatarUrl} alt="Foto profilo" class="w-100 h-100 object-fit-cover" />
 					{:else}
 						<i class="bi bi-person fs-1 text-primary"></i>
 					{/if}
@@ -244,14 +275,16 @@
 						type="button"
 						class="btn btn-link btn-sm p-0 text-decoration-none"
 						onclick={() => propicInput?.click()}
+						disabled={avatarBusy}
 					>
-						{model.propic ? 'Cambia foto' : 'Carica foto'}
+						{avatarBusy ? 'Caricamento…' : avatarUrl ? 'Cambia foto' : 'Carica foto'}
 					</button>
-					{#if model.propic}
+					{#if avatarUrl}
 						<button
 							type="button"
 							class="btn btn-link btn-sm p-0 text-decoration-none text-danger"
-							onclick={() => (model.propic = '')}
+							onclick={removePropic}
+							disabled={avatarBusy}
 						>
 							Rimuovi
 						</button>
@@ -262,9 +295,9 @@
 		</div>
 
 		<!-- Dati -->
-		<div class="col-12 col-md-10 d-flex flex-column">
+		<div class="col-12 col-md-10 d-flex flex-column row">
 			<div class="row">
-				<div class="col-12 col-md-4 p-1">
+				<div class="col-12 col-xl-4 p-1">
 					<ArtidInput name="name" label="Nome" bind:value={model.name} error={err('name')} />
 				</div>
 				<div class="col-12 col-md-4 p-1">
@@ -298,21 +331,33 @@
 				</div>
 			</div>
 
-
 			<div class="row">
-				<div class="col-12 col-md-6 p-1">
+				<div class="col-12 col-md-4 p-1">
 					<ArtidInput name="address" label="Indirizzo" bind:value={model.address} error={err('address')} />
 				</div>
-				<div class="col-12 col-md-6 p-1">
+				<div class="col-12 col-md-4 p-1">
 					<ArtidInput type="tel" name="phone" label="Telefono" bind:value={model.phone} error={err('phone')} />
+				</div>
+				<div class="col-12 col-md-4 p-1">
+					<ArtidInput type="email" name="businessEmail" label="Email aziendale" bind:value={model.businessEmail} error={err('businessEmail')} />
 				</div>
 			</div>
 
+			<hr class="mt-3">
+
 			<div class="row">
-				<div class="col-12 p-1">
+				<div class="col-12 col-md-4 p-1">
 					<ArtidInput name="linkedinId" label="LinkedIn" bind:value={model.linkedinId} error={err('linkedinId')} />
 				</div>
+				<div class="col-12 col-md-4 p-1">
+					<ArtidInput name="facebookId" label="Facebook" bind:value={model.facebookId} error={err('facebookId')} />
+				</div>
+				<div class="col-12 col-md-4 p-1">
+					<ArtidInput name="instagramId" label="Instagram" bind:value={model.instagramId} error={err('instagramId')} />
+				</div>
 			</div>
+
+			<hr class="mt-3">
 
 			<div class="row">
 				<div class="col-12 p-1">
@@ -357,14 +402,36 @@
 	</div>
 
 	<!-- Action bar -->
-	<div class="d-flex align-items-center justify-content-end gap-3 border-top border-artid-border pt-3">
-		<div style="width: 12rem;">
+	<!-- flex-wrap: su viewport stretti i bottoni vanno a capo invece di traboccare.
+	     Su desktop stanno su una riga, quindi justify-content-between resta invariato. -->
+	<div class="d-flex flex-wrap align-items-center justify-content-between gap-3 border-top border-artid-border pt-3">
+		<div class="d-flex flex-wrap gap-3">
 			<ArtidButton
 				label={isSaving ? 'Salvataggio…' : 'Salva'}
 				icon="check-lg"
 				btnStyle="success"
 				disabled={isSaving || !isDirty}
 				onclick={save}
+				fullWidth={false}
+			/>
+			<ArtidButton
+				label="Cambia password"
+				icon="pencil-square"
+				btnStyle="primary"
+				onclick={()=>{}}
+				fullWidth={false}
+			/>
+
+			<ArtidSpidButton
+				label="Associa SPID"
+			/>
+		</div>
+		<div>
+			<ArtidButton
+				label="Chiudi account"
+				btnStyle="danger"
+				onclick={()=>{}}
+				fullWidth={false}
 			/>
 		</div>
 	</div>

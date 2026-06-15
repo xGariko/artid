@@ -33,6 +33,7 @@
 			<ArtidButton
 				label="Esplora"
 				btnStyle="secondary"
+				onclick={() => goto(resolve('/explore'))}
 			/>
 
 		</div>

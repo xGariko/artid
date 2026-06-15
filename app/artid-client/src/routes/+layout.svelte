@@ -16,6 +16,8 @@
 		user.set(data.user);
 	});
 
+	// Bootstrap usa il data-API (data-bs-toggle) per dropdown/collapse: il bundle JS va caricato
+	// lato client. Import dinamico in onMount per non eseguirlo in SSR (accede a window/document).
 	onMount(async () => {
 		await import('bootstrap/dist/js/bootstrap.bundle.min.js');
 	});

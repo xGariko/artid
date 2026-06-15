@@ -12,6 +12,7 @@ public class File {
     @Id
     private Long id;
 
+    // Object key dell'oggetto su Supabase S3 (non un path filesystem).
     @Column("file_path")
     private String filePath;
 
@@ -23,5 +24,8 @@ public class File {
     @Column("mime_type")
     private String mimeType;
 
-    private byte[] blob;
+    // Dimensione in byte, salvata all'upload: con i byte ora su S3 non possiamo più
+    // derivarla via OCTET_LENGTH(blob).
+    @Column("file_size")
+    private Long fileSize;
 }

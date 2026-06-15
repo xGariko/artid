@@ -70,7 +70,7 @@
 						label="Profilo"
 						subLabel="completato"
 						subLabelData={`${data.profileCompletion}%`}
-						subLabelColor="warning"
+						subLabelColor="{data.profileCompletion == 100 ? 'success' : 'warning' }"
 						destinationRoute="/profile"
 					/>
 				</div>

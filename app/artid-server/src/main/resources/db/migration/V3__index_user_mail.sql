@@ -1,0 +1,12 @@
+-- Indice sulla colonna usata dall'autenticazione.
+-- Ogni richiesta autenticata risolve l'utente con findByMail (CustomUserDetailsService,
+-- dentro il filtro JWT). Senza indice su mail ogni richiesta fa un sequential scan della
+-- tabella "user": con il DB remoto questo costo si paga a ogni chiamata.
+--
+-- Schema gestito a mano (spring.sql.init.mode=never, niente Flyway): esegui questo script
+-- nello SQL Editor di Supabase, sul progetto a cui punta l'app.
+--
+-- NB: "user" è parola riservata in Postgres, va quotata.
+-- UNIQUE perché la mail è l'identità di login (il register già rifiuta i duplicati);
+-- se per qualche motivo esistono mail duplicate, crea l'indice senza UNIQUE.
+CREATE UNIQUE INDEX IF NOT EXISTS idx_user_mail ON "user" (mail);

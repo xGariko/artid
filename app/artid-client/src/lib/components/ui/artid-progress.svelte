@@ -15,11 +15,12 @@
 	// - /dashboard → solo navbar → top: navbar-height
 	// - altre pagine autenticate → navbar + sub-navbar → top: navbar + sub
 	const DASHBOARD = resolve('/dashboard');
+	const EXPLORE = resolve('/explore');
 	const PUBLIC_PATHS = ['/login', '/register', '/welcome'];
 
 	let currentPath = $derived(page.url.pathname);
 	let onPublic = $derived(PUBLIC_PATHS.some((p) => currentPath.startsWith(p)));
-	let onDashboard = $derived(currentPath === DASHBOARD);
+	let onDashboard = $derived(currentPath === DASHBOARD || currentPath === EXPLORE);
 
 	let topStyle = $derived(
 		onPublic
