@@ -143,14 +143,13 @@
 	<div
 		class="bg-artid-section h-100 w-60 rounded-3 border border-artid-border p-3 d-flex flex-column gap-3 artid-list"
 	>
-	<div class="row">
-
-		{#each visibleArtids as artid (artid.id)}
-		<div class="col-3">
-			<ArtidCard artid={artid} filter={activeFilterValue}/>
+		<div class="row">
+			{#each visibleArtids as artid (artid.id)}
+				<div class="col-3">
+					<ArtidCard {artid} filter={activeFilterValue} />
+				</div>
+			{/each}
 		</div>
-		{/each}
-	</div>
 		<a href={resolve('/(app)/artid/details/[id]', { id: '1' })}>Vai a dettagli</a>
 	</div>
 </div>

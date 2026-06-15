@@ -132,6 +132,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/artids": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["findByUser_1"];
+        put?: never;
+        post: operations["create_2"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/users/{id}/public": {
         parameters: {
             query?: never;
@@ -276,38 +292,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/artids": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["findByUser_1"];
-        put?: never;
-        post: operations["createArtid"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/artids/count": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["count_3"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/api/artids/{id}": {
         parameters: {
             query?: never;
@@ -332,6 +316,22 @@ export interface paths {
             cookie?: never;
         };
         get: operations["findResources"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/artids/count": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["count_3"];
         put?: never;
         post?: never;
         delete?: never;
@@ -459,6 +459,24 @@ export interface components {
             email?: string;
             password?: string;
         };
+        ArtidCreateRequest: {
+            title?: string;
+        };
+        ArtidResponse: {
+            /** Format: int64 */
+            id?: number;
+            /** Format: int64 */
+            idUser?: number;
+            title?: string;
+            description?: string;
+            favourite?: boolean;
+            /** Format: date-time */
+            createdAt?: string;
+            /** Format: date-time */
+            lastModified?: string;
+            isPublic?: boolean;
+            isPrivate?: boolean;
+        };
         PublicArtidSummaryResponse: {
             /** Format: int64 */
             id?: number;
@@ -522,23 +540,6 @@ export interface components {
             email?: string;
             name?: string;
             surname?: string;
-        };
-        ArtidResponse: {
-            /** Format: int64 */
-            id?: number;
-            /** Format: int64 */
-            idUser?: number;
-            title?: string;
-            favourite?: boolean;
-            /** Format: date-time */
-            createdAt?: string;
-            /** Format: date-time */
-            lastModified?: string;
-            isPublic?: boolean;
-            isPrivate?: boolean;
-        };
-        ArtidCreateRequest: {
-            title?: string;
         };
     };
     responses: never;
@@ -896,6 +897,50 @@ export interface operations {
             };
         };
     };
+    findByUser_1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ArtidResponse"][];
+                };
+            };
+        };
+    };
+    create_2: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ArtidCreateRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ArtidResponse"];
+                };
+            };
+        };
+    };
     publicProfile: {
         parameters: {
             query?: never;
@@ -1082,46 +1127,6 @@ export interface operations {
             };
         };
     };
-    findByUser_1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["ArtidResponse"][];
-                };
-            };
-        };
-    };
-    count_3: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["CountResponse"];
-                };
-            };
-        };
-    };
     findById: {
         parameters: {
             query?: never;
@@ -1132,30 +1137,6 @@ export interface operations {
             cookie?: never;
         };
         requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["ArtidResponse"];
-                };
-            };
-        };
-    };
-    createArtid: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["ArtidCreateRequest"];
-            };
-        };
         responses: {
             /** @description OK */
             200: {
@@ -1186,6 +1167,26 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["ResourceResponse"][];
+                };
+            };
+        };
+    };
+    count_3: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["CountResponse"];
                 };
             };
         };
