@@ -116,6 +116,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/auth/verify-password": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["verifyPassword"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/auth/register": {
         parameters: {
             query?: never;
@@ -463,6 +479,9 @@ export interface components {
             id?: number;
             title?: string;
             color?: string;
+        };
+        VerifyPasswordRequest: {
+            password?: string;
         };
         RegisterRequest: {
             name?: string;
@@ -915,6 +934,32 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["ResourceResponse"];
+                };
+            };
+        };
+    };
+    verifyPassword: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["VerifyPasswordRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": {
+                        [key: string]: boolean;
+                    };
                 };
             };
         };

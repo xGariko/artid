@@ -6,8 +6,8 @@
 		isOpen = $bindable(),
 		children
 	}: {
-		isOpen: boolean;
-		children: Snippet;
+		isOpen: boolean,
+		children: Snippet
 	} = $props();
 
 	function close() {
