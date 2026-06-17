@@ -3,7 +3,6 @@
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
 	import { page } from '$app/state';
-	
 
 	const id = $derived(page.params.id);
 </script>
@@ -35,7 +34,9 @@
 						fullWidth={false}
 						btnStyle="secondary"
 						outline={true}
-						onclick={()=>{goto(resolve("/(app)/artid/details/[id]/preview", {id: String(id)}))}}
+						onclick={() => {
+							goto(resolve('/(app)/artid/details/[id]/preview', { id: String(id) }));
+						}}
 					/>
 					<ArtidButton
 						label="Condividi"
