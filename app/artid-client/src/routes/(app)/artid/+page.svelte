@@ -21,6 +21,8 @@
 	let isSaving = $state(false);
 
 	let isTagOpen = $state(false);
+
+	let title = $state('');
 	let tag = $state('');
 
 	function handleNewArtid(): void {
@@ -154,7 +156,9 @@
 		},
 		{
 			label: 'Tag',
-			tags: data.tags
+			tags: (data.tags ?? []).map((tag) => {
+				return { id: tag.id!, title: tag.title!, color: tag.color! };
+			})
 		}
 	]);
 
@@ -162,8 +166,6 @@
 		{ label: 'Nuovo ArtID', icon: 'plus-lg', callback: handleNewArtid, type: 'button' },
 		{ label: 'Nuovo Tag +', icon: '', callback: handleNewTag, type: 'tag' }
 	];
-
-	let title = $state('');
 </script>
 
 <div class="w-100 h-100 d-flex align-items-center justify-content-center gap-4 p-5">

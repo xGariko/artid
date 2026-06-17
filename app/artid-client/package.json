@@ -32,6 +32,7 @@
 		"sass": "^1.99.0",
 		"svelte": "^5.55.2",
 		"svelte-check": "^4.4.6",
+		"svelte-dnd-action": "^0.9.70",
 		"typescript": "^5.9.3",
 		"typescript-eslint": "^8.58.1",
 		"vite": "^8.0.7"
