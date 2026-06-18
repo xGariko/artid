@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { invalidateAll } from '$app/navigation';
-	import { api } from '$lib/api/browser-client';
 	import type { ResourceResponse } from '$lib/api/types';
 	import ArtidButton from '$lib/components/ui/artid-button.svelte';
 	import ArtidEditorModal from '$lib/components/ui/artid-editor-modal.svelte';
@@ -102,6 +101,14 @@
 		});
 	});
 
+	// True se ogni risorsa filtrata è selezionata (controlla lo stato del checkbox header).
+	const areAllFilteredSelected = $derived(
+		filteredMaterials.filter((material) => !artidMaterialsIds.has(material.id)).length > 0 &&
+			filteredMaterials
+				.filter((material) => !artidMaterialsIds.has(material.id))
+				.every((material) => material.id != null && selectedMaterialsIds.has(material.id))
+	);
+
 	function toggleResourceSelection(resourceId: number | undefined): void {
 		if (resourceId == null || artidMaterialsIds.has(resourceId)) return;
 		// eslint-disable-next-line svelte/prefer-svelte-reactivity
@@ -120,6 +127,19 @@
 			event.preventDefault();
 			toggleResourceSelection(resourceId);
 		}
+	}
+
+	function toggleAllFilteredSelection(): void {
+		if (areAllFilteredSelected) {
+			selectedMaterialsIds = new Set();
+			return;
+		}
+		selectedMaterialsIds = new Set(
+			filteredMaterials
+				.filter((material) => !artidMaterialsIds.has(material.id))
+				.map((material) => material.id)
+				.filter((materialId): materialId is number => materialId != null)
+		);
 	}
 </script>
 
@@ -146,7 +166,15 @@
 				class="row g-0 align-items-center px-3 py-2 sticky-header bg-artid-surface border-bottom border-artid-border text-artid-text small fw-semibold text-nowrap"
 			>
 				<div class="col-1 me-2">
-					<input type="checkbox" class="form-check-input" aria-label="Seleziona tutto" />
+					<input
+						type="checkbox"
+						class="form-check-input"
+						checked={areAllFilteredSelected}
+						onchange={toggleAllFilteredSelection}
+						disabled={filteredMaterials.filter((material) => !artidMaterialsIds.has(material.id))
+							.length <= 0}
+						aria-label="Seleziona tutto"
+					/>
 				</div>
 				<div class="col-6">Nome</div>
 				<div class="col-2">Dimensioni</div>

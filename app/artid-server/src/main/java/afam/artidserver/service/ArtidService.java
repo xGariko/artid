@@ -81,4 +81,17 @@ public class ArtidService {
                 a.getIsPublic(),
                 a.getIsPrivate());
     }
+
+    /**
+     * Rimuove l'associazione tra un Artid e un Materiale.
+     * 
+     * @return true se la cancellazione è avvenuta, false se l'associazione non
+     *         esisteva.
+     */
+    @Transactional
+    public boolean removeResourceFromArtid(Long artidId, Long resourceId) {
+        // Esegue la DELETE e controlla se il numero di righe eliminate è maggiore di 0
+        int rowsAffected = artidDAO.removeResourceByResourceId(artidId, resourceId);
+        return rowsAffected > 0;
+    }
 }

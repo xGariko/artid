@@ -11,6 +11,7 @@
 	import { badgeColorForExtension, badgeLabelForExtension } from '$lib/utilities';
 	import ArtidAddMaterialsModal from '$lib/components/pages/artid/artid-add-materials-modal.svelte';
 	import type { ResourceResponse } from '$lib/api/types';
+	import { toast } from 'svelte-sonner';
 
 	const id = $derived(page.params.id);
 
@@ -111,6 +112,32 @@
 	}
 
 	let isOpen = $state(false);
+
+	let isDeleting = $state(false);
+	// Funzione per eliminare il materiale
+	async function handleDeleteMaterial(materialId: number) {
+		if (isDeleting) return;
+
+		isDeleting = true;
+
+		try {
+			const response = await fetch(`/api/artids/${Number(id)}/resources/${materialId}`, {
+				method: 'DELETE'
+			});
+
+			if (response.ok) {
+				draggableMaterials = draggableMaterials.filter((m) => m.id !== materialId);
+			} else if (response.status === 404) {
+				toast.error('Errore durante la cancellazione del materiale');
+			} else {
+				toast.error('Si è verificato un errore durante la cancellazione');
+			}
+		} catch {
+			toast.error('Errore di rete');
+		} finally {
+			isDeleting = false;
+		}
+	}
 </script>
 
 <div class="w-100 h-100 d-flex flex-column align-items-center gap-4 p-5">
@@ -253,7 +280,11 @@
 									<span class="flex-grow-1 text-truncate">
 										{material.title}
 									</span>
-									<button class="border-0 bg-transparent" aria-label="remove material">
+									<button
+										class="border-0 bg-transparent"
+										onclick={() => handleDeleteMaterial(material.id!)}
+										aria-label="remove material"
+									>
 										<i class="bi bi-x fs-4" style="color: red;"></i>
 									</button>
 								</li>

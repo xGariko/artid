@@ -22,6 +22,13 @@ public interface ArtidDAO extends ListCrudRepository<Artid, Long> {
     // indistinguibile.
     Optional<Artid> findByIdAndIdUserAndDeletedAtIsNull(Long id, Long idUser);
 
+    @Modifying
+    @Query("""
+            DELETE FROM artid_resources
+            WHERE id = :artidId AND id_resource = :resourceId
+            """)
+    int removeResourceByResourceId(@Param("artidId") Long id, @Param("resourceId") Long resourceId);
+
     // @Query("""
     // INSERT INTO artid_resource
     // (id, id_resource) VALUES (:id, :resourceId)
