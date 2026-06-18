@@ -620,9 +620,9 @@
 			/>
 
 			{#if spidLinked}
-				<ArtidSpidButton label="SPID COLLEGATO" disabled onclick={() => {}} />
+				<ArtidSpidButton label="SPID COLLEGATO" disabled fullWidth={false} onclick={() => {}} />
 			{:else}
-				<ArtidSpidButton label="Associa SPID" onclick={openSpidModal} />
+				<ArtidSpidButton label="Associa SPID" fullWidth={false} onclick={openSpidModal} />
 			{/if}
 		</div>
 		<div>
@@ -653,10 +653,7 @@
 					bind:value={password}
 					addClass="mb-2"
 				/>
-				<hr />
-				<span class="text-muted fst-italic"
-					>Digita <span class="fw-semibold">"Conferma chiusura"</span> per procedere</span
-				>
+			
 				<hr>
 				<span class="text-muted fst-italic">Digita <span class="fw-semibold">"Elimina"</span> per procedere</span>
 				<ArtidInput

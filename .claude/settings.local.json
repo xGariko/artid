@@ -148,7 +148,21 @@
       "Bash(python -c 'from pypdf import PdfReader; print\\('\\\\''pagine:'\\\\'', len\\(PdfReader\\(r'\\\\''/c/Users/Gabriele Iovino/Downloads/Integrazione-FE-BE-artid.pdf'\\\\''\\).pages\\)\\)')",
       "mcp__visualize__read_me",
       "mcp__visualize__show_widget",
-      "PowerShell(Get-ChildItem app\\\\artid-server\\\\target\\\\classes\\\\afam\\\\artidserver\\\\service\\\\ -Name | Where-Object { $_ -match 'Email|Otp' } | Sort-Object)"
+      "PowerShell(Get-ChildItem app\\\\artid-server\\\\target\\\\classes\\\\afam\\\\artidserver\\\\service\\\\ -Name | Where-Object { $_ -match 'Email|Otp' } | Sort-Object)",
+      "PowerShell(& \"C:\\\\progetti\\\\artid\\\\app\\\\artid-server\\\\mvnw.cmd\" -q -f \"C:\\\\progetti\\\\artid\\\\app\\\\artid-server\\\\pom.xml\" -DskipTests compile)",
+      "Bash(curl -s -o /dev/null -w \"api-docs HTTP %{http_code}\\\\n\" http://localhost:8080/v3/api-docs)",
+      "Bash(curl -s -o /dev/null -w \"front HTTP %{http_code}\\\\n\" http://localhost:5173)",
+      "Bash(curl -s http://localhost:8080/v3/api-docs)",
+      "Bash(curl -s -X POST http://localhost:8080/api/auth/spid -H 'Content-Type: application/json' -d '{\"providerId\":\"PosteID\",\"username\":\"RSSMRA85M01H501Z\",\"password\":\"Spid!2024\"}')",
+      "Bash(curl -s -o /dev/null -w 'HTTP %{http_code}\\\\n' -X POST http://localhost:8080/api/auth/spid -H 'Content-Type: application/json' -d '{\"providerId\":\"PosteID\",\"username\":\"RSSMRA85M01H501Z\",\"password\":\"sbagliata\"}')",
+      "Bash(curl -s -o /dev/null -w 'HTTP %{http_code}\\\\n' -X POST http://localhost:8080/api/auth/spid -H 'Content-Type: application/json' -d '{\"providerId\":\"PosteID\",\"username\":\"XXXYYY00A00X000X\",\"password\":\"Spid!2024\"}')",
+      "Bash(curl -s -w '\\\\nHTTP %{http_code}\\\\n' -X POST http://localhost:8080/api/auth/spid -H 'Content-Type: application/json' -d '{\"providerId\":\"PosteID\",\"username\":\"VRDLGI90A41F205X\",\"password\":\"Spid!2024\"}')",
+      "Bash(curl -s -w \"\\\\nHTTP %{http_code}\\\\n\" http://localhost:5173/spid)",
+      "Bash(curl -s -o /dev/null -w \"HTTP %{http_code}\\\\n\" http://localhost:5173/spid)",
+      "Skill(impeccable)",
+      "Skill(impeccable:*)",
+      "Read(//c/Users/Gabriele Iovino/.agents/skills/impeccable/scripts/**)",
+      "Bash(node \"C:\\\\Users\\\\Gabriele Iovino\\\\.claude\\\\skills\\\\impeccable\\\\scripts\\\\load-context.mjs\")"
     ]
   }
 }
