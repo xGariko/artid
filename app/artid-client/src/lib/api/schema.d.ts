@@ -116,6 +116,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/auth/verify-registration": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["verifyRegistration"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/auth/verify-password": {
         parameters: {
             query?: never;
@@ -142,6 +158,22 @@ export interface paths {
         get?: never;
         put?: never;
         post: operations["verifyOtp"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/auth/resend-registration-otp": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["resendRegistration"];
         delete?: never;
         options?: never;
         head?: never;
@@ -528,9 +560,6 @@ export interface components {
             title?: string;
             color?: string;
         };
-        VerifyPasswordRequest: {
-            password?: string;
-        };
         VerifyOtpRequest: {
             email?: string;
             code?: string;
@@ -542,6 +571,9 @@ export interface components {
             email?: string;
             name?: string;
             surname?: string;
+        };
+        VerifyPasswordRequest: {
+            password?: string;
         };
         ResendOtpRequest: {
             email?: string;
@@ -555,15 +587,15 @@ export interface components {
             birthdate?: string;
             birthplace?: string;
         };
-        LoginRequest: {
-            email?: string;
-            password?: string;
-        };
         OtpChallengeResponse: {
             otpRequired?: boolean;
             email?: string;
             /** Format: date-time */
             expiresAt?: string;
+        };
+        LoginRequest: {
+            email?: string;
+            password?: string;
         };
         ArtidCreateRequest: {
             title?: string;
@@ -999,6 +1031,30 @@ export interface operations {
             };
         };
     };
+    verifyRegistration: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["VerifyOtpRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["AuthResponse"];
+                };
+            };
+        };
+    };
     verifyPassword: {
         parameters: {
             query?: never;
@@ -1049,6 +1105,28 @@ export interface operations {
             };
         };
     };
+    resendRegistration: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ResendOtpRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
     resendOtp: {
         parameters: {
             query?: never;
@@ -1090,7 +1168,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["AuthResponse"];
+                    "*/*": components["schemas"]["OtpChallengeResponse"];
                 };
             };
         };

@@ -78,7 +78,6 @@
 
 		isSaving = true;
 		try {
-			// POST same-origin → proxy /api/tags → Spring (id_user = utente loggato).
 			const { data, error: err } = await api.POST('/api/tags', {
 				body: { tag: trimmed }
 			});
