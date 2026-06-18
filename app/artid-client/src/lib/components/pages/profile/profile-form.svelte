@@ -9,6 +9,7 @@
 	import ArtidSpidButton from '$lib/components/ui/artid-spid-button.svelte';
 	import ArtidEditorModal from '$lib/components/ui/artid-editor-modal.svelte';
 	import { goto } from '$app/navigation';
+	import { resolve } from '$app/paths';
 
 	let { profile }: { profile: Profile } = $props();
 
@@ -244,36 +245,33 @@
 		}
 	}
 
-	let isOpen = $state(false);
+	let deleteAccountModalOpen = $state(false);
 	let password = $state('');
 	let elimina = $state('');
 
 	function deleteAccountModal() {
-		isOpen = true;
+		deleteAccountModalOpen = true;
 		console.log('Close account');
 	}
 
 	async function deleteAccount(): Promise<void> {
 		if (!password.trim() || !elimina.trim()) {
-			toast.error('ERRORE: BISOGNA COMPILARE TUTTI I CAMPI!');
+			toast.error('Compila tutti i campi per procedere');
 			return;
 		}
 
-		if (elimina !== 'ELIMINA') {
-			toast.error('ERRORE: PER CONFERMARE DEVI DIGITARE ESATTAMENTE LA PAROLA ELIMINA');
+		if (elimina.toLowerCase() !== 'conferma chiusura') {
+			toast.error('Digita: "Conferma chiusura" per procedere');
 			return;
 		}
 
 		isSaving = true;
 
 		try {
-			// Chiamiamo l'endpoint POST usando l'istanza 'api' pre-configurata del frontend
 			const verifyResponse = await api.POST('/api/auth/verify-password', {
 				body: { password }
-				// Niente headers manuali! I cookie di sessione vengono allegati dal browser da soli
 			});
 
-			// Leggiamo il booleano di ritorno con la sintassi corretta che abbiamo visto prima
 			const isPasswordValid = verifyResponse?.data?.['passwordCorretta'] ?? false;
 
 			if (!isPasswordValid) {
@@ -284,7 +282,7 @@
 
 			const actualUserId = profile?.id; // Letto sul momento, al click, quindi è sicuro al 100%
 			if (actualUserId === undefined || actualUserId === null) {
-				toast.error("Impossibile recuperare l'ID identificativo dell'utente.");
+				toast.error('Impossibile recuperare l\'ID identificativo dell\'utente.');
 				return;
 			}
 
@@ -295,14 +293,13 @@
 			});
 
 
-
 			if (!deleteResponse.response.ok) {
-				toast.error("Errore nella rimozione dell'account dal sistema");
+				toast.error('Errore nella rimozione dell\'account dal sistema');
 				return;
 			}
 
 			toast.success('ACCOUNT ELIMINATO CON SUCCESSO');
-			isOpen = false;
+			deleteAccountModalOpen = false;
 			logoutLocal();
 
 		} catch (e) {
@@ -316,12 +313,12 @@
 
 	async function logoutLocal() {
 		localStorage.clear();
-		// Aspettiamo che SvelteKit abbia effettivamente completato la navigazione
-		await goto('/welcome');
+		await goto(resolve('/welcome'));
 	}
 </script>
 
-<div class="bg-artid-section h-100 mh-100 overflow-y-auto w-md-75 w-100 rounded-3 border border-artid-border p-4 d-flex flex-column gap-3">
+<div
+	class="bg-artid-section h-100 mh-100 overflow-y-auto w-md-75 w-100 rounded-3 border border-artid-border p-4 d-flex flex-column gap-3">
 	<div class="row flex-grow-1">
 		<!-- Propic -->
 		<div class="col-12 col-md-2 d-flex flex-column align-items-center gap-2">
@@ -400,10 +397,12 @@
 
 			<div class="row">
 				<div class="col-12 col-md-4 p-1">
-					<ArtidInput type="date" name="birthdate" label="Data di nascita" bind:value={model.birthdate} error={err('birthdate')} />
+					<ArtidInput type="date" name="birthdate" label="Data di nascita" bind:value={model.birthdate}
+					            error={err('birthdate')} />
 				</div>
 				<div class="col-12 col-md-4 p-1">
-					<ArtidInput name="birthplace" label="Luogo di nascita" bind:value={model.birthplace} error={err('birthplace')} />
+					<ArtidInput name="birthplace" label="Luogo di nascita" bind:value={model.birthplace}
+					            error={err('birthplace')} />
 				</div>
 				<div class="col-12 col-md-4 p-1">
 					<ArtidInput name="profession" label="Professione" bind:value={model.profession} error={err('profession')} />
@@ -418,7 +417,8 @@
 					<ArtidInput type="tel" name="phone" label="Telefono" bind:value={model.phone} error={err('phone')} />
 				</div>
 				<div class="col-12 col-md-4 p-1">
-					<ArtidInput type="email" name="businessEmail" label="Email aziendale" bind:value={model.businessEmail} error={err('businessEmail')} />
+					<ArtidInput type="email" name="businessEmail" label="Email aziendale" bind:value={model.businessEmail}
+					            error={err('businessEmail')} />
 				</div>
 			</div>
 
@@ -516,81 +516,90 @@
 	</div>
 </div>
 
-<ArtidEditorModal bind:isOpen>
-	<div class="text-artid-primary fw-semibold new-artid-modal">
-		<i class="bi bi-person-x fs-5 text-danger"></i>
-		<span>CHIUDI ACCOUNT</span>
-		<div class="my-2">
+<ArtidEditorModal bind:isOpen={deleteAccountModalOpen} customHeight="40">
+	<div class="d-flex flex-column align-items-start justify-content-around w-100 h-100 flex-fill">
+		<div class="text-artid-primary fw-semibold w-100">
+			<i class="bi bi-person-x fs-5 text-danger"></i>
+			<span>Chiudi account</span>
 		</div>
-		<div class="my-2">
-			<ArtidInput
-				type="password"
-				name="password"
-				label="Password"
-				placeholder="Password"
-				bind:value={password}
-				addClass="mb-2"
-			/>
-			<ArtidInput
-				type="text"
-				name="ELIMINA"
-				label="ELIMINA"
-				placeholder="ELIMINA"
-				bind:value={elimina}
-				addClass="mb-2"
-			/>
- 		</div>
-		<div class="d-flex justify-content-end gap-2">
-			<ArtidButton
-				label="Chiudi"
-				fullWidth={false}
-				btnStyle="secondary"
-				outline={true}
-				disabled={isSaving}
-				onclick={() => (isOpen = false)}
-			/>
-			<ArtidButton
-				label="CONFERMA ELIMINAZIONE"
-				fullWidth={false}
-				btnStyle="danger"
-				icon="check2"
-				disabled={isSaving}
-				onclick={deleteAccount}
-			/>
+
+		<div class="w-100 mb-3">
+			<div class="my-2">
+				<ArtidInput
+					type="password"
+					name="password"
+					label="Password"
+					placeholder="Password"
+					bind:value={password}
+					addClass="mb-2"
+				/>
+				<hr>
+				<span class="text-muted fst-italic">Digita <span class="fw-semibold">"Conferma chiusura"</span> per procedere</span>
+				<ArtidInput
+					type="text"
+					name="confirm_close"
+					label="Conferma chisura"
+					placeholder="Conferma chisura"
+					bind:value={elimina}
+					addClass="mb-2"
+				/>
+			</div>
 		</div>
+
+		<div class="w-100">
+			<div class="d-flex justify-content-end gap-2">
+				<ArtidButton
+					label="Chiudi"
+					fullWidth={false}
+					btnStyle="secondary"
+					outline={true}
+					disabled={isSaving}
+					onclick={() => (deleteAccountModalOpen = false)}
+				/>
+				<ArtidButton
+					label="Elimina account"
+					fullWidth={false}
+					btnStyle="danger"
+					icon="exclamation-triangle-fill"
+					disabled={isSaving}
+					onclick={deleteAccount}
+				/>
+			</div>
+		</div>
+
 	</div>
 </ArtidEditorModal>
 
 <style lang="scss">
-	.propic-btn {
-		background: var(--artid-section, transparent);
-		cursor: pointer;
-		transition: filter 0.15s ease-in-out;
-	}
+  .propic-btn {
+    background: var(--artid-section, transparent);
+    cursor: pointer;
+    transition: filter 0.15s ease-in-out;
+  }
 
-	.propic-btn:hover {
-		filter: brightness(0.97);
-	}
+  .propic-btn:hover {
+    filter: brightness(0.97);
+  }
 
-	// Allinea Quill (snow theme) al brand artid. :global perché il DOM lo crea Quill.
-	.bio-editor :global(.ql-toolbar.ql-snow) {
-		border: 1px solid var(--artid-border);
-		border-top-left-radius: 0.5rem;
-		border-top-right-radius: 0.5rem;
-		background-color: var(--artid-section);
-	}
+  // Allinea Quill (snow theme) al brand artid. :global perché il DOM lo crea Quill.
+  .bio-editor :global(.ql-toolbar.ql-snow) {
+    border: 1px solid var(--artid-border);
+    border-top-left-radius: 0.5rem;
+    border-top-right-radius: 0.5rem;
+    background-color: var(--artid-section);
+  }
 
-	.bio-editor :global(.ql-container.ql-snow) {
-		border: 1px solid var(--artid-border);
-		border-top: 0;
-		border-bottom-left-radius: 0.5rem;
-		border-bottom-right-radius: 0.5rem;
-		background-color: var(--artid-section);
-		font-family: var(--artid-font-sans);
-		font-size: 1rem;
-	}
+  .bio-editor :global(.ql-container.ql-snow) {
+    border: 1px solid var(--artid-border);
+    border-top: 0;
+    border-bottom-left-radius: 0.5rem;
+    border-bottom-right-radius: 0.5rem;
+    background-color: var(--artid-section);
+    font-family: var(--artid-font-sans);
+    font-size: 1rem;
+  }
 
-	.bio-editor :global(.ql-editor) {
-		min-height: 6rem;
-	}
+  .bio-editor :global(.ql-editor) {
+    min-height: 6rem;
+  }
 </style>

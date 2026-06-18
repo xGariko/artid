@@ -245,8 +245,3 @@
 	</div>
 </ArtidEditorModal>
 
-<style lang="scss">
-	.new-artid-modal {
-		width: min(22rem, 50vw);
-	}
-</style>

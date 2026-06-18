@@ -4,10 +4,14 @@
 
 	let {
 		isOpen = $bindable(),
-		children
+		children,
+		customHeight = '35',
+		customWidth = '30'
 	}: {
 		isOpen: boolean,
-		children: Snippet
+		children: Snippet,
+		customHeight?: string,
+		customWidth?: string
 	} = $props();
 
 	function close() {
@@ -36,7 +40,7 @@
 		transition:fade={{ duration: 150 }}
 	>
 		<div
-			class="bg-artid-surface border border-2 border-artid-border rounded-3 p-4 position-relative mh-100 overflow-auto"
+			class="bg-artid-surface border border-2 border-artid-border rounded-3 p-4 position-relative h-{customHeight} w-{customWidth} overflow-auto"
 		>
 			<button
 				type="button"
