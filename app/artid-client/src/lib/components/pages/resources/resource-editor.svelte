@@ -153,8 +153,8 @@
 	}
 </script>
 
-<ArtidEditorModal bind:isOpen>
-	<div class="d-flex flex-column gap-4 resource-editor pt-1">
+<ArtidEditorModal bind:isOpen customHeight="70" customWidth="50">
+	<div class="d-flex flex-column gap-4 resource-editor pt-1 w-100">
 		<div class="d-flex align-items-center justify-content-between pe-5">
 			<div class="d-flex align-items-center gap-2 text-artid-primary fw-semibold">
 				<i class="bi bi-folder2-open fs-5 text-primary"></i>
