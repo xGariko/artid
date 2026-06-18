@@ -8,6 +8,7 @@
 	import type { Profile } from '$lib/api/types';
 	import ArtidSpidButton from '$lib/components/ui/artid-spid-button.svelte';
 	import ArtidEditorModal from '$lib/components/ui/artid-editor-modal.svelte';
+	import { goto } from '$app/navigation';
 
 	let { profile }: { profile: Profile } = $props();
 
@@ -263,45 +264,60 @@
 			return;
 		}
 
+		isSaving = true;
+
 		try {
-			// Chiamiamo l'endpoint POST che abbiamo creato su Spring, passando la password nel body
+			// Chiamiamo l'endpoint POST usando l'istanza 'api' pre-configurata del frontend
 			const verifyResponse = await api.POST('/api/auth/verify-password', {
-				body: { password: password }
+				body: { password }
+				// Niente headers manuali! I cookie di sessione vengono allegati dal browser da soli
 			});
 
-			// Leggiamo il booleano 'passwordCorretta' ritornato dal controller Java
-			const isPasswordValid = verifyResponse?.passwordCorretta ?? false;
+			// Leggiamo il booleano di ritorno con la sintassi corretta che abbiamo visto prima
+			const isPasswordValid = verifyResponse?.data?.['passwordCorretta'] ?? false;
 
-			// Punto 6.e: Se la password è sbagliata
 			if (!isPasswordValid) {
 				toast.error('Errore: Password Sbagliata');
+				isSaving = false;
 				return;
 			}
 
-			const deleteResponse = await api.DELETE(`/api/users/${userId}`);
+			const actualUserId = profile?.id; // Letto sul momento, al click, quindi è sicuro al 100%
+			if (actualUserId === undefined || actualUserId === null) {
+				toast.error("Impossibile recuperare l'ID identificativo dell'utente.");
+				return;
+			}
 
-			if (!deleteResponse.ok) {
+			const deleteResponse = await api.DELETE('/api/users/{id}', {
+				params: {
+					path: { id: actualUserId }
+				}
+			});
+
+
+
+			if (!deleteResponse.response.ok) {
 				toast.error("Errore nella rimozione dell'account dal sistema");
 				return;
 			}
 
 			toast.success('ACCOUNT ELIMINATO CON SUCCESSO');
-
-			// Disconnetti l'utente localmente e rimandalo alla pagina WELCOME
+			isOpen = false;
 			logoutLocal();
 
 		} catch (e) {
 			// Gestione di crash di rete o errori del server
 			console.error(e);
 			toast.error(e instanceof Error ? e.message : 'Errore di rete o del server');
+		} finally {
+			isSaving = false;
 		}
 	}
 
-	function logoutLocal() {
-		// Svuota i dati di sessione locali (localStorage, cookie, store di Svelte)
-		localStorage.removeItem('user_token');
-		// Se usi un router (es. svelte-routing, tinro, rutte), qui fai il push alla pagina "WELCOME"
-		// window.location.href = '/welcome';
+	async function logoutLocal() {
+		localStorage.clear();
+		// Aspettiamo che SvelteKit abbia effettivamente completato la navigazione
+		await goto('/welcome');
 	}
 </script>
 
@@ -502,7 +518,7 @@
 
 <ArtidEditorModal bind:isOpen>
 	<div class="text-artid-primary fw-semibold new-artid-modal">
-		<i class="bi bi-folder2-open fs-5 text-primary"></i>
+		<i class="bi bi-person-x fs-5 text-danger"></i>
 		<span>CHIUDI ACCOUNT</span>
 		<div class="my-2">
 		</div>
@@ -513,13 +529,15 @@
 				label="Password"
 				placeholder="Password"
 				bind:value={password}
+				addClass="mb-2"
 			/>
 			<ArtidInput
 				type="text"
-				name="elimina"
-				label="Elimina"
-				placeholder="Elimina"
+				name="ELIMINA"
+				label="ELIMINA"
+				placeholder="ELIMINA"
 				bind:value={elimina}
+				addClass="mb-2"
 			/>
  		</div>
 		<div class="d-flex justify-content-end gap-2">
@@ -534,7 +552,7 @@
 			<ArtidButton
 				label="CONFERMA ELIMINAZIONE"
 				fullWidth={false}
-				btnStyle="success"
+				btnStyle="danger"
 				icon="check2"
 				disabled={isSaving}
 				onclick={deleteAccount}
