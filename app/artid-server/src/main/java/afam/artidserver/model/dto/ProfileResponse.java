@@ -27,6 +27,9 @@ public class ProfileResponse {
     // Presigned GET URL della foto profilo (null se assente): l'<img> punta diretto a Supabase.
     private String propicUrl;
     private Boolean internalShareEnabled;
+    // true se l'account è verificato via SPID (spidCode valorizzato): in Gestione Profilo il
+    // pulsante mostra "SPID COLLEGATO" invece di "Associa SPID" (RAD, caso d'uso COL_SPID).
+    private Boolean spidLinked;
 
     public static ProfileResponse from(User user, String propicUrl) {
         return new ProfileResponse(
@@ -46,7 +49,8 @@ public class ProfileResponse {
                 user.getPhone(),
                 user.getBusinessEmail(),
                 propicUrl,
-                user.getInternalShareEnabled()
+                user.getInternalShareEnabled(),
+                user.getSpidCode() != null && !user.getSpidCode().isBlank()
         );
     }
 }

@@ -2,7 +2,7 @@
 	import { enhance } from '$app/forms';
 	import { resolve } from '$app/paths';
 	import ArtidInput from '$lib/components/ui/artid-input.svelte';
-	import spidIcon from '$lib/assets/spid-ico-circle.svg';
+	import ArtidSpidButton from '$lib/components/ui/artid-spid-button.svelte';
 
 	import ArtidButton from '$lib/components/ui/artid-button.svelte';
 	import type { RegisterRequest } from '$lib/models/schemas';
@@ -33,9 +33,7 @@
 	);
 
 	let confirmPasswordError = $derived(
-		passwordMismatch
-			? 'Le password non coincidono'
-			: (form?.errors?.confirmPassword ?? undefined)
+		passwordMismatch ? 'Le password non coincidono' : (form?.errors?.confirmPassword ?? undefined)
 	);
 
 	// Pattern condiviso col login: attiva l'overlay di caricamento durante la submit.
@@ -177,25 +175,9 @@
 		<span class="p-2 bg-artid-light z-2">Oppure</span>
 	</div>
 
-	<!-- SPID BUTTON -->
-	<div class="d-flex justify-content-center">
-		<button
-			class="btn btn-primary rounded-0 d-flex w-auto align-items-center justify-content-center gap-2 py-2"
-		>
-			<img src={spidIcon} class="spid-icon" alt="SPID" />
-			<span class="border-left">Entra con spid</span>
-		</button>
-	</div>
+	<ArtidSpidButton label="Entra con SPID" />
 
 	<p class="text-center mt-4 mb-0">
 		Hai già un account? <a href={resolve('/login')} class="auth-link">Accedi</a>
 	</p>
 {/if}
-
-<style>
-	.spid-icon {
-		width: 2rem;
-		padding-right: 0.5rem;
-		border-right: 1px solid #127ae2;
-	}
-</style>

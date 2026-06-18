@@ -4,23 +4,30 @@ import afam.artidserver.model.dto.AvatarResponse;
 import afam.artidserver.model.dto.ProfileCompletionResponse;
 import afam.artidserver.model.dto.ProfileResponse;
 import afam.artidserver.model.dto.ProfileUpdateRequest;
+import afam.artidserver.model.dto.SpidLoginRequest;
 import afam.artidserver.model.entity.User;
+import afam.artidserver.model.mock.MockSpidIdentity;
 import afam.artidserver.security.AuthenticatedUser;
 import afam.artidserver.service.AvatarService;
+import afam.artidserver.service.MockSpidIdentityProvider;
 import afam.artidserver.service.ProfileService;
 import afam.artidserver.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/profile")
@@ -30,6 +37,7 @@ public class ProfileController {
     private final ProfileService profileService;
     private final UserService userService;
     private final AvatarService avatarService;
+    private final MockSpidIdentityProvider identityProvider;
 
     @GetMapping
     public ResponseEntity<ProfileResponse> profile(@AuthenticationPrincipal AuthenticatedUser principal) {
@@ -66,6 +74,35 @@ public class ProfileController {
         // mail, passwordHash e propic_path NON sono toccati qui.
 
         User saved = userService.save(user);
+        return ResponseEntity.ok(ProfileResponse.from(saved, avatarService.presignKey(saved.getPropicPath())));
+    }
+
+    /**
+     * Collega SPID al profilo del Membro corrente (RAD, caso d'uso COL_SPID). Il provider è mockato:
+     * autentica le credenziali, poi SOVRASCRIVE l'anagrafica con i dati restituiti dal provider e
+     * associa lo spidCode (l'account diventa "verificato"). L'utente è SEMPRE quello del token.
+     * 401 se l'autenticazione presso il provider fallisce.
+     */
+    @PostMapping("/spid")
+    public ResponseEntity<ProfileResponse> linkSpid(@AuthenticationPrincipal AuthenticatedUser principal,
+                                                    @RequestBody SpidLoginRequest request) {
+        Optional<MockSpidIdentity> identity =
+                identityProvider.authenticate(request.getUsername(), request.getPassword());
+        if (identity.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        MockSpidIdentity spid = identity.get();
+
+        // Carichiamo la riga completa così il save() non azzera i campi non toccati (es. propic_path).
+        User user = userService.findById(principal.getId()).orElseThrow();
+        // Nota RAD: le informazioni anagrafiche vengono sostituite con quelle del provider.
+        user.setName(spid.name());
+        user.setSurname(spid.surname());
+        user.setBirthdate(spid.birthdate());
+        user.setBirthplace(spid.birthplace());
+        user.setSpidCode(spid.username());
+        User saved = userService.save(user);
+
         return ResponseEntity.ok(ProfileResponse.from(saved, avatarService.presignKey(saved.getPropicPath())));
     }
 
