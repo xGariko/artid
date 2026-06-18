@@ -29,9 +29,12 @@ public class ArtidService {
     }
 
     /**
-     * Dettaglio di un singolo ArtID dell'utente loggato. L'ownership è imposta dalla query
-     * (filtra per id_user): un ArtID non di proprietà, inesistente o eliminato dà Optional.empty()
-     * → il controller risponde 404 senza rivelare se esiste. Impossibile leggere l'ArtID di un
+     * Dettaglio di un singolo ArtID dell'utente loggato. L'ownership è imposta
+     * dalla query
+     * (filtra per id_user): un ArtID non di proprietà, inesistente o eliminato dà
+     * Optional.empty()
+     * → il controller risponde 404 senza rivelare se esiste. Impossibile leggere
+     * l'ArtID di un
      * altro utente forzando l'id nell'URL.
      */
     public Optional<ArtidResponse> findByIdForUser(Long id, Long userId) {
@@ -40,9 +43,12 @@ public class ArtidService {
     }
 
     /**
-     * Crea un nuovo ArtID intestato all'utente loggato (solo titolo). I booleani e i timestamp
-     * sono valorizzati esplicitamente: con Spring Data JDBC l'INSERT scrive tutte le colonne,
-     * quindi non ci si affida ai DEFAULT del DB (altrimenti i NOT NULL andrebbero a NULL).
+     * Crea un nuovo ArtID intestato all'utente loggato (solo titolo). I booleani e
+     * i timestamp
+     * sono valorizzati esplicitamente: con Spring Data JDBC l'INSERT scrive tutte
+     * le colonne,
+     * quindi non ci si affida ai DEFAULT del DB (altrimenti i NOT NULL andrebbero a
+     * NULL).
      */
     @Transactional
     public ArtidResponse create(String title, Long userId) {
@@ -58,6 +64,11 @@ public class ArtidService {
         return toResponse(artidDAO.save(artid));
     }
 
+    // @Transactional
+    // public void addResource(Long id, Long resourceId) {
+    // artidDAO.addResourceToArtid(id, resourceId);
+    // }
+
     private static ArtidResponse toResponse(Artid a) {
         return new ArtidResponse(
                 a.getId(),
@@ -68,7 +79,6 @@ public class ArtidService {
                 a.getCreatedAt(),
                 a.getLastModified(),
                 a.getIsPublic(),
-                a.getIsPrivate()
-        );
+                a.getIsPrivate());
     }
 }

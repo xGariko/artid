@@ -4,18 +4,35 @@
 	import { resolve } from '$app/paths';
 	import { page } from '$app/state';
 	import { dndzone } from 'svelte-dnd-action';
-	import { flip } from 'svelte/animate';
 	import type { PageData } from './$types';
 
 	import artidimage from '$lib/assets/artid_logo_outline_primary.svg';
 	import ArtidInput from '$lib/components/ui/artid-input.svelte';
 	import { badgeColorForExtension, badgeLabelForExtension } from '$lib/utilities';
+	import ArtidAddMaterialsModal from '$lib/components/pages/artid/artid-add-materials-modal.svelte';
+	import type { ResourceResponse } from '$lib/api/types';
 
 	const id = $derived(page.params.id);
 
 	let { data }: { data: PageData } = $props();
 
-	let draggableMaterials = $state(data.materials ?? []);
+	let draggableMaterials: ResourceResponse[] = $state([]);
+	$effect(() => {
+		draggableMaterials = data.materials ?? [];
+	});
+
+	let searchQuery = $state('');
+
+	// Filtra i materiali in base alla query (match su titolo o nome file).
+	const filteredMaterials = $derived.by(() => {
+		const normalizedQuery = searchQuery.trim().toLowerCase();
+		if (!normalizedQuery) return draggableMaterials;
+		return draggableMaterials.filter((material) => {
+			const titleMatches = (material.title ?? '').toLowerCase().includes(normalizedQuery);
+			const fileNameMatches = (material.fileName ?? '').toLowerCase().includes(normalizedQuery);
+			return titleMatches || fileNameMatches;
+		});
+	});
 
 	let modelDescription = $state(data.artid.description ?? '');
 
@@ -92,6 +109,8 @@
 		draggableMaterials = e.detail.items;
 		// Qui puoi fare una chiamata API per salvare il nuovo ordine nel database Java!
 	}
+
+	let isOpen = $state(false);
 </script>
 
 <div class="w-100 h-100 d-flex flex-column align-items-center gap-4 p-5">
@@ -151,7 +170,7 @@
 	>
 		<div class="w-50 h-100 overflow-y-auto border-end border-artid-border">
 			<div
-				class="bg-artid-surface border-0 border-bottom border-artid-border px-3 py-2 text-artid-text fw-semibold fs-5 sticky-top"
+				class="bg-artid-surface border-0 border-bottom border-artid-border px-3 py-2 text-artid-text fw-semibold fs-5"
 			>
 				Informazioni
 			</div>
@@ -187,7 +206,7 @@
 
 		<div class="w-50 h-100 d-flex flex-column overflow-hidden">
 			<div
-				class="bg-artid-surface border-0 border-bottom border-artid-border px-3 py-2 text-artid-text fw-semibold fs-5 flex-shrink-0"
+				class="bg-artid-surface border-0 border-bottom border-artid-border px-3 py-2 text-artid-text fw-semibold fs-5"
 			>
 				Materiali
 			</div>
@@ -200,15 +219,16 @@
 					class="flex-grow-1 w-100 d-flex flex-column rounded-3 border border-artid-border mb-2"
 					style="min-height: 0;"
 				>
-					<div class="border-0 border-bottom border-artid-border px-2 py-3 flex-shrink-0">
+					<div class="border-0 border-bottom border-artid-border px-2 py-3">
 						<div class="position-relative">
 							<i
-								class="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-3 text-artid-primary"
+								class="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-3 text-artid"
 							></i>
 							<input
 								type="text"
 								class="form-control rounded-3 ps-5 py-2 search-input"
 								placeholder="Cerca materiali"
+								bind:value={searchQuery}
 							/>
 						</div>
 					</div>
@@ -216,11 +236,11 @@
 					<div class="p-2 flex-grow-1" style="overflow-y: auto; min-height: 0;">
 						<ul
 							class="list-group list-unstyled"
-							use:dndzone={{ items: draggableMaterials, flipDurationMs }}
+							use:dndzone={{ items: filteredMaterials, flipDurationMs }}
 							onconsider={handleDndConsider}
 							onfinalize={handleDndFinalize}
 						>
-							{#each draggableMaterials as material (material.id)}
+							{#each filteredMaterials as material (material.id)}
 								<li class="list-group-item d-flex justify-content-between align-items-center gap-3">
 									<i class="bi bi-grip-horizontal fs-4 text-artid-text-muted" style="cursor: grab;"
 									></i>
@@ -243,12 +263,19 @@
 				</div>
 
 				<div class="w-100 d-flex justify-content-end flex-shrink-0 pt-1">
-					<ArtidButton label="Aggiungi Materiale" fullWidth={false} />
+					<ArtidButton
+						label="Aggiungi Materiale"
+						icon="plus-lg"
+						fullWidth={false}
+						onclick={() => (isOpen = !isOpen)}
+					/>
 				</div>
 			</div>
 		</div>
 	</div>
 </div>
+
+<ArtidAddMaterialsModal bind:isOpen bind:artidMaterials={draggableMaterials} artidId={Number(id)} />
 
 <style lang="scss">
 	.artid-preferite {

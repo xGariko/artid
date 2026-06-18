@@ -72,4 +72,11 @@ public class ArtidController {
         return ResponseEntity.ok(resourceService.findByArtid(id, principal.getId()));
     }
 
+    @PostMapping("/{id}/resources")
+    public ResponseEntity<Void> addResource(@PathVariable Long id,
+            @AuthenticationPrincipal AuthenticatedUser principal, @RequestBody Long resourceId) {
+        resourceService.linkArtidResource(resourceId, id);
+        return ResponseEntity.ok().build();
+    }
+
 }

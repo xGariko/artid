@@ -15,9 +15,7 @@ export const load: LayoutServerLoad = async ({ params, locals }) => {
 		locals.api.GET('/api/artids/{id}', {
 			params: { path: { id } }
 		}),
-		// locals.api.GET('/api/artids/{id}/resources', { params: { path: { id } } })
-		//TODO solo per testing
-		locals.api.GET('/api/resources')
+		locals.api.GET('/api/artids/{id}/resources', { params: { path: { id } } })
 	]);
 
 	if (!artidResponse.data) {
