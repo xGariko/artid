@@ -1,6 +1,6 @@
 import { fail, redirect } from "@sveltejs/kit";
 import type { Actions } from "./$types";
-import { establishSession } from "$lib/auth.ts";
+import { requestRegistration, verifyRegistration, resendRegistrationOtp } from "$lib/auth";
 import { RegisterRequestSchema } from "$lib/models/schemas";
 
 type RegisterField =
@@ -14,6 +14,21 @@ type RegisterField =
 
 type FieldErrors = Partial<Record<RegisterField, string>>;
 
+// Forma unica di ritorno (come nel login): `step: "otp"` indica la fase di verifica del codice.
+// I campi del form vengono rimandati indietro per ripopolarli in caso di errore.
+type RegisterActionData = {
+	step?: "otp";
+	email?: string;
+	name?: string;
+	surname?: string;
+	birthdate?: string;
+	birthplace?: string;
+	errors?: FieldErrors;
+	formError?: string;
+	codeError?: string;
+	resent?: boolean;
+};
+
 const FIELD_MESSAGES: Record<RegisterField, string> = {
 	name: "Il nome è obbligatorio.",
 	surname: "Il cognome è obbligatorio.",
@@ -24,8 +39,16 @@ const FIELD_MESSAGES: Record<RegisterField, string> = {
 	birthplace: "Luogo di nascita non valido.",
 };
 
+const CODE_REGEX = /^\d{6}$/;
+const SESSION_LOST = "Sessione scaduta, ricomincia la registrazione.";
+// Messaggio di codice errato/scaduto come da RAD (caso d'uso GENERA OTP).
+const INVALID_CODE =
+	"Errore: codice non valido, controlla nella mail che non sia scaduto. Se è scaduto clicca Riprova.";
+
 export const actions: Actions = {
-	default: async ({ request, cookies, locals }) => {
+	// Step 1: valida i dati e, se l'email è libera, invia l'OTP di verifica (l'account NON è
+	// ancora creato: nasce solo dopo la verifica del codice).
+	requestOtp: async ({ request, locals }) => {
 		const form = await request.formData();
 		const name = (form.get("name") as string)?.trim() ?? "";
 		const surname = (form.get("surname") as string)?.trim() ?? "";
@@ -61,38 +84,65 @@ export const actions: Actions = {
 		}
 
 		if (Object.keys(errors).length > 0) {
-			return fail(400, { errors, ...formState });
+			return fail(400, { errors, ...formState } as RegisterActionData);
 		}
 
-		const { data, response } = await locals.api.POST("/api/auth/register", {
-			body: {
-				name,
-				surname,
-				email,
-				password,
-				birthdate: birthdate || undefined,
-				birthplace: birthplace || undefined,
-			},
+		const result = await requestRegistration(locals.api, {
+			name,
+			surname,
+			email,
+			password,
+			birthdate: birthdate || undefined,
+			birthplace: birthplace || undefined,
 		});
 
-		if (!response.ok) {
-			const conflict = response.status === 409;
-			return fail(response.status, {
-				errors: conflict
-					? ({ email: "Esiste già un account con questa email." } as FieldErrors)
-					: ({} as FieldErrors),
-				formError: conflict ? undefined : "Errore durante la registrazione. Riprova.",
+		if (!result.ok) {
+			// Email già registrata → errore sul campo; altri casi → errore generale.
+			return fail(result.field === "email" ? 409 : 400, {
+				errors: result.field === "email" ? ({ email: result.error } as FieldErrors) : ({} as FieldErrors),
+				formError: result.field === "email" ? undefined : result.error,
 				...formState,
-			});
+			} as RegisterActionData);
 		}
 
-		// /register restituisce già un token: la registrazione apre la sessione direttamente,
-		// senza passare dall'OTP (a differenza del login). Senza token, ripiega sul login.
-		if (!data?.token) {
-			redirect(303, "/login");
+		return { step: "otp", email: result.email, ...formState } as RegisterActionData;
+	},
+
+	// Step 2: verifica l'OTP e, se valido, crea l'account, apre la sessione e va in dashboard.
+	verify: async ({ request, cookies, locals }) => {
+		const form = await request.formData();
+		const email = (form.get("email") as string)?.trim() ?? "";
+		const code = (form.get("code") as string)?.trim() ?? "";
+
+		if (!email) {
+			return fail(400, { formError: SESSION_LOST } as RegisterActionData);
+		}
+		if (!CODE_REGEX.test(code)) {
+			return fail(400, {
+				step: "otp",
+				email,
+				codeError: "Inserisci il codice OTP a 6 cifre.",
+			} as RegisterActionData);
 		}
 
-		establishSession(cookies, data);
+		const result = await verifyRegistration(locals.api, cookies, { email, code });
+		if (!result.ok) {
+			return fail(401, { step: "otp", email, codeError: INVALID_CODE } as RegisterActionData);
+		}
+
 		redirect(303, "/dashboard");
+	},
+
+	// "Riprova": rigenera e rinvia l'OTP, restando nella fase di verifica.
+	resend: async ({ request, locals }) => {
+		const form = await request.formData();
+		const email = (form.get("email") as string)?.trim() ?? "";
+
+		if (!email) {
+			return fail(400, { formError: SESSION_LOST } as RegisterActionData);
+		}
+
+		await resendRegistrationOtp(locals.api, email);
+		return { step: "otp", email, resent: true } as RegisterActionData;
 	},
 };

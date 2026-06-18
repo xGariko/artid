@@ -15,6 +15,12 @@ type RequestOtpResult =
 	| { ok: true; email: string }
 	| { ok: false; error: string };
 
+// Come RequestOtpResult ma con un hint sul campo in errore (es. email già registrata → 409,
+// così la pagina può mostrare l'errore sul campo email anziché come errore generale).
+type RegistrationOtpResult =
+	| { ok: true; email: string }
+	| { ok: false; error: string; field?: "email" };
+
 type LoginResult =
 	| { ok: true; user: AuthUser }
 	| { ok: false; error: string };
@@ -31,6 +37,15 @@ interface LoginPayload {
 interface VerifyOtpPayload {
 	email: string;
 	code: string;
+}
+
+interface RegisterPayload {
+	name: string;
+	surname: string;
+	email: string;
+	password: string;
+	birthdate?: string;
+	birthplace?: string;
 }
 
 // Forma minima di AuthResponse: ciò che serve per aprire la sessione.
@@ -120,6 +135,51 @@ export async function verifyOtp(
 // "Riprova": rigenera e rinvia l'OTP. Fire-and-forget: il server risponde 200 comunque.
 export async function resendOtp(api: ApiClient, email: string): Promise<void> {
 	await api.POST("/api/auth/resend-otp", { body: { email } });
+}
+
+// --- Registrazione con verifica email: stesso schema a due passi del login, ma l'account
+// viene creato solo allo step 2 (dopo l'OTP). I dati pendenti vivono lato server (registration_otp). ---
+
+// Step 1: se l'email è libera, il server salva i dati come pending e invia l'OTP di verifica.
+export async function requestRegistration(
+	api: ApiClient,
+	payload: RegisterPayload,
+): Promise<RegistrationOtpResult> {
+	const { data, response } = await api.POST("/api/auth/register", { body: payload });
+
+	if (!response.ok || !data?.otpRequired) {
+		if (response.status === 409) {
+			return { ok: false, error: "Esiste già un account con questa email.", field: "email" };
+		}
+		// 502 = email non inviabile; altro = errore generico.
+		const error =
+			response.status === 502
+				? "Impossibile inviare il codice di verifica. Riprova tra poco."
+				: "Errore durante la registrazione. Riprova.";
+		return { ok: false, error };
+	}
+
+	return { ok: true, email: data.email ?? payload.email };
+}
+
+// Step 2: verifica l'OTP e, se valido, crea l'account e apre la sessione.
+export async function verifyRegistration(
+	api: ApiClient,
+	cookies: Cookies,
+	payload: VerifyOtpPayload,
+): Promise<LoginResult> {
+	const { data, response } = await api.POST("/api/auth/verify-registration", { body: payload });
+
+	if (!response.ok || !data?.token) {
+		return { ok: false, error: "Codice non valido o scaduto." };
+	}
+
+	return { ok: true, user: establishSession(cookies, data) };
+}
+
+// "Riprova": rigenera e rinvia l'OTP di registrazione. Fire-and-forget (200 comunque).
+export async function resendRegistrationOtp(api: ApiClient, email: string): Promise<void> {
+	await api.POST("/api/auth/resend-registration-otp", { body: { email } });
 }
 
 export function logout(cookies: Cookies): void {

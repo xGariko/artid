@@ -5,6 +5,7 @@ import afam.artidserver.model.entity.User;
 import afam.artidserver.security.AuthenticatedUser;
 import afam.artidserver.security.JwtUtil;
 import afam.artidserver.service.OtpService;
+import afam.artidserver.service.RegistrationService;
 import afam.artidserver.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -36,6 +37,7 @@ public class AuthController {
     private final JwtUtil jwtUtil;
     private final PasswordEncoder passwordEncoder;
     private final OtpService otpService;
+    private final RegistrationService registrationService;
 
     /**
      * Step 1 del login: valida le credenziali e, se corrette, invia un OTP via email.
@@ -95,32 +97,54 @@ public class AuthController {
         return ResponseEntity.ok().build();
     }
 
+    /**
+     * Step 1 della registrazione: valida che l'email sia libera e avvia la verifica via OTP
+     * (email inviata). NON crea l'utente: l'account nasce solo dopo {@link #verifyRegistration}.
+     * 409 se l'email è già registrata, 502 se l'invio email fallisce.
+     */
     @PostMapping("/register")
-    public ResponseEntity<AuthResponse> register(@RequestBody RegisterRequest request) {
+    public ResponseEntity<OtpChallengeResponse> register(@RequestBody RegisterRequest request) {
         if (userService.findByMail(request.getEmail()).isPresent()) {
             return ResponseEntity.status(HttpStatus.CONFLICT).build();
         }
+        try {
+            OffsetDateTime expiresAt = registrationService.startChallenge(request);
+            return ResponseEntity.ok(new OtpChallengeResponse(true, request.getEmail(), expiresAt));
+        } catch (MailException e) {
+            // Email non inviabile: distinguibile dal 409 lato client.
+            return ResponseEntity.status(HttpStatus.BAD_GATEWAY).build();
+        }
+    }
 
-        User user = new User();
-        user.setName(request.getName());
-        user.setSurname(request.getSurname());
-        user.setMail(request.getEmail());
-        user.setPasswordHash(passwordEncoder.encode(request.getPassword()));
-        user.setBirthdate(request.getBirthdate());
-        user.setBirthplace(request.getBirthplace());
-        user.setIsPublic(false);
-        // internal_share_enabled è NOT NULL sul DB: senza default esplicito l'INSERT fallisce.
-        user.setInternalShareEnabled(false);
-
-        User saved = userService.save(user);
-        String token = jwtUtil.generateToken(saved.getMail());
+    /**
+     * Step 2 della registrazione: verifica l'OTP e, se valido, CREA l'utente e rilascia il token.
+     * Risposta indistinta (401) per codice errato/scaduto o nessuna registrazione in corso.
+     */
+    @PostMapping("/verify-registration")
+    public ResponseEntity<AuthResponse> verifyRegistration(@RequestBody VerifyOtpRequest request) {
+        var created = registrationService.verifyAndCreate(request.getEmail(), request.getCode());
+        if (created.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        User user = created.get();
+        String token = jwtUtil.generateToken(user.getMail());
         return ResponseEntity.ok(new AuthResponse(
                 token,
-                saved.getId(),
-                saved.getMail(),
-                saved.getName(),
-                saved.getSurname()
+                user.getId(),
+                user.getMail(),
+                user.getName(),
+                user.getSurname()
         ));
+    }
+
+    /**
+     * Rigenera e rinvia l'OTP di registrazione ("Riprova"). Sempre 200 per non rivelare se esiste
+     * una registrazione in corso per quell'email: il rinvio avviene solo se un pending è presente.
+     */
+    @PostMapping("/resend-registration-otp")
+    public ResponseEntity<Void> resendRegistration(@RequestBody ResendOtpRequest request) {
+        registrationService.resend(request.getEmail());
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping("/me")

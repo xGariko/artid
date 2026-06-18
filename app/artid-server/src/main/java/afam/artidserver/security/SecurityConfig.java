@@ -39,7 +39,8 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/login", "/api/auth/register",
-                                "/api/auth/verify-otp", "/api/auth/resend-otp").permitAll()
+                                "/api/auth/verify-otp", "/api/auth/resend-otp",
+                                "/api/auth/verify-registration", "/api/auth/resend-registration-otp").permitAll()
                         .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                         // Catalogo pubblico (pagina Explore): ricerca profili pubblici senza login.
                         .requestMatchers(HttpMethod.GET, "/api/users/search").permitAll()
