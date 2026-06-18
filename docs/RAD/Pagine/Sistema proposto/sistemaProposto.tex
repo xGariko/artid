@@ -1,0 +1,86 @@
+% ==========================================
+\section{Sistema Proposto}
+% ==========================================
+
+\subsection{Overview}
+Il \textbf{sistema} proposto, denominato \textbf{``ArtID''}, è stato progettato per \textbf{associare univocamente l'identit\`a anagrafica e accademica dello studente} a un repository flessibile di asset multimediali, che supporti il \textbf{completo controllo sui materiali artistici} dell'individuo e ne consenta una \textbf{facile condivisione} con altri soggetti, interni o esterni all'organizzazione.
+
+I materiali artistici vengono raggruppati in \textbf{``ArtID''}, soluzione volta a superare il paradigma della cartella statica in favore del concetto di \textbf{``contenitore dinamico''} e \textbf{pronto alla condivisione}.
+
+Un ulteriore elemento di innovazione architetturale \`e rappresentato dal \textbf{motore di condivisione selettiva e con monitoraggio delle visualizzazioni}.
+Lo studente non espone l'intero profilo, ma seleziona un sottoinsieme di file dando vita a una vista personalizzata costituita dall'\textbf{ArtID}.\\
+Il sistema permette di generare un link univoco per una data collezione che pu\`o essere fruito da soggetti esterni.
+Parallelamente, \textbf{il sistema registra in tempo reale l'accesso al link}, restituendo allo studente un \textbf{feedback di avvenuta visione} dei materiali condivisi.
+
+Per gli utenti che cercano supporto per essere scoperti e venire considerati per eventuali ingaggi o proposte di lavoro, il sistema permette a individui esterni di ricercare utenti all'interno del sistema, per esempio con l'obiettivo di \textit{scouting}.
+
+L'\textbf{obiettivo finale} è quello di offrire uno strumento digitale che consenta agli studenti di \textbf{rappresentare in modo efficace e moderno il proprio percorso artistico e formativo}, che si integri in modo trasparente con i metodi tutt'ora usati per la condivisione del proprio portfolio a commissioni o altri enti nell'ambito della presentazione del percorso artistico.
+
+\subsection{Requisiti Funzionali}
+Nel corso degli incontri con il cliente è emersa l'esigenza di progettare un sistema unico che \textbf{permetta a ciascuno studente di costruire una propria identità digitale unica all'interno dell' istituzione AFAM}
+con particolare attenzione alla \textbf{possibilità di poter condividere parte del proprio profilo con soggetti esterni all'istituzione AFAM}, come ad esempio commissioni di audizione, docenti di altre istituzioni o enti che richiedano una valutazione del percorso artistico.
+
+\`E inoltre necessario prestare particolare attenzione alla \textbf{protezione dei dati personali e alla tutela dei materiali artistici}, che rappresentano spesso opere originali degli studenti e devono essere trattati con adeguate garanzie.
+
+Il sistema sarà utilizzato da \textbf{due principali tipologie di utenti: Membro AFAM e Guest}.
+Quando parliamo di \textbf{Membro AFAM} intendiamo uno studente iscritto alla piattaforma mentre un \textbf{Guest} rappresenta un soggetto esterno all'istituzione AFAM o in generale un individuo che interagisce con il sistema senza avere effettuato autenticazione.
+Per rendere la condivisione di materiali con soggetti esterni il più veloce e facile possibile non è richiesto che quest'ultimi si registrino sulla piattaforma per visionare i contenuti condivisi, mentre uno studente che vuole usufruire dei servizi offerti dalla piattaforma deve \textbf{effettuare la registrazione} al sistema.
+
+
+Per quanto concerne il ruolo del \textbf{Membro AFAM}, il sistema deve consentire il \textbf{caricamento di materiali personali}, la \textbf{creazione di 
+contenitori dinamici che contengano parti del profilo da poter condividere} e che quindi ne esprimano l'identità artistica del Membro, perciò \textbf{detti ArtID}. \\
+Il \textbf{Membro AFAM} potrà \textbf{aggiungere o rimuovere materiali} da un \textbf{ArtID}, nonché \textbf{aggiungere dei tag} che rispecchino i tipi di contenuti presenti.\\
+Infine è stato stabilito un \textbf{sistema di condivisione} che permette al \textbf{Membro AFAM} di condividere i propri \textbf{ArtID} sia con \textbf{soggetti esterni} sia con altri \textbf{Membri AFAM}, e che consenta un ampio controllo sui materiali condivisi e che restituisca un \textbf{feedback in caso di visualizzazione} degli stessi.
+
+Il \textbf{Guest} potrà invece \textbf{visualizzare gli ArtID a lui condivisi} tramite l'apertura di un link generato dal \textbf{Membro AFAM} e condiviso tramite canali esterni, in compatibilità con l'infrastruttura di condivisione esistente.\\
+Infine un \textbf{Guest} può anche \textbf{cercare gli utenti della piattaforma} che hanno un profilo visibile pubblicamente, attraverso la funzionalità di \textbf{Discovery}.\\
+Il sistema permette quindi al \textbf{Guest} di \textbf{visualizzare i contatti del Membro AFAM} per connettersi.\\
+
+
+\subsection{Requisiti Non Funzionali}
+
+
+\subsubsection{Requisiti Del Prodotto}
+\begin{itemize}
+    \item \textbf{Consistenza Dinamica e Gestione del Ciclo di Vita delle Condivisioni:} Il sistema deve garantire il controllo granulare, la sicurezza e la freschezza dei dati relativi ai flussi di condivisione degli \textit{ArtID}, rispettando i seguenti vincoli architetturali:
+\begin{itemize}
+    \item \textbf{Consistenza in Tempo Reale:} Il sistema non deve memorizzare istantanee (\textit{snapshot}) statiche al momento della condivisione; ogni modifica ai materiali o ai metadati deve riflettersi istantaneamente e in modo trasparente a tutti i soggetti autorizzati.
+    \item \textbf{Revoca e Reattività Intermedia:} Il sistema deve verificare lo stato di validità del link e dell'\textit{ArtID} a ogni singola richiesta di accesso. Qualora un \textit{ArtID} venga eliminato, posto in stato ``Privato'', disabilitato temporaneamente o se la data di scadenza (modificabile dinamicamente dal Membro) risulta superata, il sistema deve revocare l'accesso bloccando la richiesta specificandone il motivo, in modo da tenere aggiornato il Guest con cui il Membro ha condiviso il link.
+    \item \textbf{Persistenza dello Storico:} Le condivisioni scadute rimangono visibili nella schermata per mantenere uno storico delle condivisioni e per permettere al Membro di prolungare le scadenze.
+
+\end{itemize}
+    \item \textbf{Limiti sui File:} Il sistema deve supportare il caricamento di file multimediali con un limite di dimensione massima pari a 50MB per i documenti (PDF) e le immagini (PNG, JPG), e 50MB per i file video (MP4).
+\end{itemize}
+
+
+\subsubsection{Sicurezza e Privacy}
+\begin{itemize}
+    \item \textbf{Autenticazione a Due Fattori (2FA/OTP):} Tutte le operazioni di modifica sui dati sensibili del Membro (es. cambio password, eliminazione account) devono essere subordinate alla validazione tramite un codice One-Time Password (OTP) numerico a 6 cifre, con validità temporale limitata a 5 minuti, inviato all'email istituzionale del Membro. 
+    Al fine di prevenire attacchi di tipo \textit{brute-force}, qualora il codice inserito non sia valido (perché errato o perché temporalmente scaduto), il sistema deve restituire un messaggio di errore identico e generico (es. ``Codice non valido o scaduto. Riprova.''), senza specificare la causa esatta del fallimento della validazione.
+    \item \textbf{Segretezza dei Dati di Registrazione:} Il sistema deve prevenire attacchi di \textit{User Enumeration}: la funzionalità di condivisione tra Membri (che necessita della email del destinatario) non deve confermare o smentire l'esistenza di un'email inserita, restituendo sempre un messaggio generico di successo dell'operazione. Allo stesso modo, la email di registrazione non fa parte dei contatti del Membro ed è una informazione privata, pertanto è prevista la possibilità di inserire una email di contatto potenzialmente diversa. 
+    \item \textbf{Controllo degli Accessi e Riservatezza dei Profili Privati:} Il sistema deve garantire il diritto alla riservatezza dei Membri AFAM attraverso un meccanismo rigido di controllo degli accessi. Se un Membro imposta il proprio account come ``privato'', il sistema deve escludere totalmente l'account dai risultati di qualsiasi ricerca effettuata tramite la funzionalità di \textit{Discovery} avviata da un Guest.
+    \item \textbf{Integrità e Certificazione dei Dati tramite Identità Digitale (SPID):} Il sistema deve garantire l'autenticità e l'immutabilità delle identità anagrafiche dei Membri attraverso l'integrazione con il sistema pubblico SPID. 
+    Quando un Membro collega lo SPID all'account il sistema deve sovrascrivere i dati anagrafici e contrassegnare l'account come ``verificato''; da quel momento in poi i dati anagrafici non potranno più essere modificati. 
+    \item \textbf{Politica di Controllo degli Accessi agli ArtID:} Il sistema deve implementare controlli di autorizzazione rigidi per la gestione della visibilità degli \textit{ArtID}, basata su tre stati mutuamente esclusivi:
+\begin{itemize}
+    \item \textbf{Stato Pubblico:} Il sistema deve rendere l'\textit{ArtID} visibile da chiunque tenti di accedervi a partire dal profilo pubblico di un Membro o da una condivisione.
+    \item \textbf{Stato Privato:} Il sistema deve rendere l'\textit{ArtID} visibile solo a chi l'ha creato.
+    \item \textbf{Stato Unlisted:} Il sistema deve escludere l'\textit{ArtID} dai risultati della \textit{Discovery} e dalle funzioni di ricerca globali. L'accesso deve essere consentito esclusivamente tramite link di condivisione. Quest'ultimo deve essere imprevedibile e resistente ad attacchi di tipo \textit{brute-force}.
+\end{itemize}
+\end{itemize}
+
+\subsubsection{Usabilità}
+\begin{itemize}
+    \item \textbf{Gestione degli Errori e Tolleranza:} Il sistema deve adottare un paradigma di "Graceful Degradation". In caso di errore lato server o input non valido, l'interfaccia non deve mostrare stack trace tecnici, ma messaggi di errore parlanti in linguaggio naturale (es. indicando chiaramente quale campo editare). 
+\end{itemize}
+
+\subsubsection{Requisiti Organizzativi}
+\begin{itemize}
+    \item \textbf{Infrastruttura Hardware:} Il sistema deve essere installato su un singolo nodo dell'infrastruttura IT dell'istituzione AFAM e deve essere in grado di soddisfare fino a diverse centinaia di richieste al secondo in momenti di picco.\\ Data la tipologia di file trattati dal sistema, file multimediali potenzialmente di grandi dimensioni, \`e consigliabile l'utilizzo di un'infrastruttura di storage e risorse cloud, come AWS S3, in modo da non avere bisogno di investire troppo sulle risorse hardware del server. Inoltre, delegando al sistema in cloud, si evita che la rete venga sovraccaricata, permettendo dei tempi di risposta pi\`u brevi.
+\end{itemize}
+
+\subsubsection{Considerazioni Legislative e Conformità}
+\begin{itemize}
+    \item \textbf{Conformità GDPR (Regolamento UE 2016/679):} Il sistema deve implementare nativamente il "Diritto all'Oblio" (cancellazione definitiva dei dati e dei media del Membro entro 48 ore dalla richiesta) e il principio di "Privacy by Design". 
+    \item \textbf{Conformità Diritto d'Autore:} Il sistema deve essere conforme alla la \textbf{Legge n. 633 del 1941} sul diritto d’autore, che disciplina la protezione delle opere dell'ingegno, comprese le opere artistiche dei Membri, spesso originali. Il sistema dovr\`a garantire il rispetto dei diritti morali e patrimoniali degli autori, assicurando la corretta attribuzione della paternit\`a delle opere e impedendo ogni forma di riproduzione o diffusione non autorizzata.
+\end{itemize}

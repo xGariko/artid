@@ -131,7 +131,6 @@
 	</div>
 
 	<div class="flex-grow-1 overflow-y-auto rounded-3 border border-artid-border">
-		<!-- Intestazione: stessa griglia delle righe, sticky con z-index basso per non coprire le modali. -->
 		<div
 			class="row g-0 align-items-center px-3 py-2 sticky-header bg-artid-muted border-bottom border-artid-border text-artid-text small fw-semibold text-nowrap"
 		>

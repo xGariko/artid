@@ -36,7 +36,7 @@
 
 <ArtidNavbar></ArtidNavbar>
 
-<div class="w-100 h-100 d-flex flex-column align-items-center justify-content-start p-5 explore-main-container gap-3">
+<div class="w-100 d-flex flex-column align-items-center justify-content-start p-5 explore-main-container gap-3">
 	<ExploreSearchSection bind:searchQuery onSearch={runSearch} />
 	<ExploreResultsSection {profiles} {hasSearched} />
 </div>

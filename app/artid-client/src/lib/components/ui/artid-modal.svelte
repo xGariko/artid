@@ -7,7 +7,6 @@
 		ModalHeader
 	} from '@sveltestrap/sveltestrap';
 
-
 	let {
 		isOpen = $bindable(),
 		onConfirm,

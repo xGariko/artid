@@ -1,0 +1,57 @@
+% ==========================================
+\section{Architettura software proposta}
+% ==========================================
+
+\subsection{Panoramica Architetturale}
+
+Per l'implementazione del sistema è stata scelta un'infrastruttura basata sullo stile \textbf{Client-Server}, strutturata internamente secondo il pattern architetturale \textbf{MVC (Model-View-Controller)} e integrata con il design pattern \textbf{Repository} per il disaccoppiamento dei dati.
+
+L'adozione del paradigma \textbf{Client-Server} è dettata dalla necessità di garantire una netta \textbf{separazione tra l'utente finale e i dati con cui questo interagisce}, i quali, per la natura stessa dell'applicazione, devono essere centralizzati e protetti.
+
+A livello applicativo, la logica è organizzata tramite il pattern \textbf{MVC}, il quale suddivide il sistema in tre sottosistemi principali:
+\begin{itemize}[itemsep=-6pt]
+    \item \textbf{Model subsystem:} responsabile di mantenere la conoscenza del dominio, gestisce la persistenza, l'integrità e la distribuzione dei dati.
+    \item \textbf{View subsystem:} responsabile di esibire gli elementi del dominio all'utente, costituisce l'interfaccia grafica attraverso la quale i dati vengono visualizzati.
+    \item \textbf{Controller subsystem:} responsabile di gestire la sequenza delle interazioni, definisce i metodi con cui l'utente interroga il sistema e determina la logica di business associata.
+\end{itemize}
+
+Al fine di ottimizzare la gestione della persistenza all'interno del \textit{Model}, si è deciso di utilizzare il pattern \textbf{Repository}. Questo schema introduce un livello di \textbf{astrazione per accedere alla sorgente dei dati}, \textbf{nascondendo la complessità} derivante dalle interrogazioni dirette al database o da eventuali chiamate ad API esterne, garantendo una maggiore manutenibilità e testabilità del software.
+
+A livello di deployment, il \textbf{lato Server del sistema e il DBMS dovranno essere installati stabilmente nel nodo dell'istituzione AFAM}, garantendo il controllo istituzionale sui dati. Al contrario, il \textbf{lato Client del sistema potrà essere eseguito su un numero arbitrario di nodi separati}, quali i dispositivi personali degli utenti.
+
+\subsection{Decomposizione in sottosistemi}
+
+% \subsubsection{Gestione Autenticazione}
+% Il sottosistema Gestione Autenticazione comprende i componenti che permettono lo svolgimento delle operazioni di login, registrazione e logout del Membro AFAM tramite credenziali, e autenticazione tramite identità digitale. Comprende inoltre i componenti adibiti a recupero e modifica password, e il componente relativo alla generazione del codice OTP.
+
+% \subsubsection{Gestione Profilo}
+% Il sottosistema Gestione Profilo comprende i componenti che permettono la visualizzazione e aggiornamento dei dati anagrafici e professionali, nonché la modifica dell'immagine di profilo, della visibilità del profilo e il calcolo della percentuale di completamento. Contiene inoltre il componente necessario per il collegamento dell'identità SPID.
+
+% \subsubsection{Gestione Materiali}
+% Il sottosistema Gestione Materiali comprende i componenti necessari al caricamento e gestione (CRUD) dei materiali, nonché le funzionalità di gestione degli ArtID, associazione di tag e stati di visibilità (Pubblico/Privato/Unlisted), gestione dei preferiti e anteprima dell'ArtID.
+
+
+
+\begin{itemize}
+    \item \textbf{Gestione Autenticazione:} login, registrazione e logout del Membro AFAM tramite credenziali, con rilascio di token JWT. Predisposti: autenticazione con identità digitale (SPID), verifica a due fattori tramite OTP, recupero e modifica password, eliminazione account.
+    \item \textbf{Gestione Profilo:} visualizzazione e aggiornamento dei dati anagrafici e professionali, immagine di profilo, impostazione del profilo come pubblico o privato e calcolo della percentuale di completamento. Predisposto: collegamento dell'identità SPID.
+    \item \textbf{Gestione Materiali:} caricamento e gestione (CRUD) dei materiali con persistenza del contenuto come BLOB, organizzazione in contenitori ArtID, associazione di tag e stati di visibilità (Pubblico/Privato/Unlisted), gestione dei preferiti e anteprima dell'ArtID.
+    \item \textbf{Gestione Condivisione:} condivisione interna verso altri Membri e condivisione esterna tramite link con scadenza e attivazione/disattivazione, con tracciamento degli accessi (contatore dei clic e data dell'ultimo accesso).
+    \item \textbf{Gestione Certificazioni:} caricamento, download e rimozione di attestati con metadati descrittivi e livello di visibilità.
+    \item \textbf{Discovery:} ricerca dei profili pubblici e dei contenuti per dati nominativi e per competenze/tag (predisposto).
+\end{itemize}
+
+
+
+\input{Pagine/Sistema proposto/Sottosistemi/sottosistemi}
+
+\subsection{Mappatura Hardware/Software}
+
+La mappatura dei componenti software sui nodi hardware del sistema riflette la separazione strutturale introdotta dallo stile Client-Server e dal pattern MVC. Il sistema è distribuito su due macro-nodi principali:
+
+\begin{itemize}
+    \item \textbf{Nodo ``Dispositivo Utente'' (Client):} Ospita il sottosistema \textit{View} e le componenti di interfaccia del \textit{Controller}. Questo nodo hardware (rappresentato dai dispositivi personali degli utenti) esegue l'applicazione client, gestendo l'interazione diretta con l'utente e l'invio delle richieste verso il server centralizzato.
+    \item \textbf{Nodo Centralizzato ``Server AFAM'':} Rappresenta il nucleo del sistema e ospita la logica di business principale (\textit{Controller} di backend), l'architettura \textit{Repository} e il \textit{DBMS}. Questo nodo gestisce la sicurezza, la persistenza transazionale dei dati all'interno della sorgente dati e l'elaborazione dei portfolio multimediali, esponendo le API necessarie per permettere ai nodi client di comunicare e recuperare o inserire informazioni in modo sicuro.
+\end{itemize}
+
+Le comunicazioni tra il nodo client e il server centrale avvengono tramite canali di rete protetti, isolando completamente l'accesso diretto al DBMS dall'ambiente esterno a garanzia della sicurezza dei dati istituzionali.

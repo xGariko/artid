@@ -25,6 +25,8 @@ public class Artid {
 
     private String title;
 
+    private String description;
+
     private Boolean favourite;
 
     @Column("created_at")

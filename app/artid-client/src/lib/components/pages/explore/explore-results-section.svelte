@@ -25,7 +25,7 @@
 	}
 </script>
 
-<div class="bg-artid-section border border-artid-border rounded-3 w-75 h-75 p-3 d-flex flex-column results-section">
+<div class="bg-artid-section border border-artid-border rounded-3 w-75 h-75 p-3 d-flex flex-column results-section mb-5">
 	{#if pageProfiles.length > 0}
 		<div class="row row-cols-2 row-cols-sm-3 row-cols-lg-4 row-cols-xl-5 g-3">
 			{#each pageProfiles as profile (profile.id)}

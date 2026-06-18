@@ -1,0 +1,42 @@
+\subsubsection{Oggetti Boundary}
+
+\arrayrulecolor{SlateGray}
+\begin{tabularx}{\textwidth}{|c|X|}
+\hline
+\headerTabella{Oggetto Boundary}{Descrizione}
+\rigaTabella{DBMSBoundary}{Boundary necessaria per permettere al sistema di interfacciarsi e comunicare stabilmente con il DBMS.}
+\rigaTabella{welcomeBoundary}{Schermata iniziale che accoglie il Membro e funge da pagina di benvenuto della piattaforma. Presenta i pulsanti ``Accedi'', ``Registrati'', ``Discovery''.}
+\rigaTabella{homeBoundary}{Schermata che contiene i pulsanti ``ArtID'', ``Materiali'', ``Certificazioni'', ``Profilo'', ``Condivisioni'' che permettono l'accesso alle relative schermate.}
+\rigaTabella{headerBoundary}{Parte di ogni schermata, eccetto ``WELCOME'', ``LOGIN'', ``REGISTRAZIONE'', ``VERIFICA OTP'', che permette al Membro di accedere in qualsiasi momento alle funzionalit\`a del software, in particolare consente di visualizzare le schermate ``GESTIONE ARTID'', ``GESTIONE MATERIALI'', ``GESTIONE PROFILO'', ``GESTIONE CERTIFICATI'', ``BACHECHA CONDIVISIONI''. Presenta un pulsante per mostrare le ``AZIONI PROFILO'' che il Membro può eseguire.}
+\rigaTabella{azioniProfiloBoundary}{Menu mostrato nell' ``HEADER'' che permette al Membro di raggiungere la schermata ``GESTIONE PROFILO'' oppure effettuare il ``LOGOUT''.}
+\rigaTabella{loginBoundary}{Schermata che consente l'autenticazione degli utenti tramite l'inserimento dei campi ``Email'' e ``Password'' e che abilita l'azione di navigazione verso la schermata di recupero delle credenziali.}
+\rigaTabella{registrazioneBoundary}{Schermata provvista di form per la raccolta dei dati necessari alla creazione di un nuovo account nel sistema.}
+\rigaTabella{verificaOTPBoundary}{Schermata deputata all'inserimento del codice numerico One-Time Password ai fini della verifica di sicurezza.}
+\rigaTabella{modificaPasswordBoundary}{Schermata modale contenente un form specifico per modificare la password dell'account con una nuova fornita dal Membro.}
+\rigaTabella{recuperoPasswordBoundary}{Schermata che permette al Membro di avviare la procedura guidata per il ripristino della password. Richiede l'inserimento della email.}
+\rigaTabella{eliminaAccountBoundary}{Schermata di dialogo di tipo modale contenente un form specifico per confermare la rimozione definitiva e permanente dell'account.}
+\rigaTabella{identitaDigitaleBoundary}{Schermata che espone il comando di accesso centralizzato e mostra l'elenco dei relativi Identity Provider accreditati.}
+\rigaTabella{materialiBoundary}{Schermata adibita alla visualizzazione tabellare e all'organizzazione dell'elenco dei materiali multimediali appartenenti al membro. Contiene pulsanti per il filtraggio dei materiali in base a diverse categorie, un pulsante ``Nuovo materiale'', e i pulsanti ``Scarica'', ``Modifica'', ``Cancella'' relativi al materiale selezionato. Permette la ricerca di un materiale per nome.}
+\rigaTabella{ArtIDBoundary}{Schermata che mostra la collezione completa di tutti gli ArtID associati al Membro AFAM. Contiene pulsanti per il filtraggio degli ArtID in base a diverse categorie, e il pulsante ``Nuovo ArtID''.}
+\rigaTabella{dettagliArtIDBoundary}{Schermata che mostra i metadati, i materiali e le informazioni dettagliate relative a uno specifico ArtID. Permette di modificare la descrizione e salvarla, e contiene i pulsanti ``Aggiungi materiale'', ``Anteprima'', ``Condividi'', ``Crea link'', ``Aggiungi Tag'' e un menu a tendina per selezionare la visibilità. Permette anche di eliminare materiali e cercarli per nome.}
+\rigaTabella{nuovoMaterialeBoundary}{Schermata modale che permette il caricamento di un nuovo materiale all'interno del sistema. Permette di inserire un titolo e una descrizione.}
+\rigaTabella{modificaMaterialeBoundary}{Schermata modale che permette di modificare i dettagli di un Materiale all'interno del sistema. Permette di aggiornare il titolo e la descrizione.}
+\rigaTabella{creaArtIDBoundary}{Schermata modale per la creazione di un nuovo ArtID. Contiene un campo ``Titolo''.}
+\rigaTabella{aggiungiMaterialiBoundary}{Schermata modale che consente di selezionare e associare uno o pi\`u materiali multimediali all'interno di un determinato ArtID.}
+\rigaTabella{nuovoTagBoundary}{Schermata modale che permette la creazione di un nuovo tag di categorizzazione degli ArtID.}
+\rigaTabella{aggiungiTagBoundary}{Schermata modale contenente un menu di selezione preposto all'associazione di uno o pi\`u tag precedentemente registrati ad un ArtID.}
+\rigaTabella{previewArtIDBoundary}{Schermata preposta alla visualizzazione delle informazioni di un ArtID, dei suoi materiali e dei contatti dell'Autore.}
+\rigaTabella{profiloBoundary}{Schermata preposta alla visualizzazione e alla modifica dei dati anagrafici e professionali del Membro AFAM. Contiene i pulsanti ``Collega SPID'', ``Cambia password'', ``Chiudi account''.}
+\rigaTabella{certificatiBoundary}{Schermata che contiene un'elenco di tutti i certificati caricati dal Membro. Contiene i pulsanti ``Nuovo'', ``Scarica'', ``Elimina''.}
+\rigaTabella{nuovoCertificatoBoundary}{Schermata modale preposta al caricamento di un nuovo certificato. Contiene un campo ``Titolo''.}
+\rigaTabella{modificaCertificatoBoundary}{Schermata modale che permette di modificare i dettagli di un certificato. Permette di aggiornare il titolo e la visibilità.}
+\rigaTabella{bachecaCondivisioniBoundary}{Schermata che contiene l'elenco delle condivisioni interne ed esterne e le loro informazioni. Contiene pulsanti per il filtraggio delle condivisioni in base alle diverse categorie. Contiene il pulsante ``Elimina'' e i pulsanti ``Prolunga scadenza'', ``Attiva'', ``Disattiva'', ``Modifica descrizione''.}
+\rigaTabella{previewArtIDGuestBoundary}{Schermata ArtIDPreviewBoundary adattata per i Guest. Non presenta l'header.}
+\rigaTabella{gestisciLinkBoundary}{Schermata modale contenente un form per la scadenza del link e un form per la descrizione. Ne mostra uno alla volta.}
+\rigaTabella{condividiBoundary}{Schermata modale che permette di inserire la email del Membro destinatario di una condivisione. Permette di inserire pi\`u di un destinatario con il pulsante ``Aggiungi destinatario''.}
+\rigaTabella{discoveryBoundary}{Schermata che mostra i Membri ricercati attraverso l'apposita barra di ricerca.}
+\rigaTabella{discoveryProfiloBoundary}{Schermata che mostra i contatti di un Membro, le sue informazioni e i suoi ArtID visibili pubblicamente.}
+\rigaTabella{errorBoundary}{Avviso visivo preposto a informare il Membro del verificarsi di un'anomalia durante l'uso del software. Il testo descrittivo varia in base alla natura dell'errore.}
+\rigaTabella{messageBoundary}{Avviso testuale flessibile utilizzato per notificare il Membro circa il successo di un'operazione o per richiedere una conferma esplicita a video.}
+\hline
+\end{tabularx}
