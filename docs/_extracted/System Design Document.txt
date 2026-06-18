@@ -1,0 +1,441 @@
+
+
+===== PAGE 1 =====
+UNIVERSIT`A DEGLI STUDI DI PALERMO
+DIPARTIMENTO DI INGEGNERIA
+CORSO DI LAUREA TRIENNALE IN INGEGNERIA INFORMATICA
+System Design Document
+Studenti
+Leonardo Giovanni Caiezza
+Diego Corona
+Luca Gaetani
+Daniele Orazio Susino
+Docente
+Prof.ssa Valeria Seidita
+Anno accademico
+2024 - 2025
+
+===== PAGE 2 =====
+Indice
+1 Obiettivo del sistema 2
+2 Architettura del software attuale 2
+3 Obiettivi di progettazione 2
+4 Architettura Software Proposta 3
+4.1 Panoramica . . . . . . . . . . . . . . . . . . . . . . . . . . 3
+4.2 Requisiti minimi per l’utilizzo del software proposto . . . 3
+4.3 Scomposizione in sottosistemi . . . . . . . . . . . . . . . . 3
+4.3.1 Gestione Notifiche . . . . . . . . . . . . . . . . . . 4
+4.3.2 Gestione Account . . . . . . . . . . . . . . . . . . . 4
+4.3.3 Gestione Conferenza . . . . . . . . . . . . . . . . . 4
+4.3.4 Gestione Revisioni . . . . . . . . . . . . . . . . . . 4
+4.3.5 Presentazione Articolo . . . . . . . . . . . . . . . . 4
+4.3.6 Gestione Paper Definitivi . . . . . . . . . . . . . . 4
+4.4 Mappatura degli oggetti nei sottosistemi . . . . . . . . . . 5
+4.4.1 Gestione Notifiche . . . . . . . . . . . . . . . . . . 5
+4.4.2 Gestione Account . . . . . . . . . . . . . . . . . . . 6
+4.4.3 Gestione Conferenza . . . . . . . . . . . . . . . . . 7
+4.4.4 Gestione Revisioni . . . . . . . . . . . . . . . . . . 8
+4.4.5 Presentazione Articolo . . . . . . . . . . . . . . . . 9
+4.4.6 Gestione Paper Definitivi . . . . . . . . . . . . . . 10
+4.5 Mappatura Hardware/Software . . . . . . . . . . . . . . . 11
+5 Gestione dei Dati Persistenti 12
+5.1 Schema E-R . . . . . . . . . . . . . . . . . . . . . . . . . . 12
+5.2 Modello Relazionale . . . . . . . . . . . . . . . . . . . . . 13
+5.3 Struttura delle tabelle . . . . . . . . . . . . . . . . . . . . 14
+5.3.1 Utente . . . . . . . . . . . . . . . . . . . . . . . . . 14
+5.3.2 Notifica . . . . . . . . . . . . . . . . . . . . . . . . 14
+5.3.3 Topic . . . . . . . . . . . . . . . . . . . . . . . . . 14
+5.3.4 Conferenza . . . . . . . . . . . . . . . . . . . . . . 15
+5.3.5 Invito . . . . . . . . . . . . . . . . . . . . . . . . . 16
+5.3.6 Paper . . . . . . . . . . . . . . . . . . . . . . . . . 16
+5.3.7 Revisione . . . . . . . . . . . . . . . . . . . . . . . 17
+5.3.8 Proceeding . . . . . . . . . . . . . . . . . . . . . . 17
+5.3.9 Ruolo conferenza . . . . . . . . . . . . . . . . . . . 18
+5.3.10 TopicUtente . . . . . . . . . . . . . . . . . . . . . . 18
+5.3.11 CoAutoriPaper . . . . . . . . . . . . . . . . . . . . 18
+6 Copyright e diritto d’autore 19
+1
+
+===== PAGE 3 =====
+1 Obiettivo del sistema
+L’obiettivo del sistema ` esupportare e automatizzare l’intero processo organizzativo di una con-
+ferenza scientifica o accademica, facilitando l’interazione tra le diverse parti coinvolte.
+Il sistema consente agli autori di sottomettere i propri papers, ai revisori e sottorevisori di valutare i
+lavori assegnati, ai chair di creare e gestire le conferenze nonch´ e supervisionarne il processo decisionale,
+e agli editori di curare la pubblicazione finale dei papers.
+Un aspetto innovativo del sistema ` e l’integrazione di un modello linguistico di grandi dimensioni
+(LLM) per la gestione automatica dei tag semantici, che aiuta a classificare i paper e ad assegnarli ai
+revisori pi` u adatti. In questo modo, il sistema migliora l’efficienza, la coerenza e la qualit` a del processo
+di revisione e pubblicazione.
+2 Architettura del software attuale
+Si suppone che al momento l’ azienda non adotti alcun software dotato delle funzionalit` a offerte dal
+Sistema.
+Le attivit` ache quest’ultimo mira ad automatizzare venivano infatti gestite manualmente dalle
+diverse figure coinvolte nei processi, con conseguente maggiore dispendio di tempo e risorse.
+3 Obiettivi di progettazione
+• Il sistema e il DBMS devono essere sempre attivi , per permettere agli utenti di accedere
+alle informazioni in qualunque momento. Tuttavia, al di fuori dell’orario di lavoro, ` e tollerabile un
+periodo di inattivit` a di 5 minuti al giorno per permettere piccoli interventi di manutenzione.
+• Le password degli account devono essere criptate all’interno del database.
+• Il software non deve permettere l’inserimento di input sintatticamente scorretti da parte
+degli utenti.
+• La piattaforma deve essere intuitiva, facile da usare e immediata, in modo da risultare acces-
+sibile a un ampio e variegato gruppo di utenti.
+• Il sistema deve poter fronteggiare una perdita di connessione segnalando questa all’utente,
+assicurando la coerenza e la persistenza dei dati immagazzinati.
+• In caso di errore, il sistema deve permettere all’utente di riprendere il lavoro dal punto in cui si
+era interrotto.
+• Il sistema deve essere organizzato in modo tale da minimizzare il numero di comunicazioni con
+il DBMS.
+• Il sistema deve poter rispondere alle richieste dell’utente al pi` u entro tre secondi.
+• Il sistema ed il DBMS dovranno avere un uptime quanto pi` u vicino possibile al 100% con un
+impegno best effort, per permettere una fruizione continua dei servizi e delle informazioni per gli
+utenti.
+• Il sistema deve essere protetto da vulnerabilit` a note, come SQL injection. Ci` o comporta
+l’adozione di pratiche di sviluppo sicuro, come la validazione e sanificazione dell’input e l’uso di
+query parametrizzate.
+2
+
+===== PAGE 4 =====
+4 Architettura Software Proposta
+4.1 Panoramica
+Per l’implementazione del sistema ` e stata scelta un’architettura ibrida Three Tier-Repository, in quanto
+garantisce scalabilit` a, manutenibilit` a, modularit` a e ottime performance. Essa ` e composta da:
+• Interface Layer: si occupa dell’interfaccia utente.
+• Logic Tier: contiene le regole di business e gestisce i flussi dell’applicazione.
+• Data Tier con pattern Repository : gestisce la persistenza e l’accesso ai dati. Nel pattern
+Repository, si crea un’astrazione per accedere a una sorgente di dati, nascondendo la complessit` a
+dell’accesso a database o API esterne.
+La combinazione dei due pattern architetturali consente la separazione delle responsabilit` a, testa-
+bilit` a e flessibilit` a del software.
+L’interfaccia utente, i controller e l’interfaccia al database e alle API di ciascun sottosistema risiedono
+sullo stesso nodo, mentre il sottosistema del database e delle API ` e ospitato su un nodo separato.
+4.2 Requisiti minimi per l’utilizzo del software proposto
+Per funzionare correttamente, il sistema richiede una connessione a Internet stabile per consentire
+la comunicazione tra i sottosistemi, il DBMS e le API, nonch´ e per inviare le email per il recupero delle
+credenziali. Inoltre, ` e necessaria unacasella di posta elettronica per ogni utente che vuole utilizzare
+il sistema.
+Inoltre, per il nodo server ` e indispensabile l’impiego di una scheda video NVIDIA con CUDA
+cores, al fine di gestire l’elaborazione dei dati della LLM e garantire prestazioni ottimali.
+4.3 Scomposizione in sottosistemi
+Di seguito viene rappresentata la suddivisione in sottosistemi del sistema proposto:
+3
+
+===== PAGE 5 =====
+4.3.1 Gestione Notifiche
+Il sottosistema Gestione Notifiche comprende i moduli che permettono l’ automatizzazione delle no-
+tifiche e la ricezione degli inviti da parte degli utenti.
+In particolare, contiene i sottosistemi dedicati alla gestione delle scadenze imminenti e delle oper-
+azioni da eseguire non appena si rendano disponibili nuove attivit` a relative ai paper.
+Inoltre, contiene i sottosistemi che permettono all’utente di partecipare ad una conferenza mediante un
+codice invito, consentendo loro di accettare o rifiutare gli inviti.
+Infine, si occupa della gestione dei sottosistemi per l’archiviazione e la visualizzazione delle notifiche
+e degli inviti da parte degli utenti.
+4.3.2 Gestione Account
+Il sottosistema Gestione Account contiene i sottosistemi che permettono agli utenti di effettuare il login,
+registrarsi, autenticarsi, recuperare le credenziali, effettuare il logout e modificare la password del
+proprio profilo.
+4.3.3 Gestione Conferenza
+Il sottosistema Gestione Conferenza contiene i sottosistemi che permettono ai chair di creare le con-
+ferenze e gestirne le relative scadenze , i parametri, il rate di approvazione e la scala del punteggio
+dei paper.
+Oltre a questo, contiene i sottosistemi che consentono ai chair di invitare altri chair, revisori e l’editore
+per una specifica conferenza.
+Infine, contiene i sottosistemi che permettono ai chair di assegnare manualmente o in modo auto-
+matico i paper ai revisori, e di segnalare eventuali revisori in conflitto con determinati paper.
+4.3.4 Gestione Revisioni
+Il sottosistema Gestione Revisioni contiene i sottosistemi che permettono ai revisori ed ai sotto-revisori
+di presentare e modificare revisioni fino alla relativa scadenza e di segnalare un possibile plagio.
+Inoltre, contiene i sottosistemi che consentono ai revisori di visualizzare le revisioni dei loro colleghi
+(esclusivamente dopo aver pubblicato la propria revisione), nonch´ e i sottosistemi che permettono di
+invitare sotto-revisori per un paper a loro assegnato.
+4.3.5 Presentazione Articolo
+Il sottosistema Presentazione Articolo contiene i sottosistemi che permettono agli autori di presentare
+e modificare la propria sottomissione entro le relative scadenze, ed eventualmente di rinunciare alla
+presentazione.
+Inoltre, contiene i sottosistemi che permettono la selezione automatica (tramite LLM) e manuale
+delle parole chiave dei paper.
+4.3.6 Gestione Paper Definitivi
+Il sottosistema Gestione Paper Definitivi contiene i sottosistemi che permettono ad un editore di scari-
+care i paper , richiedere delle correzioni agli autori e pubblicare i proceedings (versione definitiva).
+Inoltre, contiene i sottosistemi che permettono ad un autore di caricare la versione corretta del
+proprio paper.
+4
+
+===== PAGE 6 =====
+4.4 Mappatura degli oggetti nei sottosistemi
+Di seguito sono riportate le funzionalit` a offerte dai sottosistemi:
+4.4.1 Gestione Notifiche
+5
+
+===== PAGE 7 =====
+4.4.2 Gestione Account
+6
+
+===== PAGE 8 =====
+4.4.3 Gestione Conferenza
+7
+
+===== PAGE 9 =====
+4.4.4 Gestione Revisioni
+8
+
+===== PAGE 10 =====
+4.4.5 Presentazione Articolo
+9
+
+===== PAGE 11 =====
+4.4.6 Gestione Paper Definitivi
+10
+
+===== PAGE 12 =====
+4.5 Mappatura Hardware/Software
+La mappatura del sistema ` e basata sul Modello architetturale Repository.
+Il sistema prevede un nodo “COMPUTER UTENTE” , che ospita tutti i sottosistemi necessari al suo
+corretto funzionamento. Questo nodo ` e collegato al nodo centrale, denominato“SERVER”, che include
+il DBMS e le API necessari, rispettivamente, per recuperare e inserire informazioni nella sorgente dati e
+per comunicare con la LLM.
+11
+
+===== PAGE 13 =====
+5 Gestione dei Dati Persistenti
+Il database scelto per la gestione dei dati persistenti ` e un database di tipo relazionale e viene utiliz-
+zata un’interfaccia di tipo SQL, che consente di rispettare le propriet` adefinite dal protocollo ACID
+(Atomicity, Consistency, Isolation, Durability).
+5.1 Schema E-R
+Di seguito viene mostrato il modello Entit` a – Relazione del database gestito dal sistema:
+12
+
+===== PAGE 14 =====
+5.2 Modello Relazionale
+Di seguito viene mostrato il modello relazionale del database gestito dal sistema:
+Utente (id utente, nome, cognome, email, password)
+PK: id utente
+Conferenza (id conferenza, nome, descrizione, data conferenza, location, metodo assegnazione, metodo valutazione,
+rate accettazione, paper previsti, giorni preavviso, scadenza sottomissione, scadenza revisione, scadenza sottomissione 2,
+scadenza editing, scadenza sottomissione 3, scadenza impaginazione)
+PK: id conferenza
+Notifica (id notifica, data, testo, isLetta, ref utente, ref conferenza)
+PK: id notifica
+FK: ref utente references Utente(id utente), ref conferenza references Conferenza(id conferenza)
+Invito (id invito, data, testo, status, email, codice, ref conferenza, ref mittente, ref destinatario)
+PK: id invito
+FK: ref conferenza references Conferenza(id conferenza), ref mittente references Utente(id utente), ref destinatario
+references Utente(id utente)
+Topic (id topic, nome)
+PK: id topic
+Paper (id paper, titolo, abstract, file, data sottomissione, ref utente, ref conferenza)
+PK: id paper
+FK: ref utente references Utente(id utente), ref conferenza references Conferenza(id conferenza)
+Revisione (id revisione, testo, valutazione, data sottomissione, punti forza, punti debolezza, commento chair,
+ref utente, ref paper)
+PK: id revisione
+FK: ref utente references Utente(id utente), ref paper references Paper(id paper)
+Proceeding (id proceeding, titolo, data sottomissione, ref utente, ref conferenza)
+PK: id proceeding
+FK: ref utente references Utente(id utente), ref conferenza references Conferenza(id conferenza)
+Ruolo conferenza (id ruolo, ruolo, ref utente, ref conferenza)
+PK: id chair
+FK: ref utente references Utente(id utente), ref conferenza references Conferenza(id conferenza)
+TopicUtente (id topic utente, ref topic, ref utente)
+PK: id topic utente
+FK: ref topic references Topic(id topic), ref utente references Utente(id utente)
+TopicPaper (id topic paper, ref topic, ref paper)
+PK: id topic paper
+FK: ref topic references Topic(id topic), ref paper references Paper(id paper)
+CoAutoriPaper (id CoAutoriPaper, email, ref paper)
+PK: id CoAutoriPaper
+FK: ref paper references Paper(id paper)
+13
+
+===== PAGE 15 =====
+5.3 Struttura delle tabelle
+5.3.1 Utente
+Nome attributo Tipo Vincoli Descrizione
+id utente integer(6) PK, AutoIncre-
+ment
+Codice identificativo univoco
+dell’utente
+nome varchar(100) Not null Nome dell’utente
+cognome varchar(100) Not null Cognome dell’utente
+email varchar(100) Not null, UNIQUE Email personale dell’utente
+password varchar(255) Not null Hash della password di accesso
+dell’utente
+5.3.2 Notifica
+Nome attributo Tipo Vincoli Descrizione
+id notifica integer(6) PK, AutoIncre-
+ment
+Codice identificativo della noti-
+fica
+data datetime Not null Data della notifica
+testo text Not null Testo della notifica
+isLetta boolean Not null Flag che indica se la notifica ` e
+stata letta
+ref utente integer(6) FK Riferimento all’utente che riceve
+la notifica
+ref conferenza integer(6) FK Riferimento alla conferenza a cui
+si riferisce la notifica
+5.3.3 Topic
+Nome attributo Tipo Vincoli Descrizione
+id topic integer(6) PK, AutoIncre-
+ment Codice identificativo del topic
+nome varchar(100) Not null Nome del topic
+14
+
+===== PAGE 16 =====
+5.3.4 Conferenza
+Nome attributo Tipo Vincoli Descrizione
+id conferenza integer(6) PK, AutoIncre-
+ment
+Codice identificativo uni-
+voco della conferenza
+nome varchar(100) Not null Nome della conferenza
+descrizione text Not null Descrizione della con-
+ferenza
+data conferenza datetime Not null Data e ora della con-
+ferenza
+location text Not null Luogo della conferenza
+metodo assegnazione enum(’Broadcast’,
+’Topic’)
+Metodo di assegnazione
+automatico dei paper
+metodo valutazione enum(’2’, ’3’, ’4’) Metodo di valutazione dei
+paper
+rate accettazione integer(6) Not null Rate di Accettazione dei
+paper
+paper previsti integer(11) Numero di paper previsti
+giorni preavviso integer(11) Not null, De-
+fault=3
+Numero di giorni di
+preavviso per le scadenze
+scadenza sottomissione datetime Not null Scadenza per la sottomis-
+sione dei paper
+scadenza revisione datetime Not null Scadenza per la revisione
+dei paper
+scadenza sottomissione 2 datetime Not null Scadenza seconda sot-
+tomissione dei paper
+scadenza editing datetime Not null Scadenza editing finale dei
+paper
+scadenza sottomissione 3 datetime Not null Scadenza terza sottomis-
+sione dei paper
+scadenza impaginazione datetime Not null Scadenza impaginazione
+finale dei paper
+15
+
+===== PAGE 17 =====
+5.3.5 Invito
+Nome attributo Tipo Vincoli Descrizione
+id invito integer(6) PK, AutoIncre-
+ment Codice identificativo dell’invito
+data datetime Not null Data della scadenza dell’invito
+testo varchar(100) Not null Testo dell’invito
+status
+enum(’Inviato’,
+’Accettato’, ’Rifiu-
+tato’)
+Not null Stato dell’invito
+email text Not null Email del destinatario
+codice varchar(100) Not null, UNIQUE Codice identificativo unico
+dell’invito
+ref conferenza integer(6) FK Riferimento alla conferenza
+ref mittente integer(6) FK Riferimento all’utente che invia
+l’invito
+ref destinatario integer(6) FK Riferimento all’utente desti-
+natario dell’invito
+5.3.6 Paper
+Nome attributo Tipo Vincoli Descrizione
+id paper integer(6) PK, AutoIncre-
+ment Codice identificativo del paper
+titolo varchar(200) Not null Titolo del paper
+abstract text Abstract del paper
+file longblog PDF del Paper
+data sottomissione datetime Data di sottomissione del paper
+ref utente integer(6) FK Riferimento all’utente che ha sot-
+tomesso il paper
+ref conferenza integer(6) FK Riferimento alla conferenza a cui
+` e stato sottomesso il paper
+16
+
+===== PAGE 18 =====
+5.3.7 Revisione
+Nome attributo Tipo Vincoli Descrizione
+id revisione integer(6) PK, AutoIncre-
+ment
+Codice identificativo della revi-
+sione
+testo text Testo della revisione
+valutazione integer(11) Valutazione del paper
+data sottomissione datetime Data di sottomissione della revi-
+sione
+punti forza text Descrizione punti di forza del pa-
+per revisionato
+punti debolezza text Descrizione punti di debolezza
+del paper revisionato
+commento chair text Commento privato da inviare al
+chair in caso di problemi
+ref utente integer(6) FK Riferimento all’utente che ha ef-
+fettuato la revisione
+ref paper integer(6) FK Riferimento al paper oggetto
+della revisione
+5.3.8 Proceeding
+Nome attributo Tipo Vincoli Descrizione
+id proceeding integer(6) PK, AutoIncre-
+ment
+Codice identificativo del pro-
+ceeding
+titolo varchar(200) Not null Titolo del proceeding
+data sottomissione datetime Data di sottomissione del pro-
+ceeding
+ref utente integer(6) FK Riferimento all’utente che ha sot-
+tomesso il proceeding
+ref conferenza integer(6) FK Riferimento alla conferenza a cui
+` e stato sottomesso il proceeding
+17
+
+===== PAGE 19 =====
+5.3.9 Ruolo conferenza
+Nome attributo Tipo Vincoli Descrizione
+id ruolo integer(6) PK, AutoIncre-
+ment
+Codice identificativo del ruolo di
+un Utente in una determinata
+Conferenza
+ruolo
+enum(”Chair”,
+”Revisore”, ”Sot-
+torevisore”, ”Au-
+tore”, ”Editor”)
+Not null Ruolo dell’utente in quella speci-
+fica conferenza
+ref utente integer(6) FK Riferimento all’utente a cui ` e
+riferito il ruolo
+ref conferenza integer(6) FK Riferimento alla conferenza a cui
+l’utente fa parte
+5.3.10 TopicUtente
+Nome attributo Tipo Vincoli Descrizione
+id topic utente integer(6) PK, AutoIncre-
+ment
+Codice identificativo
+dell’associazione topic-utente
+ref topic integer(6) FK Riferimento al topic associato
+ref utente integer(6) FK Riferimento all’utente associato
+al topic
+5.3.11 CoAutoriPaper
+Nome attributo Tipo Vincoli Descrizione
+id CoAutoriPaper integer(6) PK, AutoIncre-
+ment
+Codice identificativo del Coau-
+tore del Paper
+email varchar(100) Not null Email del Coautore
+ref paper integer(6) FK Riferimento al paper associato al
+Coautore
+18
+
+===== PAGE 20 =====
+6 Copyright e diritto d’autore
+La presente documentazione ` e protetta dalleleggi sul diritto d’autore . Nessuna parte di questo
+documento pu` o essere riprodotta, distribuita o trasmessa in alcuna forma o con alcun mezzo, elettron-
+ico o meccanico, inclusa la fotocopia, la registrazione o altri sistemi di memorizzazione o recupero di
+informazioni, senza il previo consenso scritto degli autori .
+PaperReview © 2025
+19

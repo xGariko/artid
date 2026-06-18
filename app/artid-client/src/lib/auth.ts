@@ -10,6 +10,11 @@ const ME_CACHE_TTL_MS = 60_000;
 
 const TOKEN_MAX_AGE = Number.parseInt(env.AUTH_COOKIE_MAX_AGE_SECONDS ?? "86400", 10);
 
+// Step 1 del login: credenziali valide, OTP inviato via email. Nessuna sessione ancora.
+type RequestOtpResult =
+	| { ok: true; email: string }
+	| { ok: false; error: string };
+
 type LoginResult =
 	| { ok: true; user: AuthUser }
 	| { ok: false; error: string };
@@ -21,6 +26,20 @@ type CurrentUserResult =
 interface LoginPayload {
 	email: string;
 	password: string;
+}
+
+interface VerifyOtpPayload {
+	email: string;
+	code: string;
+}
+
+// Forma minima di AuthResponse: ciò che serve per aprire la sessione.
+interface AuthResponseData {
+	token?: string;
+	id?: number;
+	email?: string;
+	name?: string;
+	surname?: string;
 }
 
 interface CacheEntry {
@@ -52,28 +71,55 @@ const cookieOptions = {
 	maxAge: TOKEN_MAX_AGE,
 };
 
-export async function login(
-	api: ApiClient,
-	cookies: Cookies,
-	payload: LoginPayload,
-): Promise<LoginResult> {
-	const { data } = await api.POST("/api/auth/login", { body: payload });
+// Persiste il JWT come cookie di sessione e mappa la AuthResponse in AuthUser.
+// Condiviso tra verifica OTP (login) e registrazione (che riceve già un token).
+export function establishSession(cookies: Cookies, data: AuthResponseData): AuthUser {
+	cookies.set(TOKEN_COOKIE, data.token!, cookieOptions);
+	return {
+		id: data.id!,
+		email: data.email!,
+		name: data.name!,
+		surname: data.surname!,
+	};
+}
 
-	if (!data?.token) {
-		return { ok: false, error: "Credenziali non valide." };
+// Step 1 del login: valida le credenziali; in caso positivo il server invia l'OTP via email.
+export async function requestOtp(
+	api: ApiClient,
+	payload: LoginPayload,
+): Promise<RequestOtpResult> {
+	const { data, response } = await api.POST("/api/auth/login", { body: payload });
+
+	if (!response.ok || !data?.otpRequired) {
+		// 401 = credenziali errate; altro (es. 502) = invio email fallito.
+		const error =
+			response.status === 401
+				? "Email o password non corretti."
+				: "Impossibile inviare il codice OTP. Riprova tra poco.";
+		return { ok: false, error };
 	}
 
-	cookies.set(TOKEN_COOKIE, data.token, cookieOptions);
+	return { ok: true, email: data.email ?? payload.email };
+}
 
-	return {
-		ok: true,
-		user: {
-			id: data.id!,
-			email: data.email!,
-			name: data.name!,
-			surname: data.surname!,
-		},
-	};
+// Step 2 del login: verifica l'OTP e, se valido, apre la sessione.
+export async function verifyOtp(
+	api: ApiClient,
+	cookies: Cookies,
+	payload: VerifyOtpPayload,
+): Promise<LoginResult> {
+	const { data, response } = await api.POST("/api/auth/verify-otp", { body: payload });
+
+	if (!response.ok || !data?.token) {
+		return { ok: false, error: "Codice non valido o scaduto." };
+	}
+
+	return { ok: true, user: establishSession(cookies, data) };
+}
+
+// "Riprova": rigenera e rinvia l'OTP. Fire-and-forget: il server risponde 200 comunque.
+export async function resendOtp(api: ApiClient, email: string): Promise<void> {
+	await api.POST("/api/auth/resend-otp", { body: { email } });
 }
 
 export function logout(cookies: Cookies): void {

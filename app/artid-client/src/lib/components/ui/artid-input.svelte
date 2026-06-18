@@ -7,6 +7,9 @@
 		addClass,
 		placeholder,
 		error,
+		inputmode,
+		maxlength,
+		autocomplete,
 		onChange
 	}: {
 		type?: 'text' | 'number' | 'password' | 'email' | 'tel' | 'date';
@@ -16,6 +19,9 @@
 		addClass?: string;
 		placeholder?: string;
 		error?: string;
+		inputmode?: 'text' | 'numeric' | 'tel' | 'email';
+		maxlength?: number;
+		autocomplete?: 'on' | 'off' | 'one-time-code';
 		onChange?: (value: string | number | Date) => void;
 	} = $props();
 </script>
@@ -26,6 +32,9 @@
 		id={name}
 		{name}
 		bind:value
+		{inputmode}
+		{maxlength}
+		{autocomplete}
 		class="form-control {addClass ?? ''} bg-artid-section outline-none rounded-1 {error
 			? 'is-invalid'
 			: ''}"

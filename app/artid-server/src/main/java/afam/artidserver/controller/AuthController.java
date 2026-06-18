@@ -4,13 +4,16 @@ import afam.artidserver.model.dto.*;
 import afam.artidserver.model.entity.User;
 import afam.artidserver.security.AuthenticatedUser;
 import afam.artidserver.security.JwtUtil;
+import afam.artidserver.service.OtpService;
 import afam.artidserver.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mail.MailException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import afam.artidserver.model.dto.VerifyPasswordRequest;
+import java.time.OffsetDateTime;
 import java.util.Map;
 import java.util.HashMap;
 
@@ -31,15 +35,45 @@ public class AuthController {
     private final UserService userService;
     private final JwtUtil jwtUtil;
     private final PasswordEncoder passwordEncoder;
+    private final OtpService otpService;
 
+    /**
+     * Step 1 del login: valida le credenziali e, se corrette, invia un OTP via email.
+     * NON rilascia il token: la sessione si ottiene solo dopo {@link #verifyOtp}.
+     */
     @PostMapping("/login")
-    public ResponseEntity<AuthResponse> login(@RequestBody LoginRequest request) {
-        // authenticate() carica già l'utente (via CustomUserDetailsService) e verifica la
-        // password: riusiamo quel principal invece di rifare una findByMail.
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
-        );
-        User user = ((AuthenticatedUser) authentication.getPrincipal()).getUser();
+    public ResponseEntity<OtpChallengeResponse> login(@RequestBody LoginRequest request) {
+        User user;
+        try {
+            // authenticate() carica già l'utente (via CustomUserDetailsService) e verifica la
+            // password: riusiamo quel principal invece di rifare una findByMail.
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
+            );
+            user = ((AuthenticatedUser) authentication.getPrincipal()).getUser();
+        } catch (AuthenticationException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        try {
+            OffsetDateTime expiresAt = otpService.generateAndSend(user);
+            return ResponseEntity.ok(new OtpChallengeResponse(true, user.getMail(), expiresAt));
+        } catch (MailException e) {
+            // Credenziali ok ma SMTP irraggiungibile: distinguibile dal 401 lato client.
+            return ResponseEntity.status(HttpStatus.BAD_GATEWAY).build();
+        }
+    }
+
+    /**
+     * Step 2 del login: verifica l'OTP e, se valido, rilascia il token JWT.
+     * Risposta indistinta (401) per email inesistente o codice errato/scaduto.
+     */
+    @PostMapping("/verify-otp")
+    public ResponseEntity<AuthResponse> verifyOtp(@RequestBody VerifyOtpRequest request) {
+        User user = userService.findByMail(request.getEmail()).orElse(null);
+        if (user == null || !otpService.verify(user.getId(), request.getCode())) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
 
         String token = jwtUtil.generateToken(user.getMail());
         return ResponseEntity.ok(new AuthResponse(
@@ -49,6 +83,16 @@ public class AuthController {
                 user.getName(),
                 user.getSurname()
         ));
+    }
+
+    /**
+     * Rigenera e rinvia l'OTP ("Riprova"). Sempre 200 per non rivelare se l'email esiste o se
+     * c'è una challenge attiva: il rinvio avviene solo se un OTP era già stato emesso.
+     */
+    @PostMapping("/resend-otp")
+    public ResponseEntity<Void> resendOtp(@RequestBody ResendOtpRequest request) {
+        userService.findByMail(request.getEmail()).ifPresent(otpService::resend);
+        return ResponseEntity.ok().build();
     }
 
     @PostMapping("/register")

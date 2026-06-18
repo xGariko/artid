@@ -1,0 +1,1480 @@
+
+
+===== PAGE 1 =====
+UNIVERSIT`A DEGLI STUDI DI PALERMO
+DIPARTIMENTO DI INGEGNERIA
+CORSO DI LAUREA IN INGEGNERIA INFORMATICA
+Requirements Analysis Document
+Specifiche dei Requisiti Software
+ArtID
+Team di Sviluppo
+Andrea Sciortino
+Davide Alaimo
+Gabriele Iovino
+Giovanni Luca Cusano
+Supervisore
+Prof.ssa Valeria Seidita
+Anno Accademico
+2025 - 2026
+
+===== PAGE 2 =====
+Indice Generale
+1 Introduzione 2
+1.1 Obiettivo del sistema . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 2
+1.2 Obiettivi del sistema . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 2
+1.3 Definizioni . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 2
+2 Sistema Attuale3
+3 Sistema Proposto4
+3.1 Overview . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 4
+3.2 Requisiti Funzionali . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 4
+3.3 Requisiti Non Funzionali . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 4
+4 Modelli del sistema6
+4.1 Modello dei casi d’uso . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 6
+4.1.1 Attori coinvolti . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 6
+4.1.2 Vista d’insieme . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 6
+4.1.3 Macro-casi d’uso . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 6
+4.1.4 Macro-caso d’uso - Autenticazione . . . . . . . . . . . . . . . . . . . . . . 6
+4.1.5 Macro-caso d’uso - Gestione Profilo . . . . . . . . . . . . . . . . . . . . . 23
+4.1.6 Macro-caso d’uso - Gestione Materiali . . . . . . . . . . . . . . . . . . . . 31
+4.1.7 Macro-caso d’uso - Condivisione . . . . . . . . . . . . . . . . . . . . . . . 45
+4.1.8 Macro-caso d’uso - Discovery . . . . . . . . . . . . . . . . . . . . . . . . . 46
+4.2 Modelli degli oggetti . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 47
+4.2.1 Oggetti entit` a . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 47
+4.2.2 Oggetti boundary . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 47
+4.2.3 Oggetti Boundary . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 47
+4.2.4 Oggetti control . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 49
+4.2.5 Oggetti Control . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 49
+4.2.6 Diagrammi delle classi . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 52
+4.3 Modelli dinamici . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 53
+4.3.1 Diagrammi di sequenza . . . . . . . . . . . . . . . . . . . . . . . . . . . . 53
+4.4 Stato dell’arte . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 54
+4.5 Modello dei Casi d’Uso . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 54
+4.5.1 Descrizione Caso d’Uso: UC-1 . . . . . . . . . . . . . . . . . . . . . . . . 54
+5 Requisiti Specifici57
+5.1 Requisiti Funzionali . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 57
+5.2 Requisiti Non Funzionali . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 57
+1
+
+===== PAGE 3 =====
+1 Introduzione
+1.1 Obiettivo del sistema
+Il progetto “ArtID” nasce con lo scopo di ingegnerizzare e rilasciare una piattaforma software cen-
+tralizzata espressamente dedicata agli studenti delle istituzioni appartenenti al comparto AFAM
+(Alta Formazione Artistica, Musicale e Coreutica). L’applicativo si propone come l’ambiente
+digitale di riferimento per la creazione, la personalizzazione e l’integrazione dell’identit` a digitale
+e del percorso formativo-artistico dei discenti.
+Il perimetro d’azione del sistema ` e delimitato dalla necessit` a di fornire uno strumento isti-
+tuzionale che superi la frammentazione delle informazioni anagrafiche e didattiche, aggregando
+in un unico ecosistema protetto sia i dati certificati dall’istituto, sia la produzione artistica mul-
+timediale prodotta dallo studente durante la sua carriera. Il sistema si rivolge primariamente
+agli studenti in qualit` a di amministratori unici del proprio portfolio, e secondariamente a una
+platea di attori esterni (commissioni d’esame, enti del terzo settore, direttori artistici e istituzioni
+partner) abilitati alla consultazione selettiva del materiale condiviso.
+1.2 Obiettivi del sistema
+L’obiettivo cardine del sistema proposto consiste nella digitalizzazione standardizzata e nella val-
+orizzazione del patrimonio artistico e accademico individuale. Nello specifico, il sistema persegue
+i seguenti traguardi strategici e operativi:
+Centralizzazione e Unificazione:Abbattere la dispersione dei dati eliminando la necessit` a
+di ricorrere a molteplici repository commerciali esterni o a supporti fisici locali, offrendo un
+unico punto di persistenza governato dall’istituzione AFAM.
+Autonomia e Flessibilit` a Configurativa:Garantire all’utente finale la piena sovranit` a sui
+propri dati, permettendo la strutturazione di portfolio dinamici e la modulazione granulare
+dei livelli di visibilit` a dei file in base al contesto d’uso.
+Disseminazione Sicura e Controllata:Abilitare canali di condivisione esterni protetti e
+monitorabili, capaci di fornire metriche analitiche oggettive circa l’avvenuta consultazione dei
+materiali condivisi.
+Compliance e Scalabilit` a Architetturale:Configurare un’infrastruttura tecnologica ader-
+ente alle vigenti normative in materia di protezione dei dati personali (GDPR) e predisposta
+nativamente per future integrazioni con i nodi di identit` a federata nazionali ed europei.
+1.3 Definizioni
+Proprieta Descrizione
+Membro AFAM Individuo autenticato che utilizza il software
+Materiale Qualsiasi file che faccia parte della produzione artistica dello studente,
+come registrazioni audio, video, spartiti e curriculum utili a rappresentarne
+le competenze e l’esperienza.
+ArtID Contenitore dinamico che contiene i materiali del membro AFAM e che
+pu` o essere condiviso con altri membri AFAM o con utenti esterni
+2
+
+===== PAGE 4 =====
+2 Sistema Attuale
+L’analisi dello scenario tecnologico corrente evidenzia l’assoluta mancanza di una piattaforma in-
+tegrata e istituzionale dedita alla valorizzazione dei flussi di lavoro dei candidati AFAM. Lo stato
+dell’arte ` e caratterizzato da un modello fortemente decentralizzato e destrutturato, all’interno del
+quale gli studenti sono costretti a gestire la propria presentazione professionale in modo manuale
+e frammentato.
+Attualmente, la sottomissione di un percorso artistico per audizioni, borse di studio o col-
+laborazioni esterne richiede l’utilizzo concorrente di canali eterogenei: la posta elettronica per le
+comunicazioni formali, i servizi di cloud storage commerciali per l’invio di file multimediali ad
+alta risoluzione (registrazioni audio, tracce video, spartiti digitalizzati) e la compilazione estem-
+poranea di documenti di testo per i curricula. Questo approccio comporta un elevato overhead di
+gestione, poich´ e l’allineamento e l’aggiornamento dei file rimangono a totale carico dello studente,
+incrementando il rischio di inviare documentazione obsoleta o non coerente.
+Sotto il profilo del controllo e della sicurezza, il sistema attuale soffre di una totale asimmetria
+informativa. Una volta spedito il materiale via email o tramite link di terze parti, l’utente
+perde qualsiasi tracciamento sul ciclo di vita del file: non ` e possibile verificare se i valutatori
+abbiano effettivamente visionato le opere, n´ e revocare l’accesso ai documenti in caso di variazioni
+contrattuali o di ripensamenti sulla privacy. Inoltre, la tutela della propriet` a intellettuale dei
+materiali originali risulta gravemente compromessa dalla mancanza di un ambiente di fruizione
+controllato dall’istituzione.
+3
+
+===== PAGE 5 =====
+3 Sistema Proposto
+3.1 Overview
+La soluzione proposta, denominata “ArtID”, si configura come un’applicazione web enterprise
+installata sui nodi infrastrutturali dell’istituzione AFAM. Il cuore del sistema risiede nel super-
+amento del paradigma della cartella statica in favore del concetto di “contenitore dinamico”.
+ArtID permette di associare univocamente l’identit` a anagrafica e accademica dello studente a un
+repository flessibile di asset multimediali, categorizzabili tramite tag di competenza tematica.
+L’elemento di innovazione architetturale ` e rappresentato dal motore di condivisione selettiva.
+L’utente non espone l’intero profilo, ma seleziona un sottoinsieme di file e informazioni dando
+vita a una vista personalizzata. Il sistema genera un link crittografato univoco che pu` o essere
+fruito da soggetti esterni direttamente via browser, senza obbligo di autenticazione per il desti-
+natario. Parallelamente, il sottosistema di auditing interno registra in tempo reale l’accesso al
+link, restituendo allo studente metriche di tracciamento sulla consultazione del portfolio.
+3.2 Requisiti Funzionali
+I requisiti funzionali del sistema proposto definiscono le capacit` a operative dell’applicazione e le
+interazioni permesse agli attori censiti.
+Il sistema deve consentire l’autenticazione sicura dell’utente tramite credenziali personali
+associate a un modulo di verifica a due fattori, nonch´ e disporre di procedure automatizzate per il
+recupero dei dati di accesso. Ciascun utente ha diritto alla gestione del proprio profilo personale,
+con la facolt` a di popolare e modificare i dati anagrafici, i dettagli sul percorso accademico e i tag
+di competenza artistica per favorire la categorizzazione e l’indicizzazione nelle ricerche interne.
+Il modulo di gestione file deve supportare il caricamento di oggetti multimediali in formati
+eterogenei, con particolare riferimento a documenti in formato PDF, file audio e flussi video,
+garantendo l’inserimento di metadati integrativi quali titolo, note esplicative e restrizioni di
+visibilit` a. Il software deve implementare una logica di strutturazione in contenitori dinamici,
+permettendo all’utente di raggruppare i file archiviati in base a specifiche finalit` a, come esami di
+profitto, audizioni o progetti di ricerca.
+Il motore di condivisione deve sovrintendere alla generazione di collegamenti ipertestuali
+esterni temporanei o permanenti. Tale funzionalit` a deve esporre una interfaccia di selezione
+tramite la quale isolare esclusivamente i file da includere nel link. Il sistema deve monitorare
+gli accessi ai suddetti collegamenti, memorizzando la data e l’ora dell’apertura e notificando il
+riscontro all’interno della dashboard dello studente. Infine, deve essere presente una funzione di
+ricerca globale che consenta la localizzazione dei profili degli studenti interni alla piattaforma,
+filtrabile sia per dati nominativi sia per specifiche competenze artistiche certificate dai tag.
+3.3 Requisiti Non Funzionali
+I requisiti non funzionali stabiliscono le qualit` a tecniche, i vincoli operativi e i criteri di efficacia
+che l’architettura di ArtID deve soddisfare.
+In termini di sicurezza e riservatezza dei dati, l’applicazione deve garantire la totale aderenza
+al regolamento europeo GDPR. Il sistema deve proteggere i file multimediali caricati, poich´ e
+configurano opere dell’ingegno originali, adottando tecniche di cifratura degli asset a riposo e
+protocolli di trasmissione sicuri su canale HTTPS. Sebbene l’integrazione con i nodi di identit` a
+federata SPID ed eIDAS non sia vincolante in questa prima fase di sviluppo, l’architettura
+4
+
+===== PAGE 6 =====
+software deve essere progettata seguendo pattern di disaccoppiamento in grado di accogliere tali
+moduli di autenticazione nazionali senza alterare il core business logico del sistema.
+L’affidabilit` a e l’integrit` a dei dati devono essere garantite da un DBMS relazionale deputato
+alla persistenza, supportato da policy di backup periodiche e da una gestione transazionale
+robusta per evitare la corruzione dei profili utente. Le performance del sistema devono essere
+ottimizzate per gestire flussi di caricamento intensivi di file pesanti, stabilendo una dimensione
+massima stringente pari a 10 megabyte per singolo file e implementando meccanismi di buffering
+e compressione lato server per non saturare la banda del nodo infrastrutturale AFAM.
+L’usabilit` a rappresenta un requisito non funzionale critico. Data la natura del target di
+riferimento, composto da studenti e valutatori provenienti da percorsi artistici e potenzialmente
+privi di competenze tecniche avanzate, l’interfaccia utente (UI) deve essere chiara, lineare e priva
+di elementi di ambiguit` a. Il sistema deve garantire un’esperienza d’uso fluida, minimizzando il
+numero di passaggi necessari per compiere le operazioni core (caricamento file e generazione dei
+link di condivisione) e offrendo una visualizzazione reattiva e accessibile da qualsiasi tipologia di
+dispositivo desktop e mobile.
+5
+
+===== PAGE 7 =====
+4 Modelli del sistema
+4.1 Modello dei casi d’uso
+Nei seguenti diagrammi, quando l’utente dovr` a scegliere tra due opzioni (“Si” e “No”, “Con-
+ferma” e “Indietro” ecc.) supponiamo che scelga la risposta affermativa in quanto, selezionando
+quella negativa, il sistema ritorna alle condizioni precedenti.
+4.1.1 Attori coinvolti
+4.1.2 Vista d’insieme
+4.1.3 Macro-casi d’uso
+AutenticazioneQuesto macro-caso si occupa di gestire l’autenticazione dell’utente in
+tutte le sue declinazioni (Login, Register, Logout).
+Si prevede anche:
+Processo di register certificato da provider ufficiali di identit` a digitale
+La gestione e la modifica dei dati di autenticazione
+Gestione ProfiloQuesto macro-caso si occupa di gestire tutte le operazioni sulle infor-
+mazioni professionali e/o di formazione dell’utente.
+Gestione
+Materiale Questo macro-caso si occupa di gestire tutte le operazioni sui materiali
+di svariata natura, caricati dall’utente al fine di costruire il proprio
+portfolio/curriculum.
+CondivisioneQuesto macro-caso si occupa di gestire la condivisione dei materiali
+verso altri utenti e/o utenti ospiti. Nota: Sono previsti diversi mecca-
+nismi di condivisione, per utenti interni tramite interfaccia dedicata e
+tramite link per utenti esterni.
+DiscoveryQuesto macro-caso prevede: L’implementazione delle funzionalit` a che
+l’utente e/o utente ospite compie sulle informazioni che gli utenti hanno
+scelto di rendere pubbliche. Funzionalit` a di ricerca e discovery da parte
+di recruiter e datori di lavoro.
+4.1.3.1 Comportamento eccezionale
+4.1.3.2 Note dei casi d’uso
+4.1.4 Macro-caso d’uso - Autenticazione
+4.1.4.1 Diagramma UML
+6
+
+===== PAGE 8 =====
+4.1.4.2 Registrazione Membro AFAM
+Questo caso d’uso permette a un nuovo Membro AFAM di registrarsi al sistema inserendo le
+proprie informazioni personali e credenziali. Il processo include la validazione dei dati e la
+verifica tramite codice OTP.
+Caso d’usoRegistrazione Membro AFAM
+IDREG MEM
+AttoriMembro AFAM, DBMS
+PrecondizioneIl sistema ha mostrato la pagina “WELCOME”
+7
+
+===== PAGE 9 =====
+Flusso degli eventi 1. Il Membro clicca sul pulsante “REGISTRATI”
+2. Il sistema mostra a video la schermata “REGISTRATI”
+3. Il Membro inserisce le proprie informazioni personali e le credenziali
+con la quale si vuole registrare all’interno del form, nonch´ e il campo
+di conferma della password
+4. Il Membro clicca sul pulsante “REGISTRATI”
+5. Il sistema controlla i valori inseriti
+6.FINCH ´Eanche solo un campo non ` e stato compilato, oppure an-
+che un solo campo dell’email non ` e in un formato corretto, oppure
+anche un solo campo della password non ` e in un formato corretto,
+oppure se il campo della password o dell’email non sono uguali al
+loro corrispettivo campo di conferma, oppure email o codice fiscale
+gi` a esistono:
+6.1SEanche solo un campo non ` e stato compilato:
+6.1.1 Il sistema mostra a video l’errore: “Errore: Bisogna com-
+pilare tutti i campi!”
+6.1.2 Il Membro ricompila i campi
+6.1.3 Il Membro preme il pulsante “REGISTRATI”
+6.2ALTRIMENTI SEil campo dell’email non ` e in un formato
+corretto:
+6.2.1 Il sistema mostra a video l’errore: “Errore: Formato
+dell’email non corretto!”, specificando i requisiti del for-
+mato corretto
+6.2.2 Il Membro ricompila il campo
+6.2.3 Il Membro preme il pulsante “REGISTRATI”
+6.3ALTRIMENTI SEanche un solo campo della password non ` e
+in un formato corretto:
+6.3.1 Il sistema mostra a video l’errore: “Errore: Formato della
+password non corretto!”, specificando i requisiti del for-
+mato corretto
+6.3.2 Il Membro ricompila i campi
+6.3.3 Il Membro preme il pulsante “REGISTRATI”
+6.4ALTRIMENTI SEil campo della password non ` e uguale al suo
+campo di verifica:
+6.4.1 Il sistema mostra a video l’errore: “Errore: I campi della
+password devono essere uguali!”
+6.4.2 Il Membro ricompila i campi
+6.4.3 Il Membro preme il pulsante “REGISTRATI”
+6.5ALTRIMENTI
+6.5.1 Il sistema interroga il DBMS per verificare l’esistenza della
+mail e del codice fiscale inseriti
+6.5.2 Il sistema effettua il controllo sulla mail
+6.5.3 Il sistema effettua il controllo sul codice fiscale
+6.5.4SEla mail inserita ` e gi` a in uso:
+6.5.4.1 Il sistema mostra a video l’errore: “Errore: email
+gi` a in uso! Scegline un’altra!”
+6.5.4.2 Il Membro ricompila i campi
+6.5.4.3 Il Membro preme il pulsante “REGISTRATI”
+6.5.5ALTRIMENTI SEil codice fiscale ` e gi` a in uso:
+6.5.5.1 Il sistema mostra a video l’errore “Errore: codice
+fiscale gi` a in uso!”
+6.5.5.2 Il Membro ricompila i campi
+6.5.5.3 Il Membro preme il pulsante “REGISTRATI”
+6.6 Il sistema controlla i valori inseriti
+7. Viene invocato il caso d’uso “GENERA OTP”
+8. Il sistema interroga il DBMS per inserire il nuovo Membro AFAM
+9. Il sistema mostra a video la schermata “LOGIN”
+8
+
+===== PAGE 10 =====
+PostcondizioneIl sistema ha mostrato a video la schermata “LOGIN”
+Requisiti SpecialiLe informazioni personali sono composte da: Nome, Cognome, Data
+di nascita, Luogo di nascita, Luogo di lavoro.
+Le credenziali sono composte da: Email, Password, Conferma Pass-
+word, Codice Fiscale.
+Il formato della password prevede almeno otto caratteri, di cui: almeno
+un carattere maiuscolo, almeno un carattere minuscolo, almeno un nu-
+mero, almeno un carattere speciale.
+Il formato dell’email prevede almeno una parola, seguita da una chioc-
+ciola, seguita da almeno un’altra parola, seguita da un punto, seguito
+da un dominio.
+9
+
+===== PAGE 11 =====
+4.1.4.3 Login Membro AFAM
+Questo caso d’uso permette a un Membro AFAM registrato di autenticarsi nel sistema tramite
+le proprie credenziali per accedere alla schermata Home.
+Caso d’usoLogin Membro AFAM
+IDLOG MEM
+AttoriMembro AFAM, DBMS
+PrecondizioneIl sistema ha mostrato la pagina “WELCOME”
+10
+
+===== PAGE 12 =====
+Flusso degli eventi 1. Il Membro clicca sul pulsante “ACCEDI”
+2. Il sistema mostra a video la schermata “LOGIN”
+3. Il Membro inserisce le credenziali con le quali si vuole autenticare
+all’interno del form
+4. Il Membro clicca sul pulsante “ACCEDI”
+5. Il sistema controlla i valori inseriti
+6. FINCH ´E anche solo un campo non ` e stato compilato, oppure anche
+un solo campo dell’email non ` e in un formato corretto, oppure anche
+un solo campo della password non ` e in un formato corretto, oppure
+le credenziali sono sbagliate:
+6.1 SE anche solo un campo non ` e stato compilato:
+6.1.1 Il sistema mostra a video l’errore: “Errore: Bisogna com-
+pilare tutti i campi!”
+6.1.2 Il Membro ricompila i campi
+6.1.3 Il Membro preme il pulsante “ACCEDI”
+6.2 ALTRIMENTI SE il campo dell’email non ` e in un formato cor-
+retto:
+6.2.1 Il sistema mostra a video l’errore: “Errore: Formato
+dell’email non corretto!”, specificando i requisiti del for-
+mato corretto
+6.2.2 Il Membro ricompila il campo
+6.2.3 Il Membro preme il pulsante “ACCEDI”
+6.3 ALTRIMENTI SE il campo della password non ` e in un formato
+corretto:
+6.3.1 Il sistema mostra a video l’errore: “Errore: Formato della
+password non corretto!”, specificando i requisiti del for-
+mato corretto
+6.3.2 Il Membro ricompila il campo
+6.3.3 Il Membro preme il pulsante “ACCEDI”
+6.4 ALTRIMENTI:
+6.4.1 Il sistema interroga il DBMS per verificare l’esistenza di
+un Membro che possiede la coppia di credenziali inserite
+6.4.2 Il sistema effettua il controllo sulle credenziali
+6.4.3 SE non esiste un Membro con tali credenziali:
+6.4.3.1 Il sistema mostra a video l’errore: “Errore: email
+o password sbagliata, riprova”
+6.4.3.2 Il Membro ricompila i campi
+6.4.3.3 Il Membro preme il pulsante “ACCEDI”
+6.5 Il sistema controlla i valori inseriti
+7. Viene invocato il caso d’uso “GENERA OTP”
+8. Il sistema autentica il Membro
+9. Il sistema mostra a video la schermata “HOME”
+PostcondizioneIl sistema ha mostrato a video la schermata “HOME”
+11
+
+===== PAGE 13 =====
+Requisiti SpecialiLe credenziali sono composte da: Email, Password.
+Il formato della password prevede almeno otto caratteri, di cui: almeno
+un carattere maiuscolo, almeno un carattere minuscolo, almeno un nu-
+mero, almeno un carattere speciale.
+Il formato dell’email prevede almeno una parola, seguita da una chioc-
+ciola, seguita da almeno un’altra parola, seguita da un punto, seguito
+da un dominio.
+12
+
+===== PAGE 14 =====
+4.1.4.4 Autenticazione con Identit` a digitale
+Questo caso d’uso permette a un Membro AFAM di autenticarsi o registrarsi rapidamente nel
+sistema avvalendosi di un provider di identit` a digitale (SPID).
+Caso d’usoAutenticazione con Identit` a digitale
+IDAUT MEM ID
+AttoriMembro AFAM, Provider Identit` a digitale, DBMS
+PrecondizioneIl sistema ha mostrato la pagina “LOGIN” oppure la pagina “REGIS-
+TRATI”
+Flusso degli eventi 1. Il Membro clicca sul pulsante “ENTRA CON SPID”
+2. Il sistema mostra un menu con i provider di identit` a digitale
+3. Il Membro seleziona il proprio provider
+4. Il sistema mostra a video la schermata di autenticazione del provider
+5. Il Membro si autentica
+6. SE l’autenticazione presso il provider non va a buon fine:
+6.1 Il sistema mostra a video la schermata precedente
+6.2 Il sistema mostra a video l’errore: “Errore, impossibile con-
+tattare il provider”
+7. ALTRIMENTI:
+7.1 Il sistema ottiene dal provider le informazioni personali del Mem-
+bro
+7.2 Il sistema interroga il DBMS per verificare se esiste gi` a un Mem-
+bro con il Codice Fiscale ricevuto
+7.3 Il sistema fa i controlli sul Codice Fiscale
+7.4 SE non esiste Membro con tale Codice Fiscale:
+7.4.1 Il sistema interroga il DBMS per registrare il Membro con
+spidCode
+7.5 Il sistema autentica il Membro
+7.6 Il sistema mostra a video la schermata “HOME”
+PostcondizioneIl sistema ha mostrato a video la schermata “LOGIN” o “REGISTRATI”
+OPPURE il sistema ha mostrato a video la schermata “HOME”
+Requisiti specialiLe informazioni personali sono composte da: Nome, Cognome, Email,
+Codice Fiscale, Data di nascita, Luogo di nascita.
+NoteSe il sistema registra il Membro con lo spid non ` e richiesto un OTP di
+verifica.
+Il Membro potr` a associare all’account appena creato una password per
+poter accedere senza l’uso di SPID attraverso il caso d’uso “MODIFICA
+PASSWORD”.
+13
+
+===== PAGE 15 =====
+4.1.4.5 Modifica Password
+Questo caso d’uso permette a un Membro AFAM di aggiornare la propria password di accesso
+dalla schermata di gestione del profilo, previa verifica di sicurezza.
+Caso d’usoModifica Password
+IDMOD PASS
+AttoriMembro AFAM, DBMS
+PrecondizioneIl sistema ha mostrato la pagina “GESTIONE PROFILO”
+Flusso degli eventi 1. Il Membro clicca sul pulsante “Modifica Password”
+2. Il sistema mostra la schermata “MODIFICA PASSWORD”
+3. Il Membro compila i campi “NUOVA PASSWORD” e “CONFERMA
+NUOVA PASSWORD”
+4. Il Membro preme sul pulsante “CONFERMA”
+5. Il sistema controlla i valori inseriti
+6. FINCH ´E anche un solo campo non ` e stato compilato, oppure anche
+un solo campo non ` e in un formato corretto, oppure il campo della
+password ` e diverso da quello di conferma della password:
+6.1 SE anche solo un campo non ` e stato compilato:
+6.1.1 Il sistema mostra a video l’errore: “Errore: Bisogna com-
+pilare tutti i campi!”
+6.1.2 Il Membro ricompila i campi
+6.1.3 Il Membro preme sul pulsante “CONFERMA”
+6.2 ALTRIMENTI SE anche un solo campo non ` e in un formato
+corretto:
+6.2.1 Il sistema mostra a video l’errore: “Errore: Formato della
+password non corretto!”, specificando i requisiti del for-
+mato corretto
+6.2.2 Il Membro ricompila i campi
+6.2.3 Il Membro preme sul pulsante “CONFERMA”
+6.3 ALTRIMENTI SE il campo della nuova password non ` e uguale
+al suo campo di conferma:
+6.3.1 Il sistema mostra a video l’errore: “Errore: I campi
+“NUOVA PASSWORD” e “CONFERMA NUOVA PASS-
+WORD” devono essere uguali!”
+6.3.2 Il Membro ricompila i campi
+6.3.3 Il Membro preme sul pulsante “CONFERMA”
+6.4 Il sistema controlla i valori inseriti
+7. Viene invocato il caso d’uso “GENERA OTP”
+8. Il sistema interroga il DBMS per modificare la password del Membro
+con la nuova password
+9. Il sistema mostra a video la schermata “HOME”
+10. Il sistema mostra a video il messaggio: “Password cambiata cor-
+rettamente”
+PostcondizioneIl sistema ha mostrato a video la schermata “HOME”
+14
+
+===== PAGE 16 =====
+Requisiti specialiIl formato della password prevede almeno ooto caratteri, di cui: almeno
+un carattere maiuscolo, almeno un carattere minuscolo, almeno un
+numero, almeno un carattere speciale.
+15
+
+===== PAGE 17 =====
+4.1.4.6 Password Dimenticata
+Questo caso d’uso consente a un Membro AFAM di recuperare l’accesso al proprio account
+richiedendo la generazione di una password temporanea inviata via email.
+Caso d’usoPassword Dimenticata
+IDDIM PASS
+AttoriMembro AFAM, DBMS
+PrecondizioneIl sistema ha mostrato la pagina “LOGIN”
+Flusso degli eventi 1. Il Membro clicca sulla scritta “Password Dimenticata?”
+2. Il sistema mostra la schermata “RECUPERO PASSWORD”
+3. Il Membro inserisce l’email associata al suo account
+4. Il Membro preme sul pulsante “CONFERMA”
+5. Il sistema controlla i valori inseriti
+6. FINCH ´E Il campo dell’email ` e vuoto oppure l’email non ` e in un
+formato corretto:
+6.1 SE il campo dell’email ` e vuoto:
+6.1.1 Il sistema mostra a video l’errore: “Errore: Bisogna com-
+pilare il campo dell’email!”
+6.1.2 Il Membro ricompila il campo
+6.1.3 Il Membro preme sul pulsante “CONFERMA”
+6.2 ALTRIMENTI SE il campo dell’email non ` e in un formato cor-
+retto:
+6.2.1 Il sistema mostra a video l’errore: “Errore: L’email non ` e
+nel formato corretto!”, specificando i requisiti del formato
+corretto
+6.2.2 Il Membro ricompila il campo
+6.2.3 Il Membro preme sul pulsante “CONFERMA”
+6.3 Il sistema controlla i valori inseriti
+7. Il sistema interroga il DBMS per verificare che esista un Membro
+con l’email inserita
+8. Il sistema effettua il controllo sulla mail
+9. SE esiste un Membro con la mail specificata:
+9.1 Il sistema imposta la password del Membro ad una generata ca-
+sualmente che rispetti i criteri di formato salvandola nel DBMS
+9.2 Il sistema manda un’email al Membro con la password appena
+generata
+9.3 Il sistema mostra a video la schermata “LOGIN”
+9.4 Il sistema mostra a video il messaggio: “Se [email] appartiene
+ad un account memorizzato nel sistema, ti arriver` a una email
+con la tua password temporanea”
+PostcondizioneIl sistema ha mostrato a video la schermata “LOGIN”
+16
+
+===== PAGE 18 =====
+Requisiti specialiIl formato dell’email prevede almeno una parola, seguita da una chioc-
+ciola, seguita da almeno un’altra parola, seguita da un punto, seguito
+da un dominio.
+L’oggetto della mail ` e: “ARTID - NOTIFICA DI RECUPERO PASS-
+WORD”.
+Il contenuto della mail ` e: “Salve [nomeUtente], le notifichiamo che ` e
+stato richiesto un reset della password per il suo account di ArtID. La
+sua password ` e [passwordGenerata]. Le consigliamo di cambiarla una
+volta che effettuer` a il prossimo accesso.”
+17
+
+===== PAGE 19 =====
+4.1.4.7 Logout Membro AFAM
+Questo caso d’uso permette a un Membro AFAM di terminare in modo sicuro la propria sessione
+di lavoro attiva, ritornando alla schermata di login.
+Caso d’usoLogout Membro AFAM
+IDLOG OUT
+AttoriMembro AFAM, DBMS
+PrecondizioneIl sistema ha mostrato la pagina “Gestione Profilo”
+Flusso degli eventi 1. Il Membro preme il tasto “LOGOUT”
+2. Il Membro viene disconnesso
+3. Il sistema mostra a video la schermata “LOGIN”
+PostcondizioneIl sistema ha mostrato a video la schermata “LOGIN”
+18
+
+===== PAGE 20 =====
+4.1.4.8 Eliminazione Account
+Questo caso d’uso permette a un Membro AFAM di eliminare permanentemente il proprio profilo
+e tutti i materiali a esso correlati dal sistema.
+Caso d’usoEliminazione Account
+IDDEL ACC
+AttoriMembro AFAM, DBMS
+PrecondizioneIl sistema ha mostrato la pagina “Gestione Profilo”
+19
+
+===== PAGE 21 =====
+Flusso degli eventi 1. Il Membro preme il tasto “CHIUDI ACCOUNT”
+2. Il sistema mostra a video la schermata “ELIMINA ACCOUNT”
+3. Il Membro inserisce la propria password e scrive la parola “ELIMINA”
+nell’apposito campo
+4. Il Membro preme il pulsante “CONFERMA ELIMINAZIONE”
+5. Il sistema controlla i valori inseriti
+6. FINCH ´E i campi sono vuoti, oppure la password ` e sbagliata, oppure
+non c’e scritta la parola “ELIMINA”:
+6.1 SE i campi sono vuoti:
+6.1.1 Il sistema mostra a video l’errore: “ERRORE: BISOGNA
+COMPILARE TUTTI I CAMPI!”
+6.1.2 Il Membro ricompila i campi
+6.1.3 Il Membro preme il pulsante “CONFERMA ELIMI-
+NAZIONE”
+6.2 ALTRIMENTI SE non c’e scritta la parola “ELIMINA”:
+6.2.1 Il sistema mostra a video l’errore: “ERRORE: PER
+CONFERMARE DEVI DIGITARE ESATTAMENTE LA
+PAROLA ELIMINA”
+6.2.2 Il Membro ricompila i campi
+6.2.3 Il Membro preme il pulsante “CONFERMA ELIMI-
+NAZIONE”
+6.3 ALTRIMENTI:
+6.3.1 il sistema interroga il DBMS per ottenere la password del
+Membro
+6.3.2 Il sistema effettua il controllo sulla password
+6.3.3 SE la password ` e sbagliata:
+6.3.3.1 Il sistema mostra a video l’errore: “Errore: Pass-
+word Sbagliata”
+6.3.3.2 Il Membro ricompila i campi
+6.3.3.3 Il Membro preme il pulsante “CONFERMA
+ELIMINAZIONE”
+6.4 Il sistema controlla i valori inseriti
+7. Il sistema interroga il DBMS per eliminare il profilo del Membro e
+tutti i suoi materiali
+8. Il sistema invia una mail di conferma di avvenuta eliminazione
+dell’account
+9. Il sistema invalida tutte le sessioni attive del Membro
+10. Il sistema mostra a video la schermata “WELCOME”
+11. Il sistema mostra a video il messaggio: “ACCOUNT ELIMINATO
+CON SUCCESSO”
+PostcondizioneIl sistema ha mostrato a video la schermata “WELCOME”
+20
+
+===== PAGE 22 =====
+Requisiti specialiSe il Membro ` e autenticato con SPID e NON ha mai inserito una pass-
+word, per eliminare l’account dovr` a seguire la stessa procedura ma al
+posto di inserire la password si ri-autenticher` a con spid.
+L’oggetto della mail ` e: “ARTID - CONFERMA ELIMINAZIONE AC-
+COUNT”.
+Il contenuto della mail ` e: “Salve [nomeUtente], la informiamo che il
+suo account ArtID ` e stato eliminato in data [dataEliminazione]”.
+21
+
+===== PAGE 23 =====
+4.1.4.9 Genera OTP
+Questo caso d’uso automatizza la generazione, il salvataggio e l’invio via email di una One-Time
+Password di sicurezza ogniqualvolta si compia un’azione legata ai dati sensibili.
+Caso d’usoGenera OTP
+IDGEN OTP
+AttoriMembro AFAM, DBMS
+Precondizione `E stata effettuata una qualsiasi azione legata ai dati sensibili del Mem-
+bro
+Flusso degli eventi 1. Il sistema genera un OTP della durata di [durataOTP]
+2. Il sistema interroga il DBMS per salvare l’OTP
+3. Il sistema invia l’OTP alla mail inserita dal Membro
+4. Il sistema mostra a video la schermata “VERIFICA OTP”
+5. Il Membro inserisce il codice OTP
+6. Il sistema richiede la data corrente
+7. Il sistema controlla che il codice OTP corrisponda e che non sia
+scaduto
+8. FINCH ´E il codice OTP non corrisponde o ` e scaduto:
+8.1 SE l’OTP non corrisponde:
+8.1.1 Il sistema mostra a video l’errore: “Errore: codice
+sbagliato, controlla meglio”
+8.1.2 Il Membro inserisce l’OTP
+8.1.3 Il sistema controlla l’OTP
+8.2 ALTRIMENTI SE l’OTP ` e scaduto:
+8.2.1 Il sistema mostra a video l’errore: “Errore: codice
+scaduto, richiedine un altro”
+8.2.2 Il Membro clicca sulla scritta “RIPROVA”
+8.2.3 Il sistema genera un nuovo OTP di durata [durataOTP]
+8.2.4 Il sistema interroga il DBMS per salvare il nuovo OTP
+8.2.5 Il sistema invia l’OTP alla mail inserita dal Membro
+8.2.6 Il Membro inserisce l’OTP
+8.2.7 Il sistema controlla l’OTP
+9. Il sistema mostra a video la schermata precedente
+PostcondizioneIl sistema ha mostrato a video la schermata precedente
+Requisiti specialiL’oggetto della mail ` e: “CODICE DI ACCESSO OTP”.
+Il contenuto della mail ` e: “Salve [nomeMembro], ecco il codice
+d’accesso OTP. Il codice sar` a valido fino alle [scadenzaOTP], non con-
+dividerlo con nessuno. SE NON SEI STATO TU A RICHIEDERLO
+NON FARE NULLA”.
+22
+
+===== PAGE 24 =====
+4.1.5 Macro-caso d’uso - Gestione Profilo
+4.1.5.1 Diagramma UML
+23
+
+===== PAGE 25 =====
+4.1.5.2 Visualizza schermata “GESTIONE PROFILO”
+Il presente caso d’uso descrive le modalit` a con cui un Membro AFAM accede alla sezione di
+configurazione del proprio profilo istituzionale. All’interno di questo ambiente sono accentrate
+le funzioni per la modifica dei dati anagrafici, l’associazione dell’identit` a SPID, l’organizzazione
+dei titoli e la disattivazione permanente del proprio account.
+Caso d’usoVisualizza schermata “GESTIONE PROFILO”
+IDVIS SCH GES PRO
+AttoriMembro AFAM, DBMS
+PrecondizioneIl sistema ha mostrato a video la schermata “HOME”
+Flusso degli eventi 1. Il Membro clicca il pulsante “PROFILO”
+2. Il sistema interroga il DBMS per ottenere i dati del Membro
+3. Il sistema mostra a video la schermata “GESTIONE PROFILO”
+PostcondizioneIl sistema ha mostrato a video la schermata “GESTIONE PROFILO”
+24
+
+===== PAGE 26 =====
+4.1.5.3 Visualizza schermata “GESTIONE CERTIFICATI”
+Il seguente caso d’uso permette al Membro AFAM di fare ingresso nella sezione dedicata al proprio
+portfolio di attestati e riconoscimenti artistici. La schermata offre una panoramica complessiva
+dei titoli caricati, abilitando le procedure per l’aggiunta di nuovi documenti, il download locale
+o la loro rimozione.
+Caso d’usoVisualizza schermata “GESTIONE CERTIFICATI”
+IDVIS SCH GES CERT
+AttoriMembro AFAM, DBMS
+PrecondizioneIl sistema ha mostrato a video la schermata “HOME”
+Flusso degli eventi 1. Il Membro clicca il pulsante “CERTIFICATI”
+2. Il sistema interroga il DBMS per ottenere i certificati del Membro
+3. Il sistema mostra a video la schermata “GESTIONE CERTIFICATI”
+PostcondizioneIl sistema ha mostrato a video la schermata “GESTIONE CERTIFI-
+CATI”
+25
+
+===== PAGE 27 =====
+4.1.5.4 Aggiorna Informazioni Profilo
+Il presente caso d’uso formalizza il flusso di aggiornamento dei dati informativi del discente,
+regolamentando la sottomissione di anagrafica, contatti telefonici ed e-mail, collegamenti ai canali
+social e impostazioni di privacy dell’account.
+Caso d’usoAggiorna Informazioni Profilo
+IDUPD INF PRO
+AttoriMembro AFAM, DBMS
+PrecondizioneIl sistema ha mostrato la schermata “GESTIONE PROFILO”
+Flusso degli eventi 1. Il Membro immette le nuove informazioni
+2. Il Membro clicca il pulsante “SALVA”
+3. Il sistema controlla se la data di nascita ` e superiore a quella corrente
+4.FINCH `Ela data di nascita ` e superiore a quella corrente:
+4.1 Il sistema mostra a video l’errore: “Errore: Data errata”
+4.2 Il Membro ricompila il campo
+4.3 Il Membro clicca il tasto “SALVA”
+4.4 Il sistema controlla se la data di nascita ` e superiore a quella
+corrente
+5. Il sistema interroga il DBMS per aggiornare le informazioni
+6. Il sistema mostra un messaggio di conferma di avvenuto aggiorna-
+mento
+7. Il sistema mostra la schermata “GESTIONE PROFILO” aggiornata
+PostcondizioneIl sistema ha mostrato la schermata “GESTIONE PROFILO” aggior-
+nata
+Requisiti specialiI dati informativi sono composti da: Nome, Cognome, Data di nascita,
+Luogo di nascita, Foto profilo, Citt` a di residenza, Comune di residenza,
+Area di interesse, Professione, Numeri di telefono, Indirizzo e-mail,
+Profilo Instagram, Profilo LinkedIn, Facebook, Impostazione Account
+Pubblico o privato.
+La data di nascita deve essere inferiore alla data corrente.
+26
+
+===== PAGE 28 =====
+4.1.5.5 Nuovo Certificato
+Il seguente caso d’uso delinea la procedura guidata per l’acquisizione e la persistenza di un nuovo
+titolo accademico o attestato all’interno del sistema. L’interfaccia consente l’associazione di
+metadati descrittivi e impone vincoli stringenti circa i formati digitali ammessi e le dimensioni
+massime dei file, accettando l’input sia tramite esploratore di file classico che tramite interazione
+diretta.
+Caso d’usoNuovo certificato
+IDNUO CER
+AttoriMembro AFAM, DBMS
+PrecondizioneIl sistema ha mostrato la schermata “GESTIONE CERTIFICATI”
+Flusso degli eventi 1. Il Membro clicca il pulsante “NUOVO”
+2. Il sistema mostra la schermata “NUOVO CERTIFICATO”
+3. Il Membro inserisce titolo, visibilit` a e opzionalmente note
+4. Il Membro clicca sul riquadro per caricare l’attestato
+5. Il sistema mostra l’esplora file del dispositivo su cui si trova il Mem-
+bro
+6. Il Membro seleziona il Materiale da caricare
+7. Il Membro clicca il tasto “SALVA”
+8. Il sistema controlla la correttezza dell’attestato
+9.FINCH `El’attestato non rispetta le dimensioni specifiche:
+9.1 Il sistema mostra a video l’errore: “Errore: File troppo grande”
+9.2 Il Membro ricarica l’attestato
+9.3 Il Membro clicca il tasto “SALVA”
+9.4 Il sistema controlla la correttezza dell’attestato
+10. Il sistema interroga il DBMS per salvare il Certificato
+11. Il sistema interroga il DBMS per ottenere la lista dei Certificati
+aggiornata
+12. Il sistema mostra la schermata “GESTIONE CERTIFICATI” ag-
+giornata
+PostcondizioneIl sistema ha mostrato la schermata “GESTIONE CERTIFICATI” ag-
+giornata
+Sequenze
+alternative Alternativamente il Membro trascina il Materiale da caricare all’interno
+del riquadro. Il flusso riprende dal punto 6.
+Requisiti specialiFinch´ e il titolo ` e vuoto il pulsante salva ` e disabilitato. Le dimensioni
+massime per ogni singolo attestato sono 10 megabyte. I formati validi
+sono: PDF, PNG, JPG. Le informazioni complementari sono: Titolo,
+Note, Pubblico o privato
+27
+
+===== PAGE 29 =====
+4.1.5.6 Scarica Certificato
+Il seguente caso d’uso permette al Membro AFAM di scaricare i certificati precedentemente
+caricati
+Caso d’usoScarica Certificato
+IDSCA CERT
+AttoriMembro AFAM, DBMS
+PrecondizioneIl sistema ha mostrato la schermata “GESTIONE CERTIFICATI”
+Flusso degli eventi 1. Il Membro seleziona uno o pi` u Certificati dalla lista
+2. Il Membro clicca il pulsante “SCARICA”
+3.PER OGNICertificato selezionato:
+3.1 Il sistema interroga il DBMS per ottenere il Certificato da scari-
+care
+3.2 Il sistema scarica il Certificato
+Postcondizione
+28
+
+===== PAGE 30 =====
+4.1.5.7 Rimuovi Certificato
+Il seguente caso d’uso permette al Membro AFAM di rimuovere i certificati che aveva preceden-
+temente caricato.
+Caso d’usoRimuovi Certificato
+IDRIM CERT
+AttoriMembro AFAM, DBMS
+PrecondizioneIl sistema ha mostrato la schermata “GESTIONE CERTIFICATI”
+Flusso degli eventi 1. Il Membro seleziona uno o pi` u Certificati dalla lista
+2. Il Membro clicca il pulsante per cancellare
+3.PER OGNICertificato selezionato:
+3.1 Il sistema interroga il DBMS per cancellare il Certificato se-
+lezionato
+4. Il sistema interroga il DBMS per ottenere la lista dei Certificati
+aggiornata
+5. Il sistema mostra a video la schermata “GESTIONE CERTIFICATI”
+aggiornata
+PostcondizioneIl sistema ha mostrato la schermata “GESTIONE CERTIFICATI” ag-
+giornata
+29
+
+===== PAGE 31 =====
+4.1.5.8 Collega SPID
+Il presente caso d’uso permette al Membro AFAM di associare il proprio SPID per verificare il
+propio profilo.
+Caso d’usoCollega SPID
+IDCOL SPID
+AttoriMembro AFAM, Provider Identit` a digitale, DBMS
+PrecondizioneIl sistema ha mostrato la schermata “GESTIONE PROFILO”
+Flusso degli eventi 1. Il Membro clicca sul pulsante “COLLEGA SPID”
+2. Il sistema mostra un menu con i provider di identit` a digitale
+3. Il Membro seleziona il proprio provider
+4. Il sistema mostra a video la schermata di autenticazione del provider
+5. Il Membro si autentica
+6.SEl’autenticazione presso il provider non va a buon fine:
+6.1 Il sistema mostra a video la schermata “GESTIONE PROFILO”
+6.2 Il sistema mostra a video l’errore: “Errore: Impossibile con-
+tattare il provider”
+7.ALTRIMENTI:
+7.1 Il sistema ottiene dal provider i dati del Membro
+7.2 Il sistema interroga il DBMS per associare lo spid al Membro
+7.3 Il sistema mostra a video la schermata “GESTIONE PROFILO”
+PostcondizioneIl sistema ha mostrato la schermata “GESTIONE PROFILO”
+30
+
+===== PAGE 32 =====
+4.1.6 Macro-caso d’uso - Gestione Materiali
+4.1.6.1 Diagramma UML
+31
+
+===== PAGE 33 =====
+4.1.6.2 Visualizza schermata ”GESTIONE ARTID”
+Il seguente caso d’uso permette di visualizzare tutti gli ArtIID del Membro AFAM.
+´ e prevista la creazione e cancellazione di ArtID da poter condividere.
+Caso d’usoVisualizza schermata “GESTIONE ARTID”
+IDVIS GES ARTID
+AttoriMembro AFAM, DBMS
+PrecondizioneIl sistema ha mostrato a video la “HOME PAGE”
+Flusso degli eventi 1. Il Membro clicca sulla scheda “ARTID”
+2. Il sistema interroga il DBMS per ottenere tutti gli ArtID del Membro
+3. Il sistema mostra a video la schermata “GESTIONE ARTID” che
+contiene tutti gli ArtID del Membro
+PostcondizioneIl sistema ha mostrato a video la schermata “GESTIONE ARTID” che
+contiene tutti gli ArtID del Membro
+4.1.6.3 Visualizza schermata “Gestione Materiali”
+Il seguente caso d’uso permette al Membro AFAM di visualizzare la lista completa dei propri
+materiali caricati all’interno del sistema.
+Caso d’usoVisualizza schermata “Gestione Materiali”
+IDVIS GES MAT
+AttoriMembro AFAM, DBMS
+PrecondizioneIl sistema ha mostrato a video la “HOME PAGE”
+Flusso degli eventi 1. Il Membro clicca sulla scheda “MATERIALI”
+2. Il sistema interroga il DBMS per ottenere tutti i materiali del Mem-
+bro
+3. Il sistema mostra a video la schermata “GESTIONE MATERIALI”
+che contiene tutti i materiali del Membro
+PostcondizioneIl sistema ha mostrato a video la schermata “GESTIONE MATERIALI”
+che contiene tutti i materiali del Membro
+NoteOpzionalmente il Membro pu` o filtrare la lista dei Materiali a schermo
+cliccando sui bottoni laterali.
+I filtri sono per tipo di materiale [audio, video].
+32
+
+===== PAGE 34 =====
+4.1.6.4 Visualizza schermata “DETTAGLI ARTID”
+Il seguente caso d’uso permette di visualizzare tutti i dettagli dell’ArtID.
+`E prevista la creazione e cancellazione di ArtID da poter condividere.
+Caso d’usoVisualizza schermata “Gestione ArtID”
+IDVIS GES ARTID
+AttoriMembro AFAM, DBMS
+PrecondizioneIl sistema ha mostrato a video la “GESTIONE ARTID”
+Flusso degli eventi 1. Il Membro clicca l’ArtID che vuole visionare
+2. Il sistema interroga il DBMS per ottenere tutte le informazioni
+dell’ArtID
+3. Il sistema mostra la schermata “DETTAGLI ARTID”
+PostcondizioneIl sistema ha mostrato a video la schermata “DETTAGLI ARTID” che
+contiene tutte le informazioni dell’ArtID
+33
+
+===== PAGE 35 =====
+4.1.6.5 Carica Materiale
+Questo caso d’uso permette al membro AFAM di caricare i suoi materiali.
+Caso d’usoCarica Materiale
+IDCRE MAT
+AttoriMembro AFAM, DBMS
+PrecondizioneIl sistema ha mostrato a video la schermata “GESTIONE MATERIALI”
+Flusso degli eventi 1. Il Membro preme sul pulsante “NUOVO”
+2. Il sistema mostra a video la schermata “NUOVO MATERIALE”
+3. Il Membro inserisce il titolo e opzionalmente una descrizione del
+Materiale che sta per caricare
+4. Il sistema controlla il campo titolo
+5. FINCH ´E il campo titolo ` e vuoto:
+5.1 Il sistema mostra a video l’errore: “Errore: il materiale deve
+avere un nome”
+5.2 Il Membro inserisce il titolo
+5.3 Il sistema controlla il campo titolo
+6. Il Membro clicca sul riquadro per caricare il Materiale
+7. Il sistema mostra l’esplora file del dispositivo su cui si trova il Mem-
+bro
+8. Il Membro naviga le cartelle e seleziona il Materiale da caricare
+9. Il sistema mostra nella schermata “NUOVO MATERIALE” il Mate-
+riale appena inserito
+10. Il Membro clicca il tasto “SALVA”
+11. Il sistema interroga il DBMS per inserire il Materiale
+12. Il sistema interroga il DBMS per ottenere la lista dei Materiali
+aggiornata
+13. Il sistema mostra a video la schermata “GESTIONE MATERIALI”
+con la lista dei Materiali aggiornata
+PostcondizioneIl sistema ha mostrato a video la schermata “GESTIONE MATERIALI”
+aggiornata
+Requisiti specialiI formati dei materiali che il Membro pu` o inserire sono: [PDF, mp4,
+png, jpg].
+Sequenze
+alternative 3.L’utente trascina il file dentro la schermata “NUOVO MATERI-
+ALE”, il flusso riprende dal punto 7.
+NoteOpzionalmente il Membro pu` o selezionare gli ArtID in cui inserire il
+Materiale attraverso un apposito menu a tendina.
+Opzionalmente il Membro pu` o aggiungere ai preferiti il Materi-
+ale attraverso un apposito bottone.
+34
+
+===== PAGE 36 =====
+4.1.6.6 Cancella Materiale
+Questo caso d’uso permette al membro AFAM di cancellare uno o pi` u materiali caricati.
+Caso d’usoCancella Materiale
+IDDEL MAT
+AttoriMembro AFAM, DBMS
+PrecondizioneIl sistema ha mostrato a video la schermata “GESTIONE MATERIALI”
+Flusso degli eventi 1. Il Membro seleziona uno o pi` u Materiali che vuole cancellare
+2. Il Membro clicca il pulsante “CANCELLA”
+3. Il sistema mostra a video un messaggio con scritto “SEI SICURO
+DI VOLER CANCELLARE I MATERIALI SELEZIONATI? [listaMa-
+terialiSelezionati]”
+4. Il Membro clicca il pulsante “SONO SICURO”
+5. PER OGNI Materiale selezionato:
+5.1 Il sistema interroga il DBMS per cancellare il Materiale selezion-
+ato e aggiornare gli ArtID che lo contenevano
+6. Il sistema interroga il DBMS per ottenere la lista dei Materiali ag-
+giornata
+7. Il sistema mostra a video la schermata “GESTIONE MATERIALI”
+aggiornata
+PostcondizioneIl sistema ha mostrato a video la schermata “GESTIONE MATERIALI”
+aggiornati
+Sequenze
+alternative 1.Il Membro opzionalmente seleziona pi` u Materiali da cancellare, il
+flusso riprende dal punto 1.
+35
+
+===== PAGE 37 =====
+4.1.6.7 Crea ArtID
+Questo caso d’uso permette al Membro AFAM di creare un ArtID.
+Caso d’usoCrea ArtID
+IDCRE ARTID
+AttoriMembro AFAM, DBMS
+PrecondizioneIl sistema ha mostrato a video la schermata “GESTIONE ARTID”
+Flusso degli eventi 1. Il Membro clicca sul pulsante “NUOVO ARTID”
+2. Il sistema mostra video la schermata “NUOVO ARTID”
+3. Il Membro inserisce il nome dell’ArtID
+4. Il sistema controlla il campo nome
+5. FINCH ´E il campo nome ` e vuoto:
+5.1 Il sistema mostra video l’errore: “Errore: l’ArtID deve avere un
+nome”
+5.2 Il Membro inserisce il nome
+5.3 Il sistema controlla il campo nome
+6. Il Membro clicca il pulsante “CREA”
+7. Il sistema interroga il DBMS per salvare l’ArtID creato
+8. Il sistema mostra la schermata “DETTAGLI ARTID”
+9. Il Membro inserisce la descrizione
+10. Il Membro clicca sul pulsante “AGGIUNGI MATERIALE”
+11. Il sistema interroga il DBMS per ottenere tutti i materiali del Mem-
+bro
+12. Il sistema mostra la schermata “AGGIUNGI MATERIALE”
+13. Il Membro seleziona uno o pi` u materiali dalla lista dei materiali,
+opzionalmente, filtrando la lista compilando la barra di ricerca
+14. Il Membro clicca sul pulsante “AGGIUNGI”
+15. Il sistema interroga il DBMS per salvare i Materiali selezionati
+all’ArtID
+16. Il sistema mostra la schermata “DETTAGLI ARTID” con i Mate-
+riali aggiunti
+17. Il Membro seleziona la visibilit` a dell’ArtID
+18. Il sistema interroga il DBMS per aggiornare la visibilit` a dell’ArtID
+19. Il Membro clicca sul pulsante “SALVA”
+20. Il sistema interroga il DBMS per salvare la descrizione dell’ArtID
+creato
+21. Il sistema interroga il DBMS per ricevere la lista aggiornata degli
+ArtID
+22. Il sistema mostra a video la schermata “GESTIONE ARTID” con
+la lista degli ArtID aggiornata
+PostcondizioneIl sistema ha mostrato a video la schermata “GESTIONE ARTID”
+aggiornata
+Requisiti specialiI valori di visibilit` a da cui poter scegliere sono: [Pubblico, Privato,
+Unlisted].
+36
+
+===== PAGE 38 =====
+4.1.6.8 Aggiungi Materiale Standalone
+Questo caso d’uso permette al membro AFAM di aggiungere dei materiali, gi` a caricati, ad un
+ArtID dopo averlo gi` a creato.
+Caso d’usoAggiungi Materiale Standalone
+IDAGG MAT STA
+AttoriMembro AFAM, DBMS
+PrecondizioneIl sistema ha mostrato a video la schermata “DETTAGLI ARTID”
+Flusso degli eventi 1. Il Membro clicca il pulsante “AGGIUNGI MATERIALE”
+2. Il sistema interroga il DBMS per ottenere tutti i Materiali del Mem-
+bro
+3. Il sistema mostra la schermata “AGGIUNGI MATERIALE”
+4. Il Membro seleziona uno o pi` u Materiali dalla lista dei Materiali,
+opzionalmente, filtrando la lista compilando la barra di ricerca
+5. Il Membro clicca sul pulsante “AGGIUNGI”
+6. Il sistema interroga il DBMS per aggiungere i Materiali selezionati
+all’ArtID
+7. Il sistema mostra la schermata “DETTAGLI ARTID” con i Materiali
+aggiunti
+8. Il Membro clicca sul pulsante “SALVA”
+9. Il sistema mostra a video la schermata “GESTIONE ARTID”
+PostcondizioneIl sistema ha mostrato a video la schermata “GESTIONE ARTID”
+37
+
+===== PAGE 39 =====
+4.1.6.9 Rimuovi Materiale
+Questo caso d’uso permette al membro AFAM di rimuovere dei Materiali da un ArtID.
+Caso d’usoRimuovi Materiale
+IDREM MAT
+AttoriMembro AFAM, DBMS
+PrecondizioneIl sistema ha mostrato a video la schermata “DETTAGLI ARTID”
+Flusso degli eventi 1. Il Membro clicca sulla “X” accanto al Materiale che vuole rimuovere
+2. Il sistema interroga il DBMS per rimuovere il Materiale dall’ArtID
+3. Il Membro clicca il pulsante “SALVA”
+4. Il sistema mostra la schermata “GESTIONE ARTID”
+PostcondizioneIl sistema ha mostrato a video la schermata “GESTIONE ARTID”
+Sequenze
+alternative 1.Il Membro opzionalmente clicca sulla “X” di un altro Materiale che
+vuole eliminare, il flusso riprende dal punto 1.
+38
+
+===== PAGE 40 =====
+4.1.6.10 Cancella ArtID
+Questo caso d’uso permette al Membro AFAM di cancellare un ArtID.
+Caso d’usoCancella ArtID
+IDDEL ARTID
+AttoriMembro AFAM, DBMS
+PrecondizioneIl sistema ha mostrato a video la schermata “DETTAGLI ARTID”
+Flusso degli eventi 1. Il Membro clicca sul pulsante “CANCELLA”
+2. Il sistema mostra a video un messaggio con scritto “SEI SICURO
+DI VOLER CANCELLARE [nome ArtID]?”
+3. Il Membro clicca il pulsante “SONO SICURO”
+4. Il sistema interroga il DBMS per cancellare l’ArtID e tutti i riferi-
+menti ai Materiali in esso contenuti
+5. Il sistema interroga il DBMS per ottenere la lista degli ArtID ag-
+giornata
+6. Il sistema mostra a video la schermata “GESTIONE ARTID” ag-
+giornata
+PostcondizioneIl sistema ha mostrato a video la schermata “GESTIONE ARTID”
+aggiornata
+NoteDopo la cancellazione di un ArtID, tutti gli eventuali link creati per
+condividerlo, se cliccati, mostreranno una pagina contenente un mes-
+saggio: “L’ArtID che cerchi ` e stato cancellato”.
+39
+
+===== PAGE 41 =====
+4.1.6.11 Aggiorna visibilit` a ArtID
+Questo caso d’uso permette di aggiornare la visibilit` a di un ArtID.
+Caso d’usoAggiorna visibilit` a ArtID
+IDUPD VIS ARTID
+AttoriMembro AFAM, DBMS
+PrecondizioneIl sistema ha mostrato a video la schermata “DETTAGLI ARTID”
+Flusso degli eventi 1. Il Membro seleziona una delle opzioni di visibilit` a dall’apposito menu
+a tendina
+2. Il sistema controlla l’opzione selezionata
+3. SE l’opzione selezionata ` e PRIVATA E precedentemente era UN-
+LISTED ED esistono link per l’ArtID:
+3.1 Il sistema mostra a video il messaggio: “Questo ArtID ` e stato
+gi` a condiviso, se lo rendi privato chi ha il link non potr` a pi` u
+visualizzarlo. Procedere comunque?”
+3.2 Il Membro clicca il tasto “CONFERMA”
+4. Il sistema interroga il DBMS per aggiornare la visibilit` a dell’ArtID
+5. Il Membro clicca il pulsante “SALVA”
+6. Il sistema mostra a video la schermata “GESTIONE ARTID”
+PostcondizioneIl sistema ha mostrato a video la schermata “GESTIONE ARTID”
+Requisiti specialiI valori di visibilit` a da cui poter scegliere sono: [Pubblico, Privato,
+Unlisted].
+NoteSe la visibilit` a passa da PUBBLICA a PRIVATA, tutti gli eventuali link
+creati per condividerlo, se cliccati, mostreranno una pagina contenente
+un messaggio: “L’ArtID che cerchi ` e privato”.
+Se la visibilit` a passa da UNLISTED a PRIVATA, tutti gli even-
+tuali link creati per condividerlo, se cliccati, mostreranno una pagina
+contenente un messaggio: “L’ArtID che cerchi ` e privato”.
+40
+
+===== PAGE 42 =====
+4.1.6.12 Crea Tag
+Questo caso d’uso permette di creare dei tag da aggiungere agli ArtID.
+Caso d’usoCrea Tag
+IDCRE TAG
+AttoriMembro AFAM, DBMS
+PrecondizioneIl sistema ha mostrato a video la schermata “GESTIONE ARTID”
+Flusso degli eventi 1. Il Membro clicca il pulsante “NUOVO TAG”
+2. Il sistema mostra la schermata “NUOVO TAG”
+3. Il sistema interroga il DBMS per ottenere tutti i Tag del Membro
+4. Il Membro inserisce il nome del Tag
+5. Il sistema controlla il nome del Tag
+6. FINCH ´E la lunghezza del Tag ` e minore di 3 oppure il nome del Tag
+contiene parole vietate oppure il tag gi` a esiste:
+6.1 SE la lunghezza del Tag ` e minore di 3:
+6.1.1 Il sistema mostra a video l’errore: “Errore: Il tag deve
+essere lungo almeno 3 caratteri”
+6.1.2 Il Membro inserisce il nome del Tag
+6.2 ALTRIMENTI SE il nome del Tag contiene parole vietate:
+6.2.1 Il sistema mostra a video l’errore: “Errore: Il tag non pu` o
+chiamarsi in questo modo”
+6.2.2 Il Membro inserisce il nome del Tag
+6.3 ALTRIMENTI SE il tag gi` a esiste:
+6.3.1 Il sistema mostra a video l’errore: “Errore: Questo tag
+gi` a esiste”
+6.3.2 Il Membro inserisce il nome del Tag
+6.4 Il sistema controlla il nome del Tag
+7. Il Membro clicca il pulsante salva
+8. Il sistema interroga il DBMS per salvare il nuovo Tag
+PostcondizioneIl sistema ha salvato nel DBMS il nuovo Tag creato
+Requisiti specialiIl tag deve rispettare le seguenti condizioni: lunghezza minima 3 carat-
+teri, lunghezza massima 50 caratteri. NO parole offensive/razziste.
+41
+
+===== PAGE 43 =====
+4.1.6.13 Aggiungi Tag
+Questo caso d’uso permette al Membro AFAM di aggiungere un tag ad un ArtID.
+Caso d’usoAggiungi Tag
+IDADD TAG
+AttoriMembro AFAM, DBMS
+PrecondizioneIl sistema ha mostrato a video la schermata “DETTAGLI ARTID”
+Flusso degli eventi 1. Il Membro clicca il pulsante “AGGIUNGI TAG”
+2. Il sistema interroga il DBMS per ottenere tutti i Tag del Membro
+3. Il sistema mostra a video la schermata “AGGIUNGI TAG”
+4. Il Membro seleziona il Tag da aggiungere
+5. Il sistema interroga il DBMS per aggiungere il Tag selezionato
+all’ArtID
+6. Il sistema mostra la schermata “DETTAGLI ARTID”
+PostcondizioneIl sistema ha mostrato a video la schermata “DETTAGLI ARTID”
+42
+
+===== PAGE 44 =====
+4.1.6.14 Rimuovi Tag
+Questo caso d’uso permette al membro AFAM di rimuovere un tag da un ArtID.
+Caso d’usoRimuovi Tag
+IDREM TAG
+AttoriMembro AFAM, DBMS
+PrecondizioneIl sistema ha mostrato a video la schermata “DETTAGLI ARTID”
+Flusso degli eventi 1. Il Membro clicca sulla “X” accanto al Tag che vuole rimuovere
+2. Il sistema interroga il DBMS per rimuovere il Tag dall’ArtID
+PostcondizioneIl sistema ha mostrato a video la schermata “I MIEI ARTID” aggiornata
+Sequenze
+alternative 1.Il Membro opzionalmente clicca sulla “X” di un altro Tag che vuole
+eliminare, il flusso riprende dal punto 1.
+43
+
+===== PAGE 45 =====
+4.1.6.15 Preview ArtID
+Questo caso d’uso permette di visualizzare come l’artID verr` a visto dalle persone a cui ` e condiviso.
+Caso d’usoPreview ArtID
+IDPREV ARTID
+AttoriMembro AFAM, DBMS
+PrecondizioneIl sistema ha mostrato a video la schermata “DETTAGLI ARTID”
+Flusso degli eventi 1. Il Membro clicca sul pulsante “ANTEPRIMA”
+2. Il sistema interroga il DBMS per ottenere tutte le informazioni
+dell’ArtID
+3. Il sistema interroga il DBMS per ottenere tutti i contatti del Membro
+4. Il sistema mostra la schermata “PREVIEW ARTID”
+PostcondizioneIl sistema ha mostrato a video la schermata “PREVIEW ARTID”
+NoteQualora l’ArtID fosse stato condiviso, la pagina mostrer` a anche la data
+di scadenza della condivisione.
+44
+
+===== PAGE 46 =====
+4.1.7 Macro-caso d’uso - Condivisione
+4.1.7.1 Diagramma UML
+45
+
+===== PAGE 47 =====
+4.1.8 Macro-caso d’uso - Discovery
+4.1.8.1 Diagramma UML
+46
+
+===== PAGE 48 =====
+4.2 Modelli degli oggetti
+4.2.1 Oggetti entit` a
+Oggetti entit` a Descrizione
+Attestato Rappresenta il documento formale caricato dal Membro AFAM volto a com-
+provare la partecipazione o il conseguimento di un titolo di studio o profes-
+sionale.
+Membro Rappresenta l’entit` a Membro AFAM principale del sistema, contenente tutte
+le informazioni anagrafiche, le credenziali di accesso e i riferimenti ai mate-
+riali e ai profili social associati.
+Certificato Entit` a preposta alla memorizzazione dei metadati e dei file relativi ai ri-
+conoscimenti accademici o artistici, dotata di attributi di visibilit` a e note
+complementari.
+4.2.2 Oggetti boundary
+Oggetti boundary Descrizione
+DBMSboundary Oggetto di frontiera preposto all’incapsulamento e alla gestione
+dello scambio dati tra i moduli applicativi e il sistema di persistenza
+(DBMS).
+certificazioniBoundary Interfaccia responsabile della gestione del ciclo di vita dei titoli e
+delle certificazioni possedute dal Membro AFAM.
+profiloBoundary Schermata deputata alla visualizzazione, modifica e personal-
+izzazione delle informazioni anagrafiche, delle credenziali e dei
+parametri di privacy del Membro.
+homePageBoundary Punto di accesso principale all’applicazione, predisposto per la nav-
+igazione verso le macro-aree e le funzionalit` a core del sistema.
+errorBoundary Componente specializzato nell’intercettazione, formattazione e vi-
+sualizzazione a video dei messaggi di errore e dei feedback di sistema
+alil Membro.
+attestatiBoundary Oggetto di frontiera dedicato all’interfacciamento, al caricamento
+e al download dei documenti formali di attestazione inseriti dal
+Membro.
+4.2.3 Oggetti Boundary
+Oggetto Boundary Descrizione
+DBMSBoundary Boundary necessaria per permettere al sistema di interfaccia-
+rsi e comunicare stabilmente con il DBMS.
+47
+
+===== PAGE 49 =====
+welcomeBoundary Interfaccia grafica iniziale che accoglie il Membro e funge da
+pagina di benvenuto della piattaforma.
+loginBoundary Interfaccia che consente l’autenticazione degli utenti e che
+abilita l’azione di navigazione verso la sotto-sezione di recu-
+pero delle credenziali.
+registrazioneBoundary Interfaccia provvista di form per la raccolta dei dati necessari
+alla creazione di un nuovo account nel sistema.
+verificaOTPBoundary Schermata deputata all’inserimento del codice numerico One-
+Time Password ai fini della verifica di sicurezza.
+recuperoPasswordBoundary Interfaccia che permette alil Membro di avviare la procedura
+guidata per il ripristino o la modifica della chiave di accesso
+smarrita.
+eliminaAccountBoundary Finestra di dialogo di tipo modale contenente un form speci-
+fico per confermare la rimozione definitiva e permanente
+dell’account.
+identit` aDigitaleBoundary Componente di interfaccia che espone il comando di accesso
+centralizzato e mostra l’elenco dei relativi Identity Provider
+accreditati.
+materialiBoundary Interfaccia grafica adibita alla visualizzazione tabellare e
+all’organizzazione dell’elenco dei materiali multimediali ap-
+partenenti al membro.
+ArtIDBoundary Schermata di riepilogo strutturata per mostrare la collezione
+completa di tutti i profili ArtID associati al Membro AFAM.
+dettagliArtIDBoundary Interfaccia analitica focalizzata sulla resa visiva dei metadati
+e delle informazioni dettagliate relative a uno specifico ArtID.
+nuovoMaterialeBoundary Finestra modale interattiva preposta al caricamento di un
+nuovo asset multimediale all’interno del sistema.
+creaArtIDBoundary Finestra di dialogo modale provvista dei campi necessari per
+la configurazione e l’istanziazione di un nuovo profilo ArtID.
+aggiungiMaterialiBoundary Interfaccia di tipo modale che consente di selezionare e asso-
+ciare uno o pi` u materiali multimediali all’interno di un deter-
+minato ArtID.
+nuovoTagBoundary Finestra modale che permette la definizione e la creazione di
+una nuova etichetta tassonomica o tag di categorizzazione.
+aggiungiTagBoundary Menu di selezione interattivo preposto all’associazione di uno
+o pi` u tag precedentemente registrati ad una risorsa.
+previewArtIDBoundary Interfaccia pubblica o di consultazione preposta alla visual-
+izzazione esclusiva delle informazioni di un ArtID condiviso
+esternamente.
+certificazioniBoundary Ambiente di interfaccia dedicato alla supervisione, alla rendi-
+contazione e alla gestione complessiva delle certificazioni.
+48
+
+===== PAGE 50 =====
+profiloBoundary Interfaccia principale preposta alla visualizzazione e alla mod-
+ifica dei dati anagrafici e professionali del Membro AFAM.
+homeBoundary Interfaccia primaria dell’applicazione che funge da dashboard
+principale e da snodo di navigazione dopo l’avvenuto login.
+errorBoundary Avviso visivo preposto a informare il Membro del verificarsi
+di un’anomalia durante l’uso del software. Il testo descrittivo
+varia in base alla natura dell’errore.
+messageBoundary Avviso testuale flessibile utilizzato per notificare il Membro
+circa il successo di un’operazione o per richiedere una con-
+ferma esplicita a video.
+attestatiBoundary Schermata portfolio dedicata all’interfacciamento, alla con-
+sultazione e alla verifica formale dei titoli di studio e degli
+attestati caricati.
+4.2.4 Oggetti control
+Oggetti Control Descrizione
+profiloControl Classe di controllo preposta al coordinamento e all’esecuzione delle
+operazioni sul profilo utente, quali la modifica dei dati anagrafici,
+l’aggiornamento delle credenziali di sicurezza e la cancellazione
+dell’account.
+certificatiControl Classe di controllo responsabile della logica di business legata alla sot-
+tomissione, verifica dei vincoli sui file (formato e dimensione), archivi-
+azione, download e rimozione dei certificati.
+4.2.5 Oggetti Control
+Oggetto Control Descrizione
+welcomeControl Control che si occupa di indirizzare il flusso di navigazione iniziale
+dell’applicazione, gestendo lo smistamento dell’utente non auten-
+ticato verso le funzionalit` a di login o di registrazione.
+loginControl Control che gestisce le operazioni di autenticazione del Membro
+AFAM. Interroga il DBMS per verificare la validit` a delle creden-
+ziali immesse; in caso di successo consente l’accesso alla dash-
+board principale, mentre in caso di credenziali errate o account in-
+esistente comanda la visualizzazione dei relativi messaggi tramite
+l’apposita boundary di errore. Gestisce inoltre il reindirizzamento
+al modulo di recupero password.
+49
+
+===== PAGE 51 =====
+registrazioneControl Control preposta alla gestione del flusso di iscrizione dei nuovi
+utenti. Si occupa di raccogliere i dati anagrafici, effettua la vali-
+dazione formale dei campi e interroga il DBMS per verificare che
+l’indirizzo e-mail non sia gi` a associato a un profilo esistente. In
+caso di esito positivo, predispone il salvataggio preliminare dei dati
+e attiva il flusso di verifica della sicurezza.
+OTPControl Control incaricata di supervisionare la procedura di validazione
+a due fattori. Genera il codice numerico One-Time Password, ne
+convalida l’inserimento rispetto ai parametri di scadenza temporale
+e, in caso di esito negativo, emette un avviso di errore bloccando
+la transazione. Se il codice risulta valido, interroga il DBMS per
+consolidare l’attivazione o la modifica dell’account.
+identit` aDigitaleControl Control che si occupa di orchestrare l’integrazione federata tramite
+SPID. Gestisce le chiamate verso i gateway degli Identity Provider
+accreditati e ne acquisisce le asserzioni sicure; in caso di falli-
+mento della comunicazione remota o di rifiuto delle credenziali,
+interrompe il flusso mostrando un errore a video, mentre in caso
+di successo interroga il DBMS per mappare stabilmente l’identit` a
+digitale al profilo dell’utente.
+materialiControl Control deputata alla gestione del ciclo di vita dei materiali mul-
+timediali del Membro AFAM. Interroga il DBMS per estrarre la
+collezione dei file associati all’utente o per effettuarne il filtraggio
+per tipologia (audio, video). Coordina inoltre il caricamento di
+nuovi asset verificandone la conformit` a e governa le operazioni di
+persistenza, rimozione o modifica dei parametri dei file.
+ArtIDControl Control che si occupa di sovrintendere alle macro-funzionalit` a dei
+profili d’opera ArtID. Interroga il DBMS per recuperare l’elenco
+completo degli ArtID associati all’allievo, coordina le routine per
+l’istanziazione e la creazione di un nuovo profilo e gestisce i flussi
+di cancellazione, aggiornando in tempo reale le viste di riepilogo a
+schermo.
+dettagliArtIDControl Control incaricata di gestire la visualizzazione analitica e la modi-
+fica interna di uno specifico ArtID. Interroga il DBMS per estrarre
+i metadati di dettaglio, gestisce i moduli per l’associazione di-
+namica di nuovi materiali multimediali, governa la creazione e il
+collegamento di tag tassonomici e predispone la generazione dei
+parametri per l’esposizione e la preview pubblica.
+ProfiloControl Control preposta alla gestione dei dati personali e delle im-
+postazioni generali dell’account del Membro AFAM. Intercollega i
+form di modifica verificando la congruenza cronologica della data
+di nascita rispetto al tempo corrente; qualora la data risulti errata
+blocca il flusso emettendo l’avviso diagnostico a video. Super-
+ata la validazione, interroga il DBMS per aggiornare stabilmente
+l’anagrafica e gestisce la modale di eliminazione account.
+50
+
+===== PAGE 52 =====
+CertificatiControl Control che si occupa di gestire le operazioni del portfolio di at-
+testati e certificazioni dell’utente. Interroga il DBMS per estrarre
+la lista dei titoli, convalida i caricamenti imponendo i vincoli di
+formato (PDF, PNG, JPG) e dimensione massima (10 megabyte)
+emettendo messaggi di errore specifici in caso di violazione, e coor-
+dina i cicli iterativi per il download multiplo o la rimozione stabile
+dei record.
+51
+
+===== PAGE 53 =====
+4.2.6 Diagrammi delle classi
+4.2.6.1 Entit` a
+4.2.6.2 Autenticazione
+4.2.6.3 Gestione Profilo
+4.2.6.4 Gestione Materiali
+4.2.6.5 Condivisione
+4.2.6.6 Discovery
+52
+
+===== PAGE 54 =====
+4.3 Modelli dinamici
+4.3.1 Diagrammi di sequenza
+4.3.1.1 Macro-caso d’uso - Autenticazione
+4.3.1.2 Macro-caso d’uso - Gestione Profilo
+4.3.1.3 Macro-caso d’uso - Gestione Materiali
+4.3.1.4 Macro-caso d’uso - Condivisione
+4.3.1.5 Macro-caso d’uso - Discovery
+53
+
+===== PAGE 55 =====
+4.4 Stato dell’arte
+Nulla malesuada porttitor diam. Donec felis erat, congue non, volutpat at, tincidunt tristique,
+libero. Vivamus viverra fermentum felis. Donec nonummy pellentesque ante. Phasellus adipi-
+scing semper elit. Proin fermentum massa ac quam. Sed diam turpis, molestie vitae, placerat
+a, molestie nec, leo. Maecenas lacinia. Nam ipsum ligula, eleifend at, accumsan nec, suscipit a,
+ipsum. Morbi blandit ligula feugiat magna. Nunc eleifend consequat lorem. Sed lacinia nulla
+vitae enim. Pellentesque tincidunt purus vel magna. Integer non enim. Praesent euismod nunc
+eu purus. Donec bibendum quam in tellus. Nullam cursus pulvinar lectus. Donec et mi. Nam
+vulputate metus eu enim. Vestibulum pellentesque felis eu massa.
+4.5 Modello dei Casi d’Uso
+4.5.1 Descrizione Caso d’Uso: UC-1
+Propriet` a
+Descrizione
+ID e Nome UC-1: Autenticazione Utente
+Attori Utente Registrato
+Pre-condizioni L’utente si trova nella schermata di login.
+Flusso Principale 1. L’utente inserisce le credenziali.
+2. Il sistema convalida i dati.
+3. Accesso consentito.
+Flussi Alternativi 2a. Credenziali errate: il sistema mostra un errore.
+Post-condizioni L’utente ` e correttamente loggato.
+Propriet` a Descrizione
+Caso D’usoAutenticazione con Identit` a digitale
+IDAUT MEM ID
+AttoriMembro AFAM, Provider Identit` a digitale, DBMS
+PrecondizioneIl sistema ha mostrato la schermata “LOGIN” oppure la schermata
+“REGISTRATI”
+54
+
+===== PAGE 56 =====
+Flusso degli eventi 1. Il Membro clicca sul pulsante “ENTRA CON SPID”
+2. Il sistema mostra un menu con i provider di identit` a digitale
+3. Il Membro seleziona il proprio provider
+4. Il sistema mostra a video la schermata di autenticazione del provider
+5. Il Membro si autentica
+6. SE l’autenticazione presso il provider non va a buon fine
+6.1. Il sistema mostra a video la schermata precedente
+6.2. Il sistema mostra a video l’errore: “Errore, impossibile con-
+tattare il provider”
+7. ALTRIMENTI
+8. Il sistema ottiene dal provider le informazioni personali del Membro
+9. Il sistema interroga il DBMS per verificare se esiste gi` a un Membro
+con il Codice Fiscale ricevuto
+10. Il sistema fa i controlli sul Codice Fiscale
+11. SE non esiste Membro con tale Codice Fiscale
+11.1. Il sistema interroga il DBMS per registrare il Membro con
+spidCode
+12. Il sistema autentica il Membro
+13. Il sistema mostra a video la schermata “HOME”
+PostcondizioneIl sistema ha mostrato a video la schermata “LOGIN” o “REGISTRATI”
+OPPURE
+Il sistema ha mostrato a video la schermata “HOME”
+Requisiti specialiLe informazioni personali sono composte da:
+Nome
+Cognome
+Email
+Codice Fiscale
+Data di nascita
+Luogo di nascita
+NoteSe il sistema registra il Membro con lo spid non ` e richiesto un OTP di
+verifica.
+Il Membro potr` a associare all’account appena creato una password per
+poter accedere senza l’uso di SPID attraverso il caso d’uso “MODIFICA
+PASSWORD”
+Caso D’usoAutenticazione con Identit` a digitale
+IDAUT MEM ID
+55
+
+===== PAGE 57 =====
+AttoriMembro AFAM, Provider Identit` a digitale, DBMS
+PrecondizioneIl sistema ha mostrato la schermata “LOGIN” oppure la schermata
+“REGISTRATI”
+Flusso degli eventi 1. Il Membro clicca sul pulsante “ENTRA CON SPID”
+2. Il sistema mostra un menu con i provider di identit` a digitale
+3. Il Membro seleziona il proprio provider
+4. Il sistema mostra a video la schermata di autenticazione del provider
+5. Il Membro si autentica
+6. SE l’autenticazione presso il provider non va a buon fine
+6.1 Il sistema mostra a video la schermata precedente
+6.2 Il sistema mostra a video l’errore: “Errore, impossibile con-
+tattare il provider”
+7. ALTRIMENTI
+8. Il sistema ottiene dal provider le informazioni personali del Membro
+9. Il sistema interroga il DBMS per verificare se esiste gi` a un Membro
+con il Codice Fiscale ricevuto
+10. Il sistema fa i controlli sul Codice Fiscale
+11. SE non esiste Membro con tale Codice Fiscale
+11.1 Il sistema interroga il DBMS per registrare il Membro con
+spidCode
+12. Il sistema autentica il Membro
+13. Il sistema mostra a video la schermata “HOME”
+PostcondizioneIl sistema ha mostrato a video la schermata “LOGIN” o “REGISTRATI”
+OPPURE
+Il sistema ha mostrato a video la schermata “HOME”
+Requisiti specialiLe informazioni personali sono composte da:
+Nome
+Cognome
+Email
+Codice Fiscale
+Data di nascita
+Luogo di nascita
+NoteSe il sistema registra il Membro con lo spid non ` e richiesto un OTP di
+verifica.
+Il Membro potr` a associare all’account appena creato una password per
+poter accedere senza l’uso di SPID attraverso il caso d’uso “MODIFICA
+PASSWORD”
+56
+
+===== PAGE 58 =====
+5 Requisiti Specifici
+5.1 Requisiti Funzionali
+ID Priorit` a
+Descrizione
+RF-1Alta Il sistema deve permettere l’accesso sicuro tramite credenziali.
+RF-2 Media Il sistema deve esportare i dati in formato PDF.
+RF-3Bassa Il sistema deve inviare una notifica di conferma.
+5.2 Requisiti Non Funzionali
+ciao
+57

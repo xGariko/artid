@@ -122,7 +122,11 @@
       "Bash(./mvnw -q compile)",
       "Bash(echo \"EXIT=$?\")",
       "PowerShell(python \"$env:TEMP\\\\artid_seed_upload.py\")",
-      "PowerShell(npm run check --prefix app/artid-client 2>&1)"
+      "PowerShell(npm run check --prefix app/artid-client 2>&1)",
+      "Bash(nslookup -type=mx artid.space)",
+      "Bash(nslookup -type=txt artid.space)",
+      "Bash(nslookup mail.artid.space)",
+      "Bash(./mvnw -q -DskipTests compile)"
     ]
   }
 }

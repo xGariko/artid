@@ -1,6 +1,6 @@
 import { fail, redirect } from "@sveltejs/kit";
 import type { Actions } from "./$types";
-import { login } from "$lib/auth.ts";
+import { establishSession } from "$lib/auth.ts";
 import { RegisterRequestSchema } from "$lib/models/schemas";
 
 type RegisterField =
@@ -64,7 +64,7 @@ export const actions: Actions = {
 			return fail(400, { errors, ...formState });
 		}
 
-		const { response } = await locals.api.POST("/api/auth/register", {
+		const { data, response } = await locals.api.POST("/api/auth/register", {
 			body: {
 				name,
 				surname,
@@ -86,12 +86,13 @@ export const actions: Actions = {
 			});
 		}
 
-		const result = await login(locals.api, cookies, { email, password });
-
-		if (!result.ok) {
+		// /register restituisce già un token: la registrazione apre la sessione direttamente,
+		// senza passare dall'OTP (a differenza del login). Senza token, ripiega sul login.
+		if (!data?.token) {
 			redirect(303, "/login");
 		}
 
+		establishSession(cookies, data);
 		redirect(303, "/dashboard");
 	},
 };
