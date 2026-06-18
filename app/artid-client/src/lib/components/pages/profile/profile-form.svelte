@@ -657,11 +657,13 @@
 				<span class="text-muted fst-italic"
 					>Digita <span class="fw-semibold">"Conferma chiusura"</span> per procedere</span
 				>
+				<hr>
+				<span class="text-muted fst-italic">Digita <span class="fw-semibold">"Elimina"</span> per procedere</span>
 				<ArtidInput
 					type="text"
 					name="confirm_close"
-					label="Conferma chisura"
-					placeholder="Conferma chisura"
+					label="Elimina"
+					placeholder="Elimina"
 					bind:value={elimina}
 					addClass="mb-2"
 				/>
