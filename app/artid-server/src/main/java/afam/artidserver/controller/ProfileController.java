@@ -93,6 +93,15 @@ public class ProfileController {
         }
         MockSpidIdentity spid = identity.get();
 
+        // Un'identità SPID può essere collegata a UN SOLO account ArtID. Se quel codice è già
+        // associato a un altro utente, rifiutiamo con 409 invece di creare un duplicato: due righe
+        // con lo stesso spid_code farebbero poi fallire il login SPID (findBySpidCode si aspetta un
+        // unico risultato). Il re-link sullo stesso account è ammesso (no-op).
+        Optional<User> alreadyLinked = userService.findBySpidCode(spid.username());
+        if (alreadyLinked.isPresent() && !alreadyLinked.get().getId().equals(principal.getId())) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        }
+
         // Carichiamo la riga completa così il save() non azzera i campi non toccati (es. propic_path).
         User user = userService.findById(principal.getId()).orElseThrow();
         // Nota RAD: le informazioni anagrafiche vengono sostituite con quelle del provider.

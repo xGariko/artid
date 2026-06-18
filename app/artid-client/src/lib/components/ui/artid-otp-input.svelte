@@ -126,14 +126,18 @@
 		font-weight: 600;
 		font-variant-numeric: tabular-nums;
 		color: var(--artid-text);
+		caret-color: var(--artid-primary);
 		background: var(--artid-section);
 		border: 1.5px solid var(--artid-border);
 		border-radius: 0.65rem;
-		transition: border-color 0.16s ease;
+		transition:
+			border-color 0.16s ease,
+			background-color 0.16s ease;
 	}
 
 	.otp__box.is-filled {
 		border-color: color-mix(in oklab, var(--artid-primary), transparent 45%);
+		background: color-mix(in oklab, var(--artid-primary-subtle), var(--artid-section) 55%);
 	}
 
 	.otp__box:focus {

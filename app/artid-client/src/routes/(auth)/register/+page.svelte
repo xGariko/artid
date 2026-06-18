@@ -2,6 +2,7 @@
 	import { enhance } from '$app/forms';
 	import { resolve } from '$app/paths';
 	import ArtidInput from '$lib/components/ui/artid-input.svelte';
+	import ArtidOtpInput from '$lib/components/ui/artid-otp-input.svelte';
 	import ArtidSpidButton from '$lib/components/ui/artid-spid-button.svelte';
 
 	import ArtidButton from '$lib/components/ui/artid-button.svelte';
@@ -56,20 +57,13 @@
 	<form method="POST" action="?/verify" class="auth-form" use:enhance={withLoading}>
 		<input type="hidden" name="email" value={form?.email ?? ''} />
 
-		<div class="row">
-			<div class="col-12 p-1">
-				<ArtidInput
-					name="code"
-					label="Codice di verifica"
-					bind:value={code}
-					inputmode="numeric"
-					maxlength={6}
-					autocomplete="one-time-code"
-					error={form?.codeError}
-				/>
-			</div>
+		<div class="p-1 mt-1">
+			<ArtidOtpInput name="code" bind:value={code} error={form?.codeError} autofocus />
 		</div>
 
+		{#if form?.codeError}
+			<div class="text-danger small text-center mt-2">{form.codeError}</div>
+		{/if}
 		{#if form?.resent}
 			<div class="text-success small text-center mt-2">Ti abbiamo inviato un nuovo codice.</div>
 		{/if}

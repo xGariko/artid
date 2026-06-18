@@ -356,7 +356,13 @@
 				}
 			});
 			if (!response.ok || !data) {
-				toast.error('Errore: impossibile contattare il provider');
+				if (response.status === 409) {
+					toast.error('Questa identità SPID è già collegata a un altro account ArtID');
+				} else if (response.status === 401) {
+					toast.error('Credenziali SPID non valide');
+				} else {
+					toast.error('Errore: impossibile contattare il provider');
+				}
 				return;
 			}
 			// L'anagrafica è stata sostituita dal provider: riallineo form e snapshot così il

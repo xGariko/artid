@@ -91,6 +91,14 @@ public class SpidAuthService {
             return Optional.empty();
         }
 
+        // Difesa contro la doppia associazione: nella finestra dell'OTP lo stesso spidCode potrebbe
+        // essere stato collegato altrove. Non creiamo un duplicato (l'indice unique su spid_code lo
+        // rifiuterebbe comunque, vedi V11); 401 indistinto come gli altri esiti incoerenti.
+        Optional<User> bySpid = userDAO.findBySpidCode(identity.username());
+        if (bySpid.isPresent() && !bySpid.get().getId().equals(user.getId())) {
+            return Optional.empty();
+        }
+
         user.setName(identity.name());
         user.setSurname(identity.surname());
         user.setBirthdate(identity.birthdate());
