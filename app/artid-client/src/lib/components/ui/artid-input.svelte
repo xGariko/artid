@@ -5,6 +5,7 @@
 		name,
 		label,
 		addClass,
+		placeholder,
 		error,
 		onChange
 	}: {
@@ -13,6 +14,7 @@
 		name: string;
 		label?: string;
 		addClass?: string;
+		placeholder?: string;
 		error?: string;
 		onChange?: (value: string | number | Date) => void;
 	} = $props();
@@ -27,7 +29,7 @@
 		class="form-control {addClass ?? ''} bg-artid-section outline-none rounded-1 {error
 			? 'is-invalid'
 			: ''}"
-		placeholder=""
+		placeholder={placeholder ?? ''}
 		onchange={(e) => onChange?.(e.currentTarget.value)}
 	/>
 	{#if label}

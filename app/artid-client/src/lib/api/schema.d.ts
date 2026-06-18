@@ -84,7 +84,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/resources": {
+    "/api/tags": {
         parameters: {
             query?: never;
             header?: never;
@@ -94,6 +94,38 @@ export interface paths {
         get: operations["findByUser"];
         put?: never;
         post: operations["create_1"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/resources": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["findByUser_1"];
+        put?: never;
+        post: operations["create_2"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/auth/verify-password": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["verifyPassword"];
         delete?: never;
         options?: never;
         head?: never;
@@ -139,9 +171,25 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get: operations["findByUser_1"];
+        get: operations["findByUser_2"];
         put?: never;
-        post: operations["create_2"];
+        post: operations["create_3"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/artids/{id}/resources": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["findResources"];
+        put?: never;
+        post: operations["addResource"];
         delete?: never;
         options?: never;
         head?: never;
@@ -308,22 +356,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/artids/{id}/resources": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["findResources"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/api/artids/count": {
         parameters: {
             query?: never;
@@ -335,6 +367,22 @@ export interface paths {
         put?: never;
         post?: never;
         delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/artids/{id}/resources/{resourceId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: operations["removeResourceFromArtid"];
         options?: never;
         head?: never;
         patch?: never;
@@ -437,6 +485,19 @@ export interface components {
         };
         AvatarResponse: {
             url?: string;
+        };
+        TagCreateRequest: {
+            title?: string;
+            color?: string;
+        };
+        TagResponse: {
+            /** Format: int64 */
+            id?: number;
+            title?: string;
+            color?: string;
+        };
+        VerifyPasswordRequest: {
+            password?: string;
         };
         RegisterRequest: {
             name?: string;
@@ -816,12 +877,56 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["ResourceResponse"][];
+                    "*/*": components["schemas"]["TagResponse"][];
                 };
             };
         };
     };
     create_1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["TagCreateRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["TagResponse"];
+                };
+            };
+        };
+    };
+    findByUser_1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ResourceResponse"][];
+                };
+            };
+        };
+    };
+    create_2: {
         parameters: {
             query?: never;
             header?: never;
@@ -845,6 +950,32 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["ResourceResponse"];
+                };
+            };
+        };
+    };
+    verifyPassword: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["VerifyPasswordRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": {
+                        [key: string]: boolean;
+                    };
                 };
             };
         };
@@ -897,7 +1028,7 @@ export interface operations {
             };
         };
     };
-    findByUser_1: {
+    findByUser_2: {
         parameters: {
             query?: never;
             header?: never;
@@ -917,7 +1048,7 @@ export interface operations {
             };
         };
     };
-    create_2: {
+    create_3: {
         parameters: {
             query?: never;
             header?: never;
@@ -938,6 +1069,52 @@ export interface operations {
                 content: {
                     "*/*": components["schemas"]["ArtidResponse"];
                 };
+            };
+        };
+    };
+    findResources: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ResourceResponse"][];
+                };
+            };
+        };
+    };
+    addResource: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": number;
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };
@@ -1149,28 +1326,6 @@ export interface operations {
             };
         };
     };
-    findResources: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["ResourceResponse"][];
-                };
-            };
-        };
-    };
     count_3: {
         parameters: {
             query?: never;
@@ -1188,6 +1343,27 @@ export interface operations {
                 content: {
                     "*/*": components["schemas"]["CountResponse"];
                 };
+            };
+        };
+    };
+    removeResourceFromArtid: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+                resourceId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };

@@ -41,7 +41,8 @@ public class ResourceService {
 
     private static final Logger logger = LoggerFactory.getLogger(ResourceService.class);
 
-    // Proiezione lightweight per le letture: solo metadati, niente byte. La dimensione ora
+    // Proiezione lightweight per le letture: solo metadati, niente byte. La
+    // dimensione ora
     // arriva dalla colonna file_size (i byte vivono su S3).
     private record FileMetadata(Long id, String fileName, String extension, String mimeType, Long fileSize) {
         static FileMetadata of(File f) {
@@ -50,7 +51,8 @@ public class ResourceService {
     }
 
     /** File scaricabile: metadati + contenuto recuperato da S3. */
-    public record DownloadableFile(String fileName, String mimeType, byte[] content) {}
+    public record DownloadableFile(String fileName, String mimeType, byte[] content) {
+    }
 
     public long countByUser(Long userId) {
         return resourceDAO.countByIdUserAndDeletedAtIsNull(userId);
@@ -62,14 +64,17 @@ public class ResourceService {
 
     /**
      * Materiali collegati a un ArtID. La proprietà è verificata nella query (vedi
-     * {@link afam.artidserver.dao.ResourceDAO#findByArtidForUser}): se l'ArtID non è dell'utente
-     * loggato la lista è vuota, e comunque tornano solo materiali suoi → niente accesso a dati altrui.
+     * {@link afam.artidserver.dao.ResourceDAO#findByArtidForUser}): se l'ArtID non
+     * è dell'utente
+     * loggato la lista è vuota, e comunque tornano solo materiali suoi → niente
+     * accesso a dati altrui.
      */
     public List<ResourceResponse> findByArtid(Long artidId, Long userId) {
         return toResponses(resourceDAO.findByArtidForUser(artidId, userId));
     }
 
-    // Mappa una lista di Resource in ResourceResponse, recuperando i metadati dei file collegati
+    // Mappa una lista di Resource in ResourceResponse, recuperando i metadati dei
+    // file collegati
     // in un'unica query batch (niente N+1).
     private List<ResourceResponse> toResponses(List<Resource> resources) {
         List<Long> fileIds = resources.stream()
@@ -80,7 +85,7 @@ public class ResourceService {
         Map<Long, FileMetadata> metadataById = fileIds.isEmpty()
                 ? Map.of()
                 : findFilesMetadata(fileIds).stream()
-                .collect(Collectors.toMap(FileMetadata::id, Function.identity()));
+                        .collect(Collectors.toMap(FileMetadata::id, Function.identity()));
 
         return resources.stream()
                 .map(r -> toResponse(r, r.getIdFile() != null ? metadataById.get(r.getIdFile()) : null))
@@ -92,7 +97,8 @@ public class ResourceService {
                 .filter(r -> userId.equals(r.getIdUser()) && r.getDeletedAt() == null && r.getIdFile() != null)
                 .flatMap(r -> fileDAO.findById(r.getIdFile()))
                 .filter(f -> f.getFilePath() != null)
-                .map(f -> new DownloadableFile(f.getFileName(), f.getMimeType(), storageService.download(f.getFilePath())));
+                .map(f -> new DownloadableFile(f.getFileName(), f.getMimeType(),
+                        storageService.download(f.getFilePath())));
     }
 
     @Transactional
@@ -120,10 +126,12 @@ public class ResourceService {
     }
 
     @Transactional
-    public Optional<ResourceResponse> update(Long resourceId, ResourceUpsertRequest request, MultipartFile file, Long userId) {
+    public Optional<ResourceResponse> update(Long resourceId, ResourceUpsertRequest request, MultipartFile file,
+            Long userId) {
         Optional<Resource> existing = resourceDAO.findById(resourceId)
                 .filter(r -> userId.equals(r.getIdUser()) && r.getDeletedAt() == null);
-        if (existing.isEmpty()) return Optional.empty();
+        if (existing.isEmpty())
+            return Optional.empty();
 
         Resource resource = existing.get();
         resource.setTitle(request.title());
@@ -131,10 +139,14 @@ public class ResourceService {
         resource.setFavorite(Boolean.TRUE.equals(request.favorite()));
         resource.setLastModified(OffsetDateTime.now());
 
-        // Se il file viene sostituito, teniamo da parte vecchio id e object key. Il record File
-        // vecchio va cancellato solo DOPO aver salvato resource col nuovo id_file, altrimenti la
-        // FK resource→file punta ancora al vecchio record e Postgres rifiuta il delete. L'oggetto
-        // su S3 lo eliminiamo solo a commit avvenuto: se la transazione fallisce il file resta.
+        // Se il file viene sostituito, teniamo da parte vecchio id e object key. Il
+        // record File
+        // vecchio va cancellato solo DOPO aver salvato resource col nuovo id_file,
+        // altrimenti la
+        // FK resource→file punta ancora al vecchio record e Postgres rifiuta il delete.
+        // L'oggetto
+        // su S3 lo eliminiamo solo a commit avvenuto: se la transazione fallisce il
+        // file resta.
         FileMetadata fileMeta;
         Long oldFileIdToDelete = null;
         String oldObjectKeyToDelete = null;
@@ -194,14 +206,14 @@ public class ResourceService {
                         rs.getString("file_name"),
                         rs.getString("extension"),
                         rs.getString("mime_type"),
-                        rs.getObject("file_size") != null ? rs.getLong("file_size") : null
-                )
-        );
+                        rs.getObject("file_size") != null ? rs.getLong("file_size") : null));
     }
 
     /**
-     * Carica i byte su S3 e registra il record File con la object key. Se la transazione
-     * dovesse fare rollback, l'oggetto appena caricato viene rimosso per non lasciare orfani.
+     * Carica i byte su S3 e registra il record File con la object key. Se la
+     * transazione
+     * dovesse fare rollback, l'oggetto appena caricato viene rimosso per non
+     * lasciare orfani.
      */
     private File saveFile(MultipartFile multipartFile) {
         String objectKey = storageService.newObjectKey(multipartFile.getOriginalFilename());
@@ -222,9 +234,11 @@ public class ResourceService {
         return fileDAO.save(file);
     }
 
-    // Cancella l'oggetto S3 solo dopo il commit della transazione (file sostituito o eliminato).
+    // Cancella l'oggetto S3 solo dopo il commit della transazione (file sostituito
+    // o eliminato).
     private void deleteObjectAfterCommit(String objectKey) {
-        if (objectKey == null) return;
+        if (objectKey == null)
+            return;
         if (!TransactionSynchronizationManager.isSynchronizationActive()) {
             safeDelete(objectKey);
             return;
@@ -237,9 +251,11 @@ public class ResourceService {
         });
     }
 
-    // Rimuove l'oggetto appena caricato se la transazione fa rollback (evita orfani su S3).
+    // Rimuove l'oggetto appena caricato se la transazione fa rollback (evita orfani
+    // su S3).
     private void deleteObjectOnRollback(String objectKey) {
-        if (objectKey == null || !TransactionSynchronizationManager.isSynchronizationActive()) return;
+        if (objectKey == null || !TransactionSynchronizationManager.isSynchronizationActive())
+            return;
         TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
             @Override
             public void afterCompletion(int status) {
@@ -250,7 +266,8 @@ public class ResourceService {
         });
     }
 
-    // La pulizia S3 è best-effort: un fallimento non deve propagarsi (il DB è già committato).
+    // La pulizia S3 è best-effort: un fallimento non deve propagarsi (il DB è già
+    // committato).
     private void safeDelete(String objectKey) {
         try {
             storageService.delete(objectKey);
@@ -259,15 +276,16 @@ public class ResourceService {
         }
     }
 
-    private void linkArtidResource(Long resourceId, Long artidId) {
+    @Transactional
+    public void linkArtidResource(Long resourceId, Long artidId) {
         jdbcTemplate.update(
                 "INSERT INTO artid_resource (id_resource, id, rank) VALUES (?, ?, 0)",
-                resourceId, artidId
-        );
+                resourceId, artidId);
     }
 
     private String extractExtension(String fileName) {
-        if (fileName == null) return null;
+        if (fileName == null)
+            return null;
         int dot = fileName.lastIndexOf('.');
         return dot > 0 && dot < fileName.length() - 1 ? fileName.substring(dot + 1) : null;
     }
@@ -286,7 +304,6 @@ public class ResourceService {
                 f != null ? f.extension() : null,
                 f != null ? f.mimeType() : null,
                 f != null ? f.fileSize() : null,
-                0L
-        );
+                0L);
     }
 }

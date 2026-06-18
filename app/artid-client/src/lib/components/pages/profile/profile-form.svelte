@@ -7,6 +7,7 @@
 	import 'quill/dist/quill.snow.css';
 	import type { Profile } from '$lib/api/types';
 	import ArtidSpidButton from '$lib/components/ui/artid-spid-button.svelte';
+	import ArtidEditorModal from '$lib/components/ui/artid-editor-modal.svelte';
 
 	let { profile }: { profile: Profile } = $props();
 
@@ -175,6 +176,7 @@
 		}
 	}
 
+
 	async function removePropic(): Promise<void> {
 		avatarBusy = true;
 		try {
@@ -239,6 +241,67 @@
 		} finally {
 			isSaving = false;
 		}
+	}
+
+	let isOpen = $state(false);
+	let password = $state('');
+	let elimina = $state('');
+
+	function deleteAccountModal() {
+		isOpen = true;
+		console.log('Close account');
+	}
+
+	async function deleteAccount(): Promise<void> {
+		if (!password.trim() || !elimina.trim()) {
+			toast.error('ERRORE: BISOGNA COMPILARE TUTTI I CAMPI!');
+			return;
+		}
+
+		if (elimina !== 'ELIMINA') {
+			toast.error('ERRORE: PER CONFERMARE DEVI DIGITARE ESATTAMENTE LA PAROLA ELIMINA');
+			return;
+		}
+
+		try {
+			// Chiamiamo l'endpoint POST che abbiamo creato su Spring, passando la password nel body
+			const verifyResponse = await api.POST('/api/auth/verify-password', {
+				body: { password: password }
+			});
+
+			// Leggiamo il booleano 'passwordCorretta' ritornato dal controller Java
+			const isPasswordValid = verifyResponse?.passwordCorretta ?? false;
+
+			// Punto 6.e: Se la password è sbagliata
+			if (!isPasswordValid) {
+				toast.error('Errore: Password Sbagliata');
+				return;
+			}
+
+			const deleteResponse = await api.DELETE(`/api/users/${userId}`);
+
+			if (!deleteResponse.ok) {
+				toast.error("Errore nella rimozione dell'account dal sistema");
+				return;
+			}
+
+			toast.success('ACCOUNT ELIMINATO CON SUCCESSO');
+
+			// Disconnetti l'utente localmente e rimandalo alla pagina WELCOME
+			logoutLocal();
+
+		} catch (e) {
+			// Gestione di crash di rete o errori del server
+			console.error(e);
+			toast.error(e instanceof Error ? e.message : 'Errore di rete o del server');
+		}
+	}
+
+	function logoutLocal() {
+		// Svuota i dati di sessione locali (localStorage, cookie, store di Svelte)
+		localStorage.removeItem('user_token');
+		// Se usi un router (es. svelte-routing, tinro, rutte), qui fai il push alla pagina "WELCOME"
+		// window.location.href = '/welcome';
 	}
 </script>
 
@@ -430,12 +493,55 @@
 			<ArtidButton
 				label="Chiudi account"
 				btnStyle="danger"
-				onclick={()=>{}}
+				onclick={deleteAccountModal}
 				fullWidth={false}
 			/>
 		</div>
 	</div>
 </div>
+
+<ArtidEditorModal bind:isOpen>
+	<div class="text-artid-primary fw-semibold new-artid-modal">
+		<i class="bi bi-folder2-open fs-5 text-primary"></i>
+		<span>CHIUDI ACCOUNT</span>
+		<div class="my-2">
+		</div>
+		<div class="my-2">
+			<ArtidInput
+				type="password"
+				name="password"
+				label="Password"
+				placeholder="Password"
+				bind:value={password}
+			/>
+			<ArtidInput
+				type="text"
+				name="elimina"
+				label="Elimina"
+				placeholder="Elimina"
+				bind:value={elimina}
+			/>
+ 		</div>
+		<div class="d-flex justify-content-end gap-2">
+			<ArtidButton
+				label="Chiudi"
+				fullWidth={false}
+				btnStyle="secondary"
+				outline={true}
+				disabled={isSaving}
+				onclick={() => (isOpen = false)}
+			/>
+			<ArtidButton
+				label="CONFERMA ELIMINAZIONE"
+				fullWidth={false}
+				btnStyle="success"
+				icon="check2"
+				disabled={isSaving}
+				onclick={deleteAccount}
+			/>
+		</div>
+	</div>
+</ArtidEditorModal>
 
 <style lang="scss">
 	.propic-btn {

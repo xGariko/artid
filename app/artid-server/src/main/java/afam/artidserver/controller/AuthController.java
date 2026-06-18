@@ -1,9 +1,6 @@
 package afam.artidserver.controller;
 
-import afam.artidserver.model.dto.AuthResponse;
-import afam.artidserver.model.dto.LoginRequest;
-import afam.artidserver.model.dto.RegisterRequest;
-import afam.artidserver.model.dto.UserResponse;
+import afam.artidserver.model.dto.*;
 import afam.artidserver.model.entity.User;
 import afam.artidserver.security.AuthenticatedUser;
 import afam.artidserver.security.JwtUtil;
@@ -21,6 +18,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import afam.artidserver.model.dto.VerifyPasswordRequest;
+import java.util.Map;
+import java.util.HashMap;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -89,5 +89,19 @@ public class AuthController {
                 user.getName(),
                 user.getSurname()
         ));
+    }
+
+    @PostMapping("/verify-password")
+    public ResponseEntity<Map<String, Boolean>> verifyPassword(
+            @AuthenticationPrincipal AuthenticatedUser principal,
+            @RequestBody VerifyPasswordRequest request) {
+
+        User user = principal.getUser();
+        boolean isCorrect = passwordEncoder.matches(request.getPassword(), user.getPasswordHash());
+
+        Map<String, Boolean> response = new HashMap<>();
+        response.put("passwordCorretta", isCorrect);
+
+        return ResponseEntity.ok(response);
     }
 }
