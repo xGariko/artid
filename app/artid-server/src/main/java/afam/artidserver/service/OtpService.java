@@ -69,7 +69,7 @@ public class OtpService {
         otp.setCreatedAt(now);
         loginOtpDAO.save(otp);
 
-        emailService.sendText(user.getMail(), SUBJECT, buildBody(user.getName(), code, expiresAt));
+        emailService.sendHtml(user.getMail(), SUBJECT, buildBody(user.getName(), code, expiresAt));
         return expiresAt;
     }
 
@@ -120,9 +120,11 @@ public class OtpService {
     }
 
     private String buildBody(String name, String code, OffsetDateTime expiresAt) {
-        String greetingName = (name == null || name.isBlank()) ? "Membro" : name;
-        return "Salve " + greetingName + ", ecco il codice d'accesso OTP: " + code + ". Il codice "
-                + "sarà valido fino alle " + EXPIRY_TIME_FORMAT.format(expiresAt) + ", non "
-                + "condividerlo con nessuno. SE NON SEI STATO TU A RICHIEDERLO NON FARE NULLA.";
+        return OtpEmailTemplate.render(
+                name,
+                code,
+                EXPIRY_TIME_FORMAT.format(expiresAt),
+                "Il tuo codice di accesso",
+                "usa questo codice per accedere al tuo account ArtID.");
     }
 }

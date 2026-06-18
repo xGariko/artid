@@ -126,7 +126,29 @@
       "Bash(nslookup -type=mx artid.space)",
       "Bash(nslookup -type=txt artid.space)",
       "Bash(nslookup mail.artid.space)",
-      "Bash(./mvnw -q -DskipTests compile)"
+      "Bash(./mvnw -q -DskipTests compile)",
+      "Bash(grep -Ei \"verify-password|api\\\\\\\\\\\\\\\\users|api\\\\\\\\\\\\\\\\auth|users\\\\\\\\\\\\\\\\\\\\[id\\\\]\")",
+      "Bash(rm -rf resources artids profile/avatar auth)",
+      "Read(//c/c/progetti/artid/app/artid-client/src/routes/**)",
+      "Bash(grep -Ei \"routes\\\\\\\\\\\\\\\\api|\\\\[\\\\.\\\\.\\\\.path\\\\]|COMPLETED\")",
+      "Bash(./mvnw -q -DskipTests -o compile)",
+      "Bash(echo \"exit=$?\")",
+      "Read(//tmp/**)",
+      "Bash(echo \"backend exit=$?\")",
+      "Bash(grep -Ei \"users\\\\\\\\\\\\\\\\\\\\[id\\\\]|auth\\\\.ts|COMPLETED\")",
+      "Bash(py --version)",
+      "Bash(pandoc --version)",
+      "Bash(wkhtmltopdf --version)",
+      "Bash(python -c \"import weasyprint; print\\('weasyprint', weasyprint.__version__\\)\")",
+      "Bash(python -c \"import markdown; print\\('markdown ok'\\)\")",
+      "Bash(python -c \"import reportlab; print\\('reportlab', reportlab.Version\\)\")",
+      "Read(//c/Program Files \\(x86\\)/Microsoft/Edge/Application/**)",
+      "Read(//c/Program Files \\(x86\\)/Google/Chrome/Application/**)",
+      "Read(//c/Users/Gabriele Iovino/Downloads/**)",
+      "Bash(python -c 'from pypdf import PdfReader; print\\('\\\\''pagine:'\\\\'', len\\(PdfReader\\(r'\\\\''/c/Users/Gabriele Iovino/Downloads/Integrazione-FE-BE-artid.pdf'\\\\''\\).pages\\)\\)')",
+      "mcp__visualize__read_me",
+      "mcp__visualize__show_widget",
+      "PowerShell(Get-ChildItem app\\\\artid-server\\\\target\\\\classes\\\\afam\\\\artidserver\\\\service\\\\ -Name | Where-Object { $_ -match 'Email|Otp' } | Sort-Object)"
     ]
   }
 }
