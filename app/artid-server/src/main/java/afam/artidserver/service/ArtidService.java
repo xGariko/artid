@@ -4,6 +4,9 @@ import afam.artidserver.dao.ArtidDAO;
 import afam.artidserver.model.dto.ArtidResponse;
 import afam.artidserver.model.entity.Artid;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,6 +19,8 @@ import java.util.Optional;
 public class ArtidService {
 
     private final ArtidDAO artidDAO;
+    private final JdbcTemplate jdbcTemplate;
+    private final NamedParameterJdbcTemplate namedJdbcTemplate;
 
     public long countByUser(Long userId) {
         return artidDAO.countByIdUserAndDeletedAtIsNull(userId);
@@ -26,6 +31,16 @@ public class ArtidService {
                 .stream()
                 .map(ArtidService::toResponse)
                 .toList();
+    }
+
+    @Transactional
+    public boolean delete(Long id, Long userId) {
+        return artidDAO.findById(id).filter(artid -> userId.equals(artid.getIdUser())).map(artid -> {
+            jdbcTemplate.update("DELETE FROM artid_resource WHERE id = ?", id);
+            // TODO delete condivisioni
+            artidDAO.deleteById(id);
+            return true;
+        }).orElse(false);
     }
 
     /**
@@ -64,10 +79,12 @@ public class ArtidService {
         return toResponse(artidDAO.save(artid));
     }
 
-    // @Transactional
-    // public void addResource(Long id, Long resourceId) {
-    // artidDAO.addResourceToArtid(id, resourceId);
-    // }
+    @Transactional
+    public void linkArtidResource(Long id, Long resourceId) {
+        jdbcTemplate.update(
+                "INSERT INTO artid_resource (id_resource, id, rank) VALUES (?, ?, 0)",
+                resourceId, id);
+    }
 
     private static ArtidResponse toResponse(Artid a) {
         return new ArtidResponse(

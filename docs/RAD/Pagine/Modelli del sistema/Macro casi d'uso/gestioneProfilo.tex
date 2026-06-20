@@ -59,7 +59,7 @@
 \rigaTabella{Precondizione}{Il sistema ha mostrato la schermata ``GESTIONE PROFILO''}
 \rigaTabella{Flusso degli eventi}{\begin{enumerate}
     \item Il Membro immette le nuove informazioni
-    \item Il Membro clicca il pulsante ``SALVA''
+    \item Il Membro clicca il pulsante ``SALVA'' \label{Salva informazioni}
     \item Il sistema controlla se la data di nascita \`e superiore a quella corrente
     \item \textbf{FINCH\'E} la data di nascita \`e superiore a quella corrente:
     \begin{enumerate}
@@ -72,6 +72,15 @@
     \item Il sistema mostra il messaggio: ``Informazioni aggiornate con successo''
     \item Il sistema mostra la schermata ``GESTIONE PROFILO'' aggiornata
 \end{enumerate}
+}
+\rigaTabella{Sequenza alternative}{
+    \begin{enumerate}[start=2]
+        \item Il Membro clicca sull'immagine profilo
+        \item Il sistema mostra l'esplora file del dispositivo su cui si trova il Membro
+        \item Il Membro seleziona l'immagine da caricare
+        \item Il sistema interroga il DBMS per aggiornare l'immagine del profilo
+    \end{enumerate}
+    Il flusso riprende dal punto \ref{Salva informazioni}
 }
 \rigaTabella{Postcondizione}{Il sistema ha mostrato la schermata ``GESTIONE PROFILO'' aggiornata}
 \rigaTabella{Requisiti Speciali}{I dati informativi che compongono il profilo sono:

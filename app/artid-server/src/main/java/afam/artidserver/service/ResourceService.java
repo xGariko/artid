@@ -36,6 +36,7 @@ public class ResourceService {
     private final ResourceDAO resourceDAO;
     private final FileDAO fileDAO;
     private final StorageService storageService;
+    private final ArtidService artidService;
     private final JdbcTemplate jdbcTemplate;
     private final NamedParameterJdbcTemplate namedJdbcTemplate;
 
@@ -120,7 +121,7 @@ public class ResourceService {
         Resource saved = resourceDAO.save(resource);
 
         if (request.artidId() != null) {
-            linkArtidResource(saved.getId(), request.artidId());
+            artidService.linkArtidResource(request.artidId(), saved.getId());
         }
         return toResponse(saved, FileMetadata.of(savedFile));
     }
@@ -165,10 +166,11 @@ public class ResourceService {
         }
         Resource saved = resourceDAO.save(resource);
 
+        // TODO rivedere logica
         // Il design corrente vincola un materiale a un solo ArtID → wipe+insert.
         jdbcTemplate.update("DELETE FROM artid_resource WHERE id_resource = ?", saved.getId());
         if (request.artidId() != null) {
-            linkArtidResource(saved.getId(), request.artidId());
+            artidService.linkArtidResource(request.artidId(), saved.getId());
         }
 
         if (oldFileIdToDelete != null) {
@@ -274,13 +276,6 @@ public class ResourceService {
         } catch (RuntimeException e) {
             logger.warn("Impossibile eliminare l'oggetto S3 '{}': {}", objectKey, e.getMessage());
         }
-    }
-
-    @Transactional
-    public void linkArtidResource(Long resourceId, Long artidId) {
-        jdbcTemplate.update(
-                "INSERT INTO artid_resource (id_resource, id, rank) VALUES (?, ?, 0)",
-                resourceId, artidId);
     }
 
     private String extractExtension(String fileName) {

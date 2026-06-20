@@ -12,6 +12,7 @@
 	import ArtidAddMaterialsModal from '$lib/components/pages/artid/artid-add-materials-modal.svelte';
 	import type { ResourceResponse } from '$lib/api/types';
 	import { toast } from 'svelte-sonner';
+	import { api } from '$lib/api/browser-client';
 
 	const id = $derived(page.params.id);
 
@@ -114,23 +115,21 @@
 	let isOpen = $state(false);
 
 	let isDeleting = $state(false);
-	// Funzione per eliminare il materiale
+	// Funzione per rimuovere il materiale dall'artid
 	async function handleDeleteMaterial(materialId: number) {
 		if (isDeleting) return;
 
 		isDeleting = true;
 
 		try {
-			const response = await fetch(`/api/artids/${Number(id)}/resources/${materialId}`, {
-				method: 'DELETE'
-			});
+			const response = await api.DELETE('/api/artids/{id}/resources/{resourceId}', {params:{path:{id: Number(id), resourceId: materialId}}})
 
-			if (response.ok) {
+			if(!response.error){
 				draggableMaterials = draggableMaterials.filter((m) => m.id !== materialId);
-			} else if (response.status === 404) {
-				toast.error('Errore durante la cancellazione del materiale');
-			} else {
-				toast.error('Si è verificato un errore durante la cancellazione');
+				toast.success("Materiale rimosso con successo")
+
+			}else{
+				toast.error('Errore durante la rimozione del materiale');
 			}
 		} catch {
 			toast.error('Errore di rete');
@@ -138,6 +137,22 @@
 			isDeleting = false;
 		}
 	}
+
+	async function handleDelete(){
+		try {
+			const response = await api.DELETE('/api/artids/{id}', {params: {path: {id: Number(id)}}})
+
+			if(!response.error){
+				toast.success("ArtId cancellato con successo");
+				await goto(resolve("/(app)/artid"));
+			}else{
+				toast.error('Errore durante la cancellazione dell\'artid');
+			}
+		} catch  {
+			toast.error("Errore di rete")
+		}
+	}
+
 </script>
 
 <div class="w-100 h-100 d-flex flex-column align-items-center gap-4 p-5">
@@ -166,7 +181,7 @@
 				</div>
 			</div>
 			<div class="col-6 d-flex align-items-center justify-content-between">
-				<ArtidButton icon="trash" fullWidth={false} btnStyle="danger" outline={true} />
+				<ArtidButton icon="trash" fullWidth={false} btnStyle="danger" outline={true} onclick={handleDelete}/>
 				<div style="padding-right: calc(var(--bs-gutter-x)*0.5);">
 					<ArtidButton
 						label="Anteprima"
