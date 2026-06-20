@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { invalidateAll } from '$app/navigation';
+	import { api } from '$lib/api/browser-client';
 	import type { ResourceResponse } from '$lib/api/types';
 	import ArtidButton from '$lib/components/ui/artid-button.svelte';
 	import ArtidEditorModal from '$lib/components/ui/artid-editor-modal.svelte';
@@ -50,31 +51,18 @@
 	async function handleSubmit() {
 		isSaving = true;
 		try {
-			// const results = await Promise.all(
-			// 	[...selectedMaterialsIds].map((materialId) =>
-			// 		api.POST('/api/artids/{id}/resources', {
-			// 			params: { path: { id: artidId } },
-			// 			body: materialId
-			// 		})
-			// 	)
-			// );
-
 			const results = await Promise.all(
-				[...selectedMaterialsIds].map(async (materialId) => {
-					const response = await fetch(`/api/artids/${artidId}/resources`, {
-						method: 'POST',
-						headers: {
-							'Content-Type': 'application/json'
-						},
-						body: JSON.stringify(materialId)
-					});
-					return response;
-				})
+				[...selectedMaterialsIds].map((materialId) =>
+					api.POST('/api/artids/{id}/resources', {
+						params: { path: { id: artidId } },
+						body: materialId
+					})
+				)
 			);
 
 			await invalidateAll();
-			if (results.some((r) => !r.ok)) {
-				toast.error('Errore nel caricamento di qualche risorsa');
+			if (results.some((r) => r.error)) {
+				toast.error('Errore nel caricamento delle risorse');
 			} else {
 				toast.success('Risorse caricate con successo');
 			}
@@ -143,7 +131,7 @@
 	}
 </script>
 
-<ArtidEditorModal bind:isOpen>
+<ArtidEditorModal bind:isOpen customHeight="60" customWidth="50">
 	<div class="d-flex flex-column gap-4 resource-editor pt-1">
 		<div class="d-flex align-items-center gap-2 text-artid-primary fw-semibold">
 			<i class="bi bi-plus-lg fs-5 text-primary"></i>
@@ -257,7 +245,7 @@
 
 <style lang="scss">
 	.resource-editor {
-		width: min(48rem, 92vw);
+		width: 100%;
 		min-height: min(48rem, 50vh);
 		max-height: min(48rem, 50vh);
 	}

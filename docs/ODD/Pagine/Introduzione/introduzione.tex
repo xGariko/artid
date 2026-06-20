@@ -5,17 +5,34 @@
 \subsection{Prestazioni e costi}
 Per la realizzazione di ArtID sono state impiegate esclusivamente \textbf{tecnologie e librerie open source}, minimizzando i tempi e i costi di sviluppo e di esercizio e ottenendo al contempo prestazioni adeguate al dominio applicativo.
 
-A differenza di sistemi che richiedono hardware specializzato, ArtID è pensata come \textbf{applicazione web} e non necessita di risorse di calcolo dedicate: il carico è dominato da operazioni di I/O verso il database e verso lo storage. Il livello di Front-End è distribuibile su piattaforma serverless (Vercel, tramite l'adapter dedicato), il livello di Back-End gira su una JVM standard e la persistenza relazionale è affidata a PostgreSQL; i contenuti binari sono delegati al servizio di object storage AWS S3, evitando i costi e la complessità di un'infrastruttura di archiviazione proprietaria.
+A differenza di sistemi che richiedono hardware specializzato, ArtID è pensata come \textbf{applicazione web} e non necessita di risorse di calcolo dedicate: il carico è dominato da operazioni di I/O verso il database e verso lo storage. Il livello di Front-End è distribuibile su piattaforma serverless (Vercel, tramite l'adapter dedicato), il livello di Back-End gira su una JVM standard e la persistenza relazionale è affidata a PostgreSQL; i contenuti multimediali sono delegati al servizio di object storage AWS S3, evitando i costi e la complessità di un'infrastruttura di archiviazione proprietaria.
 
 \subsection{Tempi di risposta}
 I tempi di risposta delle operazioni CRUD sono nell'ordine di pochi secondi e tendono a crescere con l'aumentare dei dati nel database; sono mitigati da indicizzazione, conteggi aggregati e pooling delle connessioni. I tempi di caricamento e download dei file dipendono dalla loro dimensione e dal round-trip verso l'object storage; per il download dei file multimediali si impiegano URL firmati (presigned), così che i byte transitino direttamente tra browser e storage senza gravare sul nodo Back-End. ArtID non presenta latenze imprevedibili: tutte le operazioni hanno un costo sostanzialmente deterministico, funzione della dimensione dei contenuti.
 
 \subsection{Overview del sistema}
-Il sistema si divide in due package principali:
-\begin{itemize}[itemsep=-6pt]
-    \item \textbf{Front-End:} implementa il lato \textbf{View} del modello MVC adottato in fase di analisi, con una parte di \textbf{Controller} il cui obiettivo è prevenire che utenti non esperti effettuino involontariamente operazioni non consentite.
-    \item \textbf{Back-End:} implementa il lato \textbf{Controller} vero e proprio e il lato \textbf{Model} del modello MVC adottato in fase di analisi.
+% Il sistema si divide in due package principali:
+% \begin{itemize}[itemsep=-6pt]
+%     \item \textbf{Front-End:} implementa il lato \textbf{View} del modello MVC adottato in fase di analisi, con una parte di \textbf{Controller} il cui obiettivo è prevenire che utenti non esperti effettuino involontariamente operazioni non consentite.
+%     \item \textbf{Back-End:} implementa il lato \textbf{Controller} vero e proprio e il lato \textbf{Model} del modello MVC adottato in fase di analisi.
+% \end{itemize}
+
+Il sistema \`e strutturato secondo una scomposizione fisica e logica in due macro-package principali distribuiti su un'architettura Client-Server a 5 livelli (\textit{5-Tier Architecture}), che evolve e mappa i concetti del pattern \textit{Entity-Control-Boundary} definito in fase di analisi:
+
+\begin{itemize}
+    \item \textbf{Front-End (Nodo Client):} Sviluppato mediante il framework \textit{SvelteKit}, ospita i primi due livelli dell'architettura:
+    \begin{itemize}
+        \item \textit{Presentation Layer (Boundary):} Gestisce il rendering delle interfacce grafiche e la cattura degli eventi utente.
+        \item \textit{Controller Layer - Client:} Implementa una prima logica di controllo decentralizzata, deputata alla gestione dello stato locale dell'applicazione, al routing e alla validazione formale immediata dell'input, al fine di prevenire l'invio di richieste inconsistenti verso il server.
+    \end{itemize}
+    
+    \item \textbf{Back-End (Nodo Server):} Sviluppato mediante il framework \textit{Java Spring Boot}, centralizza la logica di business e la persistenza dei dati, articolandosi in tre livelli logici:
+    \begin{itemize}
+        \item \textit{REST Controller Layer:} Espone le API RESTful del sistema, intercettando i payload HTTP/HTTPS provenienti dal client e validandone la struttura formale.
+        \item \textit{Service Layer (Control centrale):} Custodisce i componenti di controllo centrali in cui risiede la core business logic del sistema (es. gestione delle transazioni, orchestrazione dei flussi di autenticazione e vincoli di integrit\`a).
+\item \textit{DAO Layer (Data Access Object / Repository):} Incapsula i pattern di persistenza delle \textit{Entity} di dominio, interfacciandosi direttamente con il \textit{DBMS}. \textbf{In questo livello, l'adozione dell'architettura \textit{Repository} (tramite Spring Data) si giustifica per elevare il livello di astrazione, permettendo al Service Layer di trattare i dati come collezioni di oggetti in memoria ed isolando completamente la logica di business dai dettagli implementativi del database relazionale.}    \end{itemize}
 \end{itemize}
+
 
 \subsection{Sviluppo Front-End}
 L'interfaccia di ArtID privilegia semplicità e immediatezza: grazie a un layout lineare, essenziale e responsive, consente la migliore interazione possibile anche a un'utenza priva di competenze tecniche avanzate. Ove possibile, errori e messaggi rivolti all'utente sono resi non bloccanti — tramite notifiche toast — per non interrompere il flusso di lavoro.
@@ -43,8 +60,11 @@ L'applicazione è sviluppata con \textbf{SvelteKit} (Svelte 5, modalità Runes) 
 
 \subsection{Sviluppo Back-End}
 
-Lo sviluppo lato server adotta \textbf{Spring Boot 4} su \textbf{Java 17}, con architettura a strati (controller → service → dao) che separa nettamente l'esposizione delle API, la logica di business e l'accesso ai dati. Le API sono REST e \textbf{stateless}: ogni richiesta è autenticata in modo indipendente tramite token JWT, abilitando la scalabilità orizzontale del lato Back-End del sistema.
-La persistenza relazionale è gestita con \textbf{Spring Data JDBC} e, dove servono query o aggregazioni puntuali, con JdbcTemplate/NamedParameterJdbcTemplate; i contenuti binari sono delegati a un object storage S3-compatibile. La specifica \textbf{OpenAPI} (springdoc) costituisce il contratto condiviso dal quale il client genera i propri tipi, garantendo coerenza end-to-end. La sicurezza è gestita da Spring Security (filtro JWT, codifica BCrypt); il boilerplate è ridotto con Lombok.
+Lo sviluppo lato server adotta \textbf{Spring Boot 4} su piattaforma \textbf{Java 17}, strutturandosi secondo un'architettura a strati (\texttt{Controller} $\rightarrow$ \texttt{Service} $\rightarrow$ \texttt{DAO}) che separa nettamente l'esposizione delle API, la logica di business e l'accesso ai dati.
+
+Le API sono di tipo REST e \textit{stateless}: ogni richiesta viene autenticata in modo indipendente tramite token \textbf{JWT} (JSON Web Token), abilitando la scalabilit\`a orizzontale del Back-End del sistema. La persistenza relazionale \`e gestita in modo snello con \textbf{Spring Data JDBC} e, dove si rendono necessarie query o aggregazioni puntuali, tramite l'ausilio di \texttt{JdbcTemplate} e \texttt{NamedParameterJdbcTemplate}; l'archiviazione dei contenuti binari e dei file multimediali \`e invece delegata a un \textbf{object storage S3-compatibile}.
+
+La specifica \textbf{OpenAPI} (generata mediante \textit{springdoc-openapi}) costituisce il contratto formale e condiviso dal quale il client genera programmaticamente i propri tipi e modelli di dato, garantendo una coerenza \textit{end-to-end} tra i due nodi. La sicurezza dell'applicazione \`e interamente governata da \textbf{Spring Security} tramite un filtro di intercettazione per i token JWT e l'algoritmo \textbf{BCrypt} per la codifica delle password, mentre l'utilizzo di \textit{Lombok} riduce drasticamente il codice boilerplate all'interno delle classi di dominio.
 
 \subsubsection{Librerie Back-End}
 
@@ -52,15 +72,16 @@ La persistenza relazionale è gestita con \textbf{Spring Data JDBC} e, dove serv
 \begin{tabularx}{\textwidth}{|c|c|X|}
 \hline
 \headerTabellaLib{Libreria}{Versione}{Ruolo}
-\rigaTabellaLib{spring-boot-starter-web}{4.0}{MVC REST, server embedded, serializzazione JSON.}
-\rigaTabellaLib{spring-boot-starter-data-jdbc}{4.0}{Repository e mapping relazionale (Spring Data JDBC).}
-\rigaTabellaLib{spring-boot-starter-jdbc}{4.0}{JdbcTemplate, datasource e gestione delle transazioni.}
-\rigaTabellaLib{spring-boot-starter-security}{4.0}{Autenticazione, autorizzazione e catena di filtri.}
+\rigaTabellaLib{spring-boot-starter-web}{4.0.6}{Dispatching delle richieste HTTP sul REST Controller Layer tramite l'infrastruttura di Spring MVC, server embedded Tomcat e serializzazione JSON.}
+\rigaTabellaLib{spring-boot-starter-data-jdbc}{4.0.6}{Repository e mapping relazionale (Spring Data JDBC).}
+\rigaTabellaLib{spring-boot-starter-jdbc}{4.0.6}{JdbcTemplate, datasource e gestione delle transazioni.}
+\rigaTabellaLib{spring-boot-starter-security}{4.0.6}{Autenticazione, autorizzazione e catena di filtri.}
+\rigaTabellaLib{spring-boot-starter-mail}{4.0.6}{Servizio di astrazione per la composizione e l'invio asincrono di e-mail.}
 \rigaTabellaLib{postgresql}{runtime}{Driver JDBC per PostgreSQL.}
 \rigaTabellaLib{jjwt (api/impl/jackson)}{0.12.6}{Generazione e verifica dei token JWT.}
 \rigaTabellaLib{springdoc-openapi-starter-webmvc-ui}{2.8.8}{Esposizione della specifica OpenAPI e Swagger UI.}
 \rigaTabellaLib{software.amazon.awssdk:s3}{2.31}{Client S3 per l'object storage (Supabase Storage).}
-\rigaTabellaLib{lombok}{—}{Riduzione del boilerplate (@Data, @RequiredArgsConstructor).}
+\rigaTabellaLib{lombok}{—}{Riduzione del boilerplate (\texttt{@Data}, \texttt{@RequiredArgsConstructor}).}
 \rigaTabellaLib{spring-boot-devtools}{runtime}{Hot reload in fase di sviluppo.}
 \end{tabularx}
 
@@ -74,17 +95,18 @@ Le interfacce sono realizzate con \textbf{SvelteKit} e \textbf{Bootstrap}, con l
 La componentizzazione (organizzata nella cartella \texttt{lib/components} e suddivisa in primitive UI, componenti di pagina ed elementi di layout) favorisce il riuso e l'uniformità visiva, mentre l'impiego di stili condivisi assicura un design moderno e responsive su dispositivi desktop.
 
 \subsection{Linee guida per la documentazione del DBMS}
-Il DBMS scelto è \textbf{PostgreSQL}, nel deployment corrente erogato come servizio gestito da \textbf{Supabase}. 
+Il DBMS scelto \`e \textbf{PostgreSQL}, erogato nel deployment corrente come servizio gestito sulla piattaforma \textbf{Supabase}. Il database garantisce intrinsecamente il pieno rispetto delle propriet\`a \textbf{ACID} (Atomicity, Consistency, Isolation, Durability) per tutte le transazioni di sistema.
 
-\noindent
-Le caratteristiche principali della gestione dei dati includono:
+Le caratteristiche principali legate alla gestione e alla sicurezza dei dati includono:
 \begin{itemize}
-    \item \textbf{Interazione e Sicurezza:} Avviene tramite Spring Data JDBC e query parametrizzate come protezione da SQL injection, nel rispetto delle proprietà ACID.
-    \item \textbf{Controllo degli Accessi:} L'accesso al database è mediato esclusivamente dal nodo Back-End, che si connette con un'utenza dedicata; il client non interroga mai direttamente il database.
+    \item \textbf{Interazione e Sicurezza:} L'interfacciamento con il database avviene mediante il framework \textit{Spring Data JDBC}. L'esecuzione di query unicamente parametrizzate (precompilate tramite\\ \texttt{NamedParameterJdbcTemplate}) azzera completamente il rischio di vulnerabilit\`a da \textit{SQL Injection}.
+    \item \textbf{Controllo degli Accessi ed Isolamento:} Il livello di persistenza \`e rigorosamente segregato. L'accesso al database \`e mediato in via esclusiva dal nodo \textit{Back-End}, il quale si connette tramite credenziali dedicate e cifrate. Il client non possiede alcun canale di comunicazione diretto verso il DBMS, mitigando i vettori di attacco esterni.
+    \item \textbf{Prevenzione degli Accessi Indiretti (IDOR):} Si evidenzia una scelta di progettazione di sicurezza non visibile nei diagrammi di sequenza del RAD (dove le firme dei metodi includono solo gli ID delle risorse, es. \texttt{idArtid}). Nel codice effettivo, ogni operazione di lettura o scrittura sul database (es. eliminazione o dettaglio) riceve sempre l'ID del membro autenticato (\texttt{@AuthenticationPrincipal}) iniettato automaticamente tramite JWT. Il \textit{Service Layer} propaga questo ID al database per validare la reale proprietà della risorsa prima di eseguire la query, garantendo a runtime la protezione da vulnerabilità di tipo \textit{Insecure Direct Object Reference}.
 \end{itemize}
 
-\noindent
-Per il dettaglio dello schema entità-relazione e del modello relazionale si rimanda al \textit{System Design Document} (§3.6).
+I parametri di connessione e autenticazione verso l'istanza remota di Supabase sono centralizzati interamente all'interno del file \texttt{application.properties} del backend (\texttt{src/main/resources/}). Questa scelta garantisce il totale disaccoppiamento tra la logica dei componenti \textit{DAO} e l'infrastruttura di rete.
+
+Per il dettaglio dello schema entit\`a-relazione (ER) e del relativo modello relazionale si rimanda alle sezioni dedicate all'interno del \textit{System Design Document} (§3.6).
 
 \subsection{Linee guida per la documentazione dello storage dei file}
 Per la persistenza dei contenuti binari (materiali, attestati e immagini di profilo) è impiegato un servizio di \textbf{object storage S3-compatibile} — nel deployment corrente \textbf{Supabase Storage} — interrogato tramite l'\textit{AWS SDK for Java v2}. La comunicazione avviene su HTTPS verso un servizio specializzato esterno, mantenendo il sistema modulare e scalabile e sgravando il DBMS dalla gestione dei BLOB.
@@ -100,4 +122,26 @@ Per la persistenza dei contenuti binari (materiali, attestati e immagini di prof
 
 
 
-% \subsection{Linee guida per la documentazione delle interfacce}
+\subsection{Convenzioni di Nomenclatura e Mappatura delle Entità}
+Al fine di massimizzare la chiarezza descrittiva e garantire la piena tracciabilità tra la fase di analisi concettuale (RAD) e l'effettiva implementazione software, nel presente documento è stata adottata una convenzione linguistica ibrida:
+\begin{itemize}
+    \item \textbf{Analisi e Diagrammi:} I componenti di analisi (\textit{Boundary, Control, Entity}), le descrizioni dei casi d'uso e i messaggi scambiati all'interno dei diagrammi di sequenza utilizzano la \textbf{lingua italiana} per facilitare la comprensione concettuale dei flussi.
+    \item \textbf{Codice Sorgente:} L'implementazione effettiva del software (classi, firme dei metodi, rotte API e tabelle del DBMS) è interamente sviluppata in \textbf{lingua inglese}, in conformità con le \textit{best practice} globali dell'ingegneria del software.
+\end{itemize}
+
+Di seguito viene riportata la corrispondenza terminologica tra le entità descritte nel modello di analisi e le rispettive classi Java/tabelle del database relazionale:
+
+\vspace{0.3cm}
+\arrayrulecolor{SlateGray}
+\begin{tabularx}{\textwidth}{|c|X|}
+\hline
+\headerTabella{Oggetti Entità (RAD)}{Classe Java / Tabella DB (Codice)}
+\rigaTabella{Membro}{ \texttt{User} }
+\rigaTabella{ArtID}{ \texttt{Artid} }
+\rigaTabella{Materiale}{ \texttt{Resource} / \texttt{File} \newline \textit{(Scissa tra i metadati logici della risorsa e l'asset fisico su Supabase S3)} }
+\rigaTabella{Certificato}{ \texttt{Certification} }
+\rigaTabella{Token}{ \texttt{ExternalShare} }
+\rigaTabella{Condivisione}{ \texttt{InternalShare} }
+\hline
+\end{tabularx}
+\vspace{0.3cm}

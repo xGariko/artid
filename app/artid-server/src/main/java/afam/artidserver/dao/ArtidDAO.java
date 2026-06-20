@@ -24,7 +24,7 @@ public interface ArtidDAO extends ListCrudRepository<Artid, Long> {
 
     @Modifying
     @Query("""
-            DELETE FROM artid_resources
+            DELETE FROM artid_resource
             WHERE id = :artidId AND id_resource = :resourceId
             """)
     int removeResourceByResourceId(@Param("artidId") Long id, @Param("resourceId") Long resourceId);

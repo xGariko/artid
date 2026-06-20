@@ -462,7 +462,7 @@ export interface paths {
         get: operations["findById"];
         put?: never;
         post?: never;
-        delete?: never;
+        delete: operations["delete_2"];
         options?: never;
         head?: never;
         patch?: never;
@@ -1635,6 +1635,26 @@ export interface operations {
                 content: {
                     "*/*": components["schemas"]["ArtidResponse"];
                 };
+            };
+        };
+    };
+    delete_2: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };

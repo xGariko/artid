@@ -27,3 +27,4 @@ export type PublicProfile = Schemas["PublicProfileResponse"];
 export type PublicProfileDetail = Schemas["PublicProfileDetailResponse"];
 export type PublicArtidSummary = Schemas["PublicArtidSummaryResponse"];
 export type PublicCertification = Schemas["PublicCertificationResponse"];
+export type certificationResponse = Schemas["certificationResponse"];

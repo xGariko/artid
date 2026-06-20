@@ -279,6 +279,34 @@ I filtri sono per tipo di materiale [es. audio, video], recenti e preferiti.}
 
 \clearpage
 
+\paragraph{Modifica dettagli ArtID}
+\par{\noindent Questo caso d'uso permette al Membro AFAM di modificare le informazioni identificative di uno specifico ArtID, inclusi il titolo, la descrizione testuale e l'immagine di copertina associata.}
+
+\begin{tabularx}{\textwidth}{|C|X|}
+\hline
+\rigaTabella{Caso d'uso}{Modifica dettagli ArtID}
+\rigaTabella{ID}{UPD\_ARTID}
+\rigaTabella{Attori}{Membro AFAM, DBMS}
+\rigaTabella{Precondizione}{Il sistema ha mostrato a video la schermata ``DETTAGLI ARTID''}
+\rigaTabella{Flusso degli eventi}{\begin{enumerate}
+    \item Il Membro inserisce il nuovo titolo dell'ArtID
+    \item Il Membro inserisce la nuova descrizione dell'ArtID
+    \item Il Membro clicca sull'immagine dell'ArtID
+    \item Il sistema mostra l'esplora file del dispositivo su cui si trova il Membro
+    \item Il Membro seleziona l'immagine da caricare
+    \item Il Membro clicca il pulsante ``SALVA''
+    \item Il sistema interroga il DBMS per aggiornare i dettagli dell'ArtID
+    \item Il sistema mostra la schermata ``DETTAGLI ARTID'' aggiornata
+    \item Il sistema mostra un messaggio di avvenuto aggiornamento
+\end{enumerate}
+}
+\rigaTabella{Postcondizione}{Il sistema ha mostrato a video la schermata ``DETTAGLI ARTID'' aggiornata}
+\rigaTabella{Note}{Il pulsante ``SALVA'' rimane disabilitato finch\'e almeno uno tra Titolo, descrizione o immagine non viene modificato, oppure se il campo Titolo \`e vuoto.}
+\hline
+\end{tabularx}
+
+\clearpage
+
 \paragraph{Cancella ArtID}
 \par{\noindent Questo caso d'uso permette al Membro AFAM di cancellare un ArtID.}
 
@@ -292,7 +320,7 @@ I filtri sono per tipo di materiale [es. audio, video], recenti e preferiti.}
     \item Il Membro clicca sul pulsante ``CANCELLA''
     \item Il sistema mostra a video un messaggio con scritto ``Sei sicuro di voler cancellare [nome ArtID]?''
     \item Il Membro clicca il pulsante ``CONFERMA''
-    \item Il sistema interroga il DBMS per cancellare l'ArtID e tutti i riferimenti ai Materiali in esso contenuti
+    \item Il sistema interroga il DBMS per cancellare l'ArtID e tutti i riferimenti ai Materiali in esso contenuti e tutte le condivisioni interne ad esso riferite
     \item Il sistema interroga il DBMS per ottenere la lista degli ArtID aggiornata
     \item Il sistema mostra a video la schermata ``GESTIONE ARTID'' aggiornata
 \end{enumerate}

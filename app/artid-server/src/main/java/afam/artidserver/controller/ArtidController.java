@@ -62,6 +62,14 @@ public class ArtidController {
         return ResponseEntity.ok(artidService.create(request.title(), principal.getId()));
     }
 
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable Long id, @AuthenticationPrincipal AuthenticatedUser principal) {
+        return artidService.delete(id, principal.getId())
+                ? ResponseEntity.noContent().build()
+                : ResponseEntity.notFound().build();
+
+    }
+
     // Materiali collegati a un ArtID. La consistenza di proprietà è verificata
     // nella query del
     // service (sia l'ArtID sia i materiali devono essere dell'utente del JWT): un
@@ -76,7 +84,7 @@ public class ArtidController {
     @PostMapping("/{id}/resources")
     public ResponseEntity<Void> addResource(@PathVariable Long id,
             @AuthenticationPrincipal AuthenticatedUser principal, @RequestBody Long resourceId) {
-        resourceService.linkArtidResource(resourceId, id);
+        artidService.linkArtidResource(id, resourceId);
         return ResponseEntity.ok().build();
     }
 

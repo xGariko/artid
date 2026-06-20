@@ -96,7 +96,6 @@ Questa cartella si occupa della gestione dello stato globale dell'applicazione.\
 \end{itemize}
 
 
-
 \subsection{\texttt{java/afam/artid-server}}
 Questo package costituisce il nucleo del \textbf{Back-end} dell'applicazione, suddiviso nelle seguenti componenti.
 
@@ -104,7 +103,7 @@ Questo package costituisce il nucleo del \textbf{Back-end} dell'applicazione, su
 Questa cartella contiene i componenti \textbf{REST Controller} responsabili di esporre gli endpoint \textbf{API} verso il \textbf{front-end}. Il loro compito principale è intercettare le richieste HTTP, validare i dati in ingresso e delegare l'esecuzione della logica di business al rispettivo \texttt{service}. Inoltre, i \textbf{Controller} si occupano di mappare e convertire i risultati ricevuti dal service nei relativi \texttt{dto} (Data Transfer Object) prima di impacchettare e restituire la risposta HTTP al front-end.
 
 \subsubsection{\texttt{dao}}
-Contiene le interfacce \textbf{DAO} (Data Access Object) responsabili dell'interazione diretta con il database relazionale. Di norma, grazie a \textbf{Spring Data JPA}, è sufficiente dichiarare il prototipo del metodo nella firma dell'interfaccia per demandare al framework la generazione automatica della query SQL a runtime. Tuttavia, per operazioni non standard o ad alta complessità, il sistema garantisce la possibilità di estendere tali interfacce scrivendo manualmente query personalizzate, sfruttando l'annotazione \texttt{@Query}.
+Contiene le interfacce \textbf{DAO} (Data Access Object) responsabili dell'interazione diretta con il database relazionale. Sfruttando le specifiche di \textbf{Spring Data JDBC} tramite l'estensione di \texttt{ListCrudRepository}, è sufficiente dichiarare il prototipo del metodo nella firma dell'interfaccia per demandare al framework la generazione automatica della query SQL a runtime. Tuttavia, per operazioni complesse o manipolazioni custom, il sistema consente la scrittura di query personalizzate sfruttando l'annotazione \texttt{@Query}.
 
 \subsubsection{\texttt{model}}
 Questo package definisce le strutture dati utilizzate all'interno dell'applicazione ed è suddiviso in due sottopackage principali:
@@ -112,11 +111,40 @@ Questo package definisce le strutture dati utilizzate all'interno dell'applicazi
 \paragraph{\texttt{dto}}
 Contiene i \textbf{Data Transfer Object} (\texttt{DTO}), ovvero classi Java fittizie utilizzate esclusivamente per \textbf{modellare} e \textbf{standardizzare} il formato dei messaggi e dei payload scambiati nelle richieste e risposte HTTP tra il front-end e il back-end.
 
-\paragraph{\texttt{entity}}
-Contiene le classi Java che rappresentano l'esatta mappatura delle tabelle presenti nel Database. Queste classi sono annotate con le specifiche di Jakarta Persistence (JPA) e sfruttano la libreria \texttt{Lombok} (tramite annotazioni come \texttt{@Data}, \texttt{@Getter}, \texttt{@Setter}) per generare automaticamente a tempo di compilazione il codice boilerplate (metodi getter, setter, costruttori, ecc.).
+\paragraph{entity}
+Contiene le classi Java che rappresentano l'esatta mappatura delle tabelle presenti nel Database. Queste classi sono modellate secondo i requisiti di \textbf{Spring Data JDBC} (utilizzando le annotazioni del pacchetto \texttt{org.springframework.data.relational.core.mapping}) e sfruttano la libreria \texttt{Lombok} (che tramite l'annotazione \texttt{@Data} genera automaticamente a tempo di compilazione tutti i metodi getter, setter, costruttori e codice boilerplate equivalente) per massimizzare la leggibilità del codice.
 
 \subsubsection{\texttt{service}}
 Questa cartella contiene le classi in cui è implementata la \textbf{logica di business} dell'applicazione. I componenti di questa cartella orchestrano il flusso dei dati interni: ricevono gli input dai \texttt{controller}, interrogano o modificano lo stato del database invocando i relativi \texttt{dao}, applicano le regole applicative e i controlli di consistenza, e infine restituiscono gli oggetti di business o le entità elaborate direttamente ai \texttt{controller}.
 
 \subsubsection{\texttt{storage}}
 Questo package gestisce la persistenza degli asset digitali (Materiali, allegati e foto profilo) sfruttando un'infrastruttura di Object Storage esterna. Contiene le classi di configurazione e i servizi per l'interazione con endpoint S3-compatibili.
+
+\subsubsection{\texttt{security}}
+Questo package centralizza l'intera infrastruttura di autenticazione e controllo degli accessi dell'applicativo basata su \textbf{Spring Security}. Configurato in modalità rigorosamente \textbf{stateless} tramite l'utilizzo di token \textbf{JWT}, gestisce il ciclo di vita delle sessioni utente senza sovraccaricare il server. 
+
+Al suo interno risiedono le componenti per la generazione e validazione crittografica dei token, il filtro per l'intercettazione e il controllo delle richieste HTTP, la configurazione della catena di sicurezza con la definizione dei permessi delle rotte.
+
+
+\subsection*{Nota sulla Nomenclatura e Convenzioni Linguistiche}
+Si specifica che all'interno del presente documento è stata adottata una convenzione linguistica ibrida, finalizzata a massimizzare la chiarezza descrittiva e l'aderenza agli standard industriali:
+\begin{itemize}
+    \item \textbf{Documentazione e Diagrammi:} I componenti di analisi (\textit{Boundary, Control, Entity}), le descrizioni dei casi d'uso e i messaggi scambiati nei diagrammi di sequenza utilizzano la lingua italiana per facilitare la comprensione concettuale delle funzionalità e dei flussi applicativi.
+    \item \textbf{Codice Sorgente:} L'implementazione effettiva del software (nomi delle classi, variabili, firme dei metodi, commenti nel codice e rotte API) è interamente sviluppata in lingua inglese, in conformità con le \textit{best practice} globali dello sviluppo software e per garantire la piena compatibilità con i framework utilizzati.
+\end{itemize}
+
+\subsection{Mappatura delle Classi di Entità}
+Al fine di garantire la tracciabilità tra la fase di analisi concettuale (RAD) e l'effettiva implementazione nel database relazionale, si riporta la tabella di corrispondenza tra i componenti \textit{Entity} descritti in lingua italiana e le rispettive classi Java.
+
+\arrayrulecolor{SlateGray} % Mantiene il colore delle linee della tabella impostato nel tuo documento
+\begin{tabularx}{\textwidth}{|c|X|}
+\hline
+\headerTabella{Oggetti Entità (RAD)}{Classe Java / Tabella DB (Codice)}
+\rigaTabella{Membro}{ \texttt{User} }
+\rigaTabella{ArtID}{ \texttt{Artid} }
+\rigaTabella{Materiale}{ \texttt{Resource} / \texttt{File} \newline \textit{(Scissa tra i metadati logici della risorsa e l'asset fisico su Supabase S3)} }
+\rigaTabella{Certificato}{ \texttt{Certification} }
+\rigaTabella{Token}{ \texttt{ExternalShare} }
+\rigaTabella{Condivisione}{ \texttt{InternalShare} }
+\hline
+\end{tabularx}
