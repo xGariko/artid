@@ -1,5 +1,6 @@
 package afam.artidserver.model.entity;
 
+import afam.artidserver.model.VISIBILITY_STATE;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
@@ -17,11 +18,8 @@ public class Artid {
     @Column("id_user")
     private Long idUser;
 
-    @Column("id_tag")
-    private Long idTag;
-
-    @Column("id_visibility_state")
-    private Long idVisibilityState;
+    @Column("id_thumbnail")
+    private Long idThumbnail;
 
     private String title;
 
@@ -38,9 +36,6 @@ public class Artid {
     @Column("deleted_at")
     private OffsetDateTime deletedAt;
 
-    @Column("is_public")
-    private Boolean isPublic;
-
-    @Column("is_private")
-    private Boolean isPrivate;
+    @Column("visibility_state")
+    private VISIBILITY_STATE visibilityState;
 }

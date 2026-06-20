@@ -56,8 +56,6 @@ public class ArtidService {
         artid.setIdUser(userId);
         artid.setTitle(title.trim());
         artid.setFavourite(false);
-        artid.setIsPublic(false);
-        artid.setIsPrivate(false);
         OffsetDateTime now = OffsetDateTime.now();
         artid.setCreatedAt(now);
         artid.setLastModified(now);
@@ -77,9 +75,8 @@ public class ArtidService {
                 a.getDescription(),
                 a.getFavourite(),
                 a.getCreatedAt(),
-                a.getLastModified(),
-                a.getIsPublic(),
-                a.getIsPrivate());
+                a.getLastModified()
+        );
     }
 
     /**

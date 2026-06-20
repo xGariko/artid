@@ -1,22 +1,22 @@
 package afam.artidserver.model.entity;
 
+
 import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
- @Data
- @Table("tag")
- public class Tag {
+@Data
+@Table("artid_tag")
+public class ArtidTag {
 
-  @Id
-  private Long id;
+    @Id
+    private Long id;
 
-  @Column("id_user")
-  private Long idUser;
+    @Column("id_artid")
+    private Long idArtid;
 
-  private String title;
+    @Column("id_tag")
+    private Long idTag;
 
-  private String color;
-
- }
+}
