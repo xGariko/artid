@@ -116,6 +116,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/profile/spid": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["linkSpid"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/auth/verify-registration": {
         parameters: {
             query?: never;
@@ -158,6 +174,38 @@ export interface paths {
         get?: never;
         put?: never;
         post: operations["verifyOtp"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/auth/spid": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["login"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/auth/spid/verify-otp": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["verifyOtp_1"];
         delete?: never;
         options?: never;
         head?: never;
@@ -221,7 +269,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        post: operations["login"];
+        post: operations["login_1"];
         delete?: never;
         options?: never;
         head?: never;
@@ -546,6 +594,7 @@ export interface components {
             businessEmail?: string;
             propicUrl?: string;
             internalShareEnabled?: boolean;
+            spidLinked?: boolean;
         };
         AvatarResponse: {
             url?: string;
@@ -559,6 +608,11 @@ export interface components {
             id?: number;
             title?: string;
             color?: string;
+        };
+        SpidLoginRequest: {
+            providerId?: string;
+            username?: string;
+            password?: string;
         };
         VerifyOtpRequest: {
             email?: string;
@@ -574,6 +628,23 @@ export interface components {
         };
         VerifyPasswordRequest: {
             password?: string;
+        };
+        SpidAuthResponse: {
+            /** @enum {string} */
+            outcome?: "AUTHENTICATED" | "OTP_REQUIRED";
+            token?: string;
+            /** Format: int64 */
+            id?: number;
+            email?: string;
+            name?: string;
+            surname?: string;
+            /** Format: date-time */
+            expiresAt?: string;
+        };
+        SpidVerifyOtpRequest: {
+            username?: string;
+            email?: string;
+            code?: string;
         };
         ResendOtpRequest: {
             email?: string;
@@ -1031,6 +1102,30 @@ export interface operations {
             };
         };
     };
+    linkSpid: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SpidLoginRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ProfileResponse"];
+                };
+            };
+        };
+    };
     verifyRegistration: {
         parameters: {
             query?: never;
@@ -1091,6 +1186,54 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": components["schemas"]["VerifyOtpRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["AuthResponse"];
+                };
+            };
+        };
+    };
+    login: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SpidLoginRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["SpidAuthResponse"];
+                };
+            };
+        };
+    };
+    verifyOtp_1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SpidVerifyOtpRequest"];
             };
         };
         responses: {
@@ -1173,7 +1316,7 @@ export interface operations {
             };
         };
     };
-    login: {
+    login_1: {
         parameters: {
             query?: never;
             header?: never;

@@ -137,6 +137,13 @@ public class UserService {
         return userRepository.findByMail(mail);
     }
 
+    // Lookup per identità digitale: l'unico utente che ha collegato quel codice SPID (unicità
+    // garantita dall'indice parziale su spid_code, vedi migration V11). Usato per impedire che la
+    // stessa identità venga associata a più account.
+    public Optional<User> findBySpidCode(String spidCode) {
+        return userRepository.findBySpidCode(spidCode);
+    }
+
     public User save(User user) {
         return userRepository.save(user);
     }

@@ -11,6 +11,9 @@ public interface UserDAO extends ListCrudRepository<User, Long> {
 
     Optional<User> findByMail(String mail);
 
+    // Lookup per identità digitale (SPID): l'utente che ha già collegato quel codice fiscale.
+    Optional<User> findBySpidCode(String spidCode);
+
     /**
      * Lookup di autenticazione: gira nell'hot path (filtro JWT) a OGNI richiesta autenticata.
      * Non seleziona {@code propic_path}: l'avatar si risolve a parte (vedi {@link #findPropicPathById}),
