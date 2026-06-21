@@ -34,7 +34,6 @@
 	let showDeleteModal = $state(false);
 
 	$effect(() => {
-		certifications;
 		selectedIds.clear();
 	});
 

@@ -9,9 +9,10 @@
 
 	export interface CertificationResponse {
 		id?: number;
-		title: string;
+		title?: string;      // Modificato in opzionale (?) per allinearsi a +page.svelte
 		description?: string;
-		isPublic: boolean;
+		isPublic?: boolean;
+		public?: boolean;    // Aggiunto per tollerare il mapping nativo del backend
 		extension?: string;
 		fileSize?: number;
 		createdAt?: string;
@@ -44,7 +45,8 @@
 		if (!isOpen) return;
 		title = certification?.title ?? '';
 		description = certification?.description ?? '';
-		isPublic = certification?.isPublic ?? false;
+		// Mappa in modo sicuro sia isPublic che public provenienti dal backend
+		isPublic = certification?.isPublic ?? certification?.public ?? false;
 		selectedFile = null;
 	});
 
@@ -143,7 +145,6 @@
 				<span>{isEditMode ? 'Modifica certificato' : 'Nuovo certificato'}</span>
 			</div>
 
-			<!-- Toggle della visibilità dell'attestato (Pubblico/Privato) -->
 			<button
 				type="button"
 				class="btn btn-link p-0 d-flex align-items-center gap-2 text-decoration-none"
@@ -152,8 +153,8 @@
 			>
 				<i class="bi bi-{isPublic ? 'globe text-success' : 'lock-fill text-muted'} fs-5"></i>
 				<span class="text-artid-dark font-medium small">
-					{isPublic ? 'Visibilità: Pubblica' : 'Visibilità: Privata'}
-				</span>
+      {isPublic ? 'Visibilità: Pubblica' : 'Visibilità: Privata'}
+     </span>
 			</button>
 		</div>
 
@@ -170,7 +171,6 @@
 			</div>
 		</div>
 
-		<!-- Area di Drop per il File Certificato -->
 		<button
 			type="button"
 			class="dropzone d-flex align-items-center justify-content-between p-4 rounded-3 bg-artid-section text-start w-100"
@@ -181,12 +181,12 @@
 			ondrop={(e) => { e.preventDefault(); isDragging = false; selectedFile = e.dataTransfer?.files?.[0] ?? null; }}
 		>
 			<div class="d-flex flex-column gap-1">
-				<span class="fw-bold text-artid-text">
-					{selectedFile?.name ?? 'Trascina qui il certificato (PDF, PNG, JPG)'}
-				</span>
+     <span class="fw-bold text-artid-text">
+      {selectedFile?.name ?? 'Trascina qui il certificato (PDF, PNG, JPG)'}
+     </span>
 				<span class="text-artid-primary text-decoration-underline small">
-					O clicca qui per caricarlo dal tuo dispositivo
-				</span>
+      O clicca qui per caricarlo dal tuo dispositivo
+     </span>
 			</div>
 			<i class="bi bi-upload text-artid-primary fs-3"></i>
 		</button>
@@ -198,7 +198,6 @@
 			accept=".pdf,image/*"
 		/>
 
-		<!-- Pulsanti di Chiusura e Salvataggio -->
 		<div class="d-flex justify-content-end gap-2">
 			<ArtidButton
 				label="Chiudi"
