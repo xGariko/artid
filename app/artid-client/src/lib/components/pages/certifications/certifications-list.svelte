@@ -5,12 +5,14 @@
 	import ArtidModal from '$lib/components/ui/artid-modal.svelte';
 	import { formatFileSize, formatItalianDate, badgeColorForExtension, badgeLabelForExtension } from '$lib/utilities';
 	import { toast } from 'svelte-sonner';
+	import { SvelteSet } from 'svelte/reactivity'; // Ottimizzato per Svelte 5
 
 	export interface CertificationResponse {
 		id?: number;
-		title: string;
+		title?: string;
 		description?: string;
-		isPublic: boolean;
+		isPublic?: boolean;
+		public?: boolean;
 		extension?: string;
 		fileSize?: number;
 		createdAt?: string;
@@ -27,14 +29,13 @@
 		onNewRequest?: () => void;
 	} = $props();
 
-	// Stato degli elementi selezionati tramite checkbox
-	let selectedIds = $state<Set<number>>(new Set());
+	// Utilizzo di SvelteSet per far felice l'ESLint ed evitare istanze mutabili non tracciate
+	let selectedIds = $state(new SvelteSet<number>());
 	let showDeleteModal = $state(false);
 
-	// Resetta la selezione se la lista delle certificazioni cambia
 	$effect(() => {
 		certifications;
-		selectedIds = new Set();
+		selectedIds.clear();
 	});
 
 	const areAllSelected = $derived(
@@ -46,22 +47,20 @@
 
 	function toggleSelection(id: number | undefined): void {
 		if (id == null) return;
-		const next = new Set(selectedIds);
-		if (next.has(id)) {
-			next.delete(id);
+		if (selectedIds.has(id)) {
+			selectedIds.delete(id);
 		} else {
-			next.add(id);
+			selectedIds.add(id);
 		}
-		selectedIds = next;
 	}
 
 	function toggleAll(): void {
 		if (areAllSelected) {
-			selectedIds = new Set();
+			selectedIds.clear();
 		} else {
-			selectedIds = new Set(
-				certifications.map((c) => c.id).filter((id): id is number => id != null)
-			);
+			for (const c of certifications) {
+				if (c.id != null) selectedIds.add(c.id);
+			}
 		}
 	}
 
@@ -102,7 +101,6 @@
 </script>
 
 <div class="card p-4 shadow-sm border-0 bg-white main-certification-card">
-	<!-- Intestazione con icona di spunta blu scuro (Coerente con image_698ac0.png) -->
 	<div class="d-flex align-items-center gap-2 mb-4">
 		<div class="check-badge-container d-flex align-items-center justify-content-center">
 			<i class="bi bi-patch-check-fill text-white fs-5"></i>
@@ -110,7 +108,6 @@
 		<h3 class="fs-5 fw-bold text-artid-dark m-0">I tuoi attestati</h3>
 	</div>
 
-	<!-- Tabella dei Certificati -->
 	<div class="flex-grow-1 overflow-y-auto rounded-3 border border-artid-border table-scroll-container">
 		<div class="row g-0 align-items-center px-3 py-2 sticky-header bg-artid-muted border-bottom border-artid-border text-artid-text small fw-semibold text-nowrap text-muted">
 			<div class="col-1 d-flex align-items-center">
@@ -139,7 +136,6 @@
 				onclick={() => toggleSelection(cert.id)}
 				onkeydown={(e) => (e.key === ' ' || e.key === 'Enter') && toggleSelection(cert.id)}
 			>
-				<!-- Selezione e Badge Estensione File (PDF/etc.) -->
 				<div class="col-1 d-flex align-items-center gap-2" onclick={(e) => e.stopPropagation()} role="presentation">
 					<input
 						type="checkbox"
@@ -152,33 +148,28 @@
 						class="badge-type fw-bold text-dark text-uppercase fs-xs"
 						style:background-color={badgeColorForExtension(cert.extension || 'pdf')}
 					>
-						{badgeLabelForExtension(cert.extension || 'pdf')}
-					</span>
+            {badgeLabelForExtension(cert.extension || 'pdf')}
+          </span>
 				</div>
 
-				<!-- Titolo dell'attestato -->
 				<div class="col-4 pe-3 text-truncate fw-medium text-artid-text" title={cert.title}>
-					{cert.title}
+					{cert.title ?? ''}
 				</div>
 
-				<!-- Dimensioni del file -->
 				<div class="col-2 text-center text-secondary small">
 					{cert.fileSize ? formatFileSize(cert.fileSize) : '781 kb'}
 				</div>
 
-				<!-- Data Creazione -->
 				<div class="col-2 text-center text-secondary small">
 					{cert.createdAt ? formatItalianDate(cert.createdAt) : '7 Mag 2026'}
 				</div>
 
-				<!-- Data Modifica -->
 				<div class="col-2 text-center text-secondary small">
 					{cert.lastModified ? formatItalianDate(cert.lastModified) : '7 Mag 2026'}
 				</div>
 
-				<!-- Icona Visibilità (Mappata su isPublic: globo o lucchetto) -->
 				<div class="col-1 text-center">
-					{#if cert.isPublic}
+					{#if cert.isPublic || cert.public}
 						<i class="bi bi-globe fs-5 text-secondary" title="Pubblico"></i>
 					{:else}
 						<i class="bi bi-lock-fill fs-5 text-secondary" title="Privato"></i>
@@ -195,102 +186,24 @@
 		{/if}
 	</div>
 
-	<!-- Barra delle Azioni (Allineata a sinistra come in image_698ac0.png) -->
 	<div class="d-flex align-items-center gap-2 mt-4">
-		<ArtidButton
-			label="Nuovo"
-			icon="plus-lg"
-			fullWidth={false}
-			onclick={onNewRequest}
-		/>
-		<ArtidButton
-			label="Scarica"
-			icon="download"
-			disabled={!hasSelection}
-			fullWidth={false}
-			onclick={downloadSelected}
-		/>
-		<ArtidButton
-			label="Modifica"
-			icon="pencil-square"
-			outline={true}
-			disabled={selectedIds.size !== 1}
-			fullWidth={false}
-			onclick={editSelected}
-		/>
-		<ArtidButton
-			icon="trash"
-			btnStyle="danger"
-			outline={true}
-			disabled={!hasSelection}
-			fullWidth={false}
-			ariaLabel="Elimina selezionati"
-			onclick={() => { showDeleteModal = true; }}
-		/>
+		<ArtidButton label="Nuovo" icon="plus-lg" fullWidth={false} onclick={onNewRequest} />
+		<ArtidButton label="Scarica" icon="download" disabled={!hasSelection} fullWidth={false} onclick={downloadSelected} />
+		<ArtidButton label="Modifica" icon="pencil-square" outline={true} disabled={selectedIds.size !== 1} fullWidth={false} onclick={editSelected} />
+		<ArtidButton icon="trash" btnStyle="danger" outline={true} disabled={!hasSelection} fullWidth={false} ariaLabel="Elimina selezionati" onclick={() => { showDeleteModal = true; }} />
 	</div>
 </div>
 
-<ArtidModal
-	bind:isOpen={showDeleteModal}
-	title="Conferma eliminazione"
-	onConfirm={deleteSelected}
-	message="Una volta eliminata la certificazione non sarà recuperabile."
-	btnStyle="danger"
-/>
+<ArtidModal bind:isOpen={showDeleteModal} title="Conferma eliminazione" onConfirm={deleteSelected} message="Una volta eliminata la certificazione non sarà recuperabile." btnStyle="danger" />
 
 <style>
-    .main-certification-card {
-        width: 100%;
-        max-width: 75rem;
-        border-radius: 12px;
-    }
-
-    .check-badge-container {
-        background-color: #0d4b83; /* Colore blu scuro per il badge della spunta */
-        width: 2rem;
-        height: 2rem;
-        border-radius: 50%;
-    }
-
-    .table-scroll-container {
-        max-height: 450px;
-    }
-
-    .sticky-header {
-        position: sticky;
-        top: 0;
-        z-index: 2;
-    }
-
-    .resource-row {
-        transition: 0.15s ease all;
-        cursor: pointer;
-    }
-
-    .resource-row:hover {
-        background-color: #f1f5f9;
-    }
-
-    .resource-row.selected {
-        box-shadow: inset 6px 0px 0px -3px var(--artid-primary, #0d6efd);
-        background-color: #f8fafc;
-    }
-
-    .badge-type {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        width: 2.5rem;
-        height: 1.8rem;
-        flex-shrink: 0;
-        border-radius: 4px;
-        font-size: 0.75rem;
-        letter-spacing: 0.02em;
-        background-color: #4de2d6 !important; /* Colore turchese per PDF come in image_698ac0.png */
-        color: #0f172a !important;
-    }
-
-    .fs-xs {
-        font-size: 0.7rem;
-    }
+    .main-certification-card { width: 100%; max-width: 75rem; border-radius: 12px; }
+    .check-badge-container { background-color: #0d4b83; width: 2rem; height: 2rem; border-radius: 50%; }
+    .table-scroll-container { max-height: 450px; }
+    .sticky-header { position: sticky; top: 0; z-index: 2; }
+    .resource-row { transition: 0.15s ease all; cursor: pointer; }
+    .resource-row:hover { background-color: #f1f5f9; }
+    .resource-row.selected { box-shadow: inset 6px 0px 0px -3px var(--artid-primary, #0d6efd); background-color: #f8fafc; }
+    .badge-type { display: inline-flex; align-items: center; justify-content: center; width: 2.5rem; height: 1.8rem; flex-shrink: 0; border-radius: 4px; font-size: 0.75rem; letter-spacing: 0.02em; background-color: #4de2d6 !important; color: #0f172a !important; }
+    .fs-xs { font-size: 0.7rem; }
 </style>

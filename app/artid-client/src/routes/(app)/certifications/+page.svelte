@@ -8,7 +8,7 @@
 		title?: string;
 		description?: string;
 		isPublic?: boolean;
-		public?: boolean; // Aggiunto per tollerare il mapping del backend
+		public?: boolean;
 		extension?: string;
 		fileSize?: number;
 		createdAt?: string;
@@ -17,7 +17,6 @@
 
 	let { data }: { data: PageData } = $props();
 
-	// Stato per l'apertura dell'editor modale
 	let editorOpen = $state(false);
 	let editingCertification = $state<CertificationResponse | undefined>(undefined);
 
@@ -33,7 +32,6 @@
 </script>
 
 <div class="w-100 h-100 d-flex align-items-center justify-content-center p-5 page-background">
-	<!-- Elenco principale degli attestati (No sidebar, centrato come in image_698ac0.png) -->
 	<CertificationList
 		certifications={data.certifications || []}
 		onEditRequest={handleEditRequest}
@@ -41,12 +39,11 @@
 	/>
 </div>
 
-<!-- Modal di creazione e modifica dell'attestato -->
 <CertificationEditor bind:isOpen={editorOpen} certification={editingCertification} />
 
 <style>
     .page-background {
         background-color: #f8fafc;
-        min-height: calc(100vh - 120px); /* Regola in base alla navbar globale di ArtID */
+        min-height: calc(100vh - 120px);
     }
 </style>
