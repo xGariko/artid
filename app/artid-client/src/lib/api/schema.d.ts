@@ -68,6 +68,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/certifications/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: operations["update_2"];
+        post?: never;
+        delete: operations["delete_2"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/users": {
         parameters: {
             query?: never;
@@ -126,6 +142,22 @@ export interface paths {
         get?: never;
         put?: never;
         post: operations["linkSpid"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/certifications": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getAll_1"];
+        put?: never;
+        post: operations["create_3"];
         delete?: never;
         options?: never;
         head?: never;
@@ -285,7 +317,7 @@ export interface paths {
         };
         get: operations["findByUser_2"];
         put?: never;
-        post: operations["create_3"];
+        post: operations["create_4"];
         delete?: never;
         options?: never;
         head?: never;
@@ -420,22 +452,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/certifications/count": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["count_2"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/api/auth/me": {
         parameters: {
             query?: never;
@@ -462,7 +478,7 @@ export interface paths {
         get: operations["findById"];
         put?: never;
         post?: never;
-        delete: operations["delete_2"];
+        delete: operations["delete_3"];
         options?: never;
         head?: never;
         patch?: never;
@@ -475,7 +491,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get: operations["count_3"];
+        get: operations["count_2"];
         put?: never;
         post?: never;
         delete?: never;
@@ -599,6 +615,20 @@ export interface components {
         AvatarResponse: {
             url?: string;
         };
+        CertificationResponse: {
+            /** Format: int64 */
+            id?: number;
+            title?: string;
+            description?: string;
+            extension?: string;
+            /** Format: int64 */
+            fileSize?: number;
+            /** Format: date-time */
+            createdAt?: string;
+            /** Format: date-time */
+            lastModified?: string;
+            public?: boolean;
+        };
         TagCreateRequest: {
             title?: string;
             color?: string;
@@ -683,8 +713,6 @@ export interface components {
             createdAt?: string;
             /** Format: date-time */
             lastModified?: string;
-            isPublic?: boolean;
-            isPrivate?: boolean;
         };
         PublicArtidSummaryResponse: {
             /** Format: int64 */
@@ -966,6 +994,59 @@ export interface operations {
             };
         };
     };
+    update_2: {
+        parameters: {
+            query: {
+                title: string;
+                description?: string;
+                isPublic: boolean;
+            };
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "multipart/form-data": {
+                    /** Format: binary */
+                    file?: string;
+                };
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["CertificationResponse"];
+                };
+            };
+        };
+    };
+    delete_2: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
     getAll: {
         parameters: {
             query?: never;
@@ -1122,6 +1203,57 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["ProfileResponse"];
+                };
+            };
+        };
+    };
+    getAll_1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["CertificationResponse"][];
+                };
+            };
+        };
+    };
+    create_3: {
+        parameters: {
+            query: {
+                title: string;
+                description?: string;
+                isPublic: boolean;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "multipart/form-data": {
+                    /** Format: binary */
+                    file: string;
+                };
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["CertificationResponse"];
                 };
             };
         };
@@ -1360,7 +1492,7 @@ export interface operations {
             };
         };
     };
-    create_3: {
+    create_4: {
         parameters: {
             query?: never;
             header?: never;
@@ -1576,26 +1708,6 @@ export interface operations {
             };
         };
     };
-    count_2: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["CountResponse"];
-                };
-            };
-        };
-    };
     me: {
         parameters: {
             query?: never;
@@ -1638,7 +1750,7 @@ export interface operations {
             };
         };
     };
-    delete_2: {
+    delete_3: {
         parameters: {
             query?: never;
             header?: never;
@@ -1658,7 +1770,7 @@ export interface operations {
             };
         };
     };
-    count_3: {
+    count_2: {
         parameters: {
             query?: never;
             header?: never;
