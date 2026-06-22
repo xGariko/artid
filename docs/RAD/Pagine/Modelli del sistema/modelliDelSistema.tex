@@ -2,12 +2,11 @@
 
 \subsection{Modello dei casi d'uso}
 Nei seguenti diagrammi, quando il Membro dovrà scegliere tra due opzioni
-(``Si'' e ``No'', ``Conferma'' e ``Indietro'' ecc.) supponiamo che scelga la 
+(``Si'' e ``No'', ``Conferma'' e ``Chiudi'' ecc.) supponiamo che scelga la 
 risposta affermativa in quanto, selezionando quella negativa, il sistema ritorna alle condizioni precedenti.
 
 \subsubsection{Attori coinvolti}
-Gli attori coinvolti nei seguenti casi d'uso vengono di seguito definiti per la
-modalità d'interazione e di utilizzo del sistema.
+Gli attori coinvolti nei seguenti casi d'uso vengono di seguito definiti.
 
 \begin{figure}[H]
     \centering
@@ -29,13 +28,13 @@ Di seguito la vista d'insieme del sistema proposto:
 \subsubsection{Macro-casi d'uso}
 \begin{tabularx}{\textwidth}{|C|X|}
 \hline
-\rigaTabella{Autenticazione}{Questo macro-caso d'uso si occupa di gestire l'accesso sicuro e l'identificazione del Membro all'interno dell'applicazione in tutte le sue declinazioni (Login, Registrazione, Logout). Fornisce i meccanismi di protezione dell'account e si articola in:
+\rigaTabella{Autenticazione}{Questo macro-caso d'uso si occupa di gestire l'accesso sicuro e l'identificazione del Membro all'interno dell'applicazione in tutte le sue declinazioni (Login, Registrazione, Logout). Fornisce i meccanismi di protezione dell'account e le opzioni di chiusura definitiva dell'account, si articola in:
 \begin{itemize}
     \item \textbf{Verifica dell'identit\`a:} Processo di registrazione e verifica dell'account supportato da sistemi di autenticazione forte (One-Time Password) o certificato tramite l'integrazione con i sistemi ufficiali di identit\`a digitale (SPID).
     \item \textbf{Gestione delle credenziali:} Procedure per il ripristino, il recupero e la modifica delle credenziali di accesso in caso di smarrimento.
 \end{itemize}}
 
-\rigaTabella{Gestione Profilo}{Questo macro-caso d'uso racchiude tutte le operazioni relative alla personalizzazione e manutenzione delle informazioni personali, professionali, di contatto e di formazione del Membro AFAM. Include l'amministrazione delle impostazioni generali di sicurezza, le preferenze sulla ricezione delle condivisioni, le opzioni di chiusura definitiva dell'account e la gestione dei Certificati, che include il caricamento, la modifica e l'eliminazione degli stessi e dei relativi file scaricabili.}
+\rigaTabella{Gestione Profilo}{Questo macro-caso d'uso racchiude tutte le operazioni relative alla personalizzazione e manutenzione delle informazioni personali, professionali, di contatto e di formazione del Membro AFAM. Include l'amministrazione delle impostazioni generali di sicurezza, le preferenze sulla ricezione delle condivisioni e la gestione dei Certificati, che include il caricamento, la modifica e l'eliminazione degli stessi e dei relativi file scaricabili.}
 
 \rigaTabella{Gestione Materiale}{Questo macro-caso d'uso si occupa di governare l'intero ciclo di vita degli elementi multimediali e didattici caricati dal Membro AFAM per la costruzione del proprio portfolio digitale. Nello specifico, coordina:
 \begin{itemize}
@@ -101,7 +100,7 @@ Il sistema è tornato nella condizione precedente al verificarsi dell'errore}
 \clearpage
 
 \paragraph{Note dei casi d'uso}
-In qualunque schermata, ad eccezione della schermata ``WELCOME'', ``LOGIN'', ``REGISTRAZIONE'', ``VERIFICA OTP'', è presente una barra ``HEADER'' nella quale sono presenti i pulsanti: ``ArtID'', ``Materiali'', ``Condivisioni'', ``Certificazioni'', ``Profilo'', per navigare alle relative pagine, indipendentemente da quale schermata il Membro si trovi, e il pulsante ``AZIONI PROFILO'' per raggiungere la schermata ``GESTIONE PROFILO'' o effettuare il logout.\\
+In qualunque schermata, ad eccezione della schermata ``WELCOME'', ``LOGIN'', ``REGISTRAZIONE'', ``VERIFICA OTP'', è presente una barra ``HEADER'' nella quale sono presenti i pulsanti: ``ArtID'', ``Materiali'', ``Condivisioni'', ``Certificazioni'', ``Profilo'', per navigare alle relative pagine, indipendentemente da quale schermata sia attualmente mostrata, e il pulsante ``AZIONI PROFILO'' per raggiungere la schermata ``GESTIONE PROFILO'' o effettuare il logout.\\
 Il Guest, invece, vedrà solamente il pulsante ``ACCEDI'' per poter effettuare il login qualora sia in possesso di un account.
 
 \clearpage

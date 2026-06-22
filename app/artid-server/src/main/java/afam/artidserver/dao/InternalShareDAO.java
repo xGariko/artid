@@ -18,7 +18,7 @@ public interface InternalShareDAO extends ListCrudRepository<InternalShare, Long
 //        String sql = """
 //                SELECT COUNT(*)
 //                FROM internal_share s
-//                JOIN artid a ON s.id = a.id
+//                JOIN artid a ON s.id_artid = a.id
 //                WHERE a.id_user = :userId AND a.deleted_at IS NULL
 //                """;
 //        Long count = jdbc.queryForObject(sql, new MapSqlParameterSource("userId", userId), Long.class);
@@ -28,7 +28,7 @@ public interface InternalShareDAO extends ListCrudRepository<InternalShare, Long
     @Query("""
             SELECT COUNT(*)
             FROM internal_share s
-            JOIN artid a ON s.id = a.id
+            JOIN artid a ON s.id_artid = a.id
             WHERE a.id_user = :userId AND a.deleted_at IS NULL
             """)
     long countByArtidOwner(@Param("userId") Long userId);

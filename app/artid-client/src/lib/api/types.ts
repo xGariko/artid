@@ -29,3 +29,4 @@ export type PublicArtidSummary = Schemas["PublicArtidSummaryResponse"];
 export type PublicCertification = Schemas["PublicCertificationResponse"];
 export type InternalShareResponse = Schemas["InternalShareResponse"];
 export type ExternalShareResponse = Schemas["ExternalShareResponse"];
+export type certificationResponse = Schemas["certificationResponse"];

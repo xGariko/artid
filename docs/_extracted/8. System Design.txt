@@ -1,0 +1,1019 @@
+
+
+===== PAGE 1 =====
+System Design
+Ingegneria del Software
+
+===== PAGE 2 =====
+System Design: una panoramica
+Dalla fase di analisi dei requisiti: 
+un set di requisiti non funzionali: esempio il tempo massimo di risposta, il 
+linguaggio di programmazione, etc. 
+modello dei casi d’uso: che descrive le funzionalità dal punto di vista degli 
+attori 
+modello degli oggetti: che descrive le entità manipolate dal sistema 
+un sequence diagram per caso d'uso per mostrare la sequenza di interazioni 
+tra gli oggetti che partecipano al caso d’uso
+2
+
+===== PAGE 3 =====
+System Design: una panoramica
+Un modello di analisi descrive un sistema, completamente, dal punto di 
+vista degli attori 
+Serve come base di comunicazione tra clienti e sviluppatori 
+non può contenere informazioni sulla struttura interna e la sua relazione 
+hardware 
+Più generalmente non può contenere dettagli su come il sistema dovrebbe 
+essere realizzato 
+System Design
+3
+
+===== PAGE 4 =====
+System Design: una panoramica
+Il System Design ha come risultato i seguenti prodotti: 
+Una lista di goal di design: descrivono le qualità del sistema che lo sviluppatore deve 
+ottimizzare 
+Strettamente collegati ai requisiti non funzionali 
+architettura software: descrive la decomposizione in sottosistemi in termini di 
+Dipendenza tra sottosistemi 
+Mapping tra sottosistemi e hardware 
+Politiche di decisione come per esempio flusso di controllo e controllo degli accessi
+4
+
+===== PAGE 5 =====
+5
+An Overview of System Design 227
+configuration, or more generally, how the system should be realized. System design is the first
+step in this direction. System design results in the following products:
+• design goals , describing the qualities of the system  that developers should optimize
+• software architecture , describing the subsystem decomposition in terms of subsystem
+responsibilities, dependencies among subsystems, subsystem mapping to hardware,
+and major policy decisions such as control flow, access control, and data storage 
+• boundary use cases , describing the system configurati on, startup, shutdown, and
+exception handling issues.
+The design goals are derived from the no nfunctional requirements. Design goals guide the
+decisions to be made by the developers when trade-offs are needed. The subsystem
+decomposition constitutes the bulk of system design.  D e v e l o p e r s  d i v i d e  t h e  s y s t e m  i n t o
+manageable pieces to deal with complexity: each subsystem is assigned to a team and realized
+independently. For this to be possible, developers need to address system-wide issues when
+decomposing the system. In this chapter, we describ e the concept of subsystem decomposition
+and discuss examples of generic system decompositions called “architectural styles.” In the next
+chapter, we describe how the system decomposition is ref ined to meet specific design goals.
+Figure 6-2 depicts the relationship of system design with other software engineering activities.
+Figure 6-2 The activities of system de sign (UML activity diagram).
+System design
+Object design
+object design
+design goals
+subsystem
+Analysis 
+analysis object
+dynamic model
+nonfunctional
+requirements
+model
+decomposition
+model
+
+===== PAGE 6 =====
+Le attività del System Design
+6
+Describe boundary
+conditions
+Define Define
+subsystems
+Map subsystems
+to hardware/
+Manage
+Select a
+Define access
+design goals
+persistent data
+control policies
+global 
+Implement
+subsystems
+software platform
+control flow
+
+===== PAGE 7 =====
+Architetture di sistema 
+Semplicemente, una architettura di sistema fornisce indicazioni su come i 
+sottosistemi sono interconnessi tra di loro e come comunicano.
+7
+
+===== PAGE 8 =====
+Architetture di sistema 
+La progettazione architetturale riguarda la comprensione di:  
+come un sistema software debba essere organizzato e  
+la progettazione della struttura complessiva di tale sistema. 
+La progettazione architetturale è il collegamento critico tra la progettazione e 
+l' ingegneria dei requisiti, in quanto identifica i principali componenti 
+strutturali di un sistema e le loro relazioni.  
+L' output del processo di progettazione architetturale è un modello 
+architetturale che descrive come il sistema è organizzato come un insieme di 
+componenti comunicanti.
+8
+
+===== PAGE 9 =====
+Architettura di un sistema di imballaggio robotizzato
+9
+V isio n
+syste m
+O b je ct
+id e n tificatio n
+syste m
+A rm
+co n tro lle r
+G rip p e r
+co n tro lle r
+P ack ag in g
+se le ctio n
+syste m
+P ack in g
+syste m
+C o n ve yo r
+co n tro lle r
+
+===== PAGE 10 =====
+Astrazioni architetturali
+E’ possibile progettare l’architettura del software a due livelli di astrazione: 
+Architettura in piccolo - riguarda i singoli programmi. A questo livello, ci 
+occupiamo del modo in cui un singolo programma viene scomposto in 
+componenti.   
+Architettura in grande - riguarda l' architettura di sistemi aziendali 
+complessi che includono altri sistemi, programmi e componenti di 
+programma. Questi sistemi aziendali sono distribuiti su diversi computer, 
+che possono essere di proprietà e gestiti da diverse aziende.  
+10
+
+===== PAGE 11 =====
+Vantaggi della progettazione architetturale
+Comunicazione agli stakeholder 
+L' architettura può essere utilizzata come punto di discussione da parte degli stakeholder 
+del sistema. 
+Analisi del sistema 
+Significa che è possibile analizzare se il sistema può soddisfare i suoi requisiti non 
+funzionali. 
+Riutilizzo su larga scala 
+L' architettura può essere riutilizzabile in una serie di sistemi 
+Possono essere sviluppate architetture di linee di prodotti.
+11
+
+===== PAGE 12 =====
+Modellazione delle architetture di sistema
+I diagrammi a blocchi semplici e informali che mostrano entità e relazioni 
+sono il metodo più utilizzato per documentare le architetture software. 
+Ma questi sono stati criticati perché mancano di semantica, non mostrano i 
+tipi di relazioni tra entità né le proprietà visibili delle entità nell' architettura. 
+Dipende dall' uso dei modelli architetturali: i requisiti per la semantica dei 
+modelli dipendono da come vengono utilizzati
+12
+
+===== PAGE 13 =====
+Modellazione delle architetture di sistema
+Diagrammi a blocchi: 
+Molto astratti - non mostrano la natura delle relazioni dei componenti né le 
+proprietà esternamente visibili dei sottosistemi. 
+Tuttavia, utili per la comunicazione con le parti interessate e per la 
+pianificazione del progetto. 
+Offrono una vista di alto livello della struttura del sistema 
+Facilmente comprensibili da varie persone di discipline diverse interessate al 
+processo di sviluppo.
+13
+
+===== PAGE 14 =====
+Uso di modelli architetturali - due modi
+Per facilitare la discussione sulla progettazione del sistema  
+Una visione architetturale di alto livello di un sistema è utile per la 
+comunicazione con gli stakeholder del sistema e la pianificazione del progetto 
+perché non è ingombra di dettagli. Le parti interessate possono relazionarsi 
+con esso e comprendere una visione astratta del sistema. Essi possono quindi 
+discutere il sistema nel suo insieme senza essere confusi dai dettagli.  
+Come modo di documentare un' architettura progettata  
+L' obiettivo è produrre un modello di sistema completo che mostri i diversi 
+componenti di un sistema, le loro interfacce e i loro collegamenti. 
+14
+
+===== PAGE 15 =====
+Decisioni di progettazione architetturale
+La progettazione architetturale è un processo creativo, quindi il processo varia 
+a seconda del tipo di sistema sviluppato. 
+soddisfa requisiti funzionali e non funzionali d’un sistema 
+Tuttavia, una serie di decisioni comuni abbracciano tutti i processi di 
+progettazione e riguardano le caratteristiche non funzionali del sistema. 
+basandosi sulle proprie conoscenze ed esperienze si deve rispondere alle 
+domande della slide seguente
+15
+
+===== PAGE 16 =====
+16
+Is there a generic application 
+architecture that can act as a 
+template for the system that is 
+being designed?
+How will the system be 
+distributed across hardware 
+cores or processors?
+What architectural patterns or 
+styles might be used?
+What will be the fundamental 
+approach used to structure 
+the system?
+How will the structural 
+components in the system be 
+decomposed into 
+sub-components?
+What strategy will be used to 
+control the operation of the 
+components in the system?
+What architectural organization 
+is best for delivering the 
+non-functional requirements 
+of the system?
+How should the architecture 
+of the system be 
+documented?
+?
+
+===== PAGE 17 =====
+Riuso
+I sistemi nello stesso settore hanno spesso architetture simili che riflettono concetti di 
+dominio. 
+Per esempio, le linee di prodotti applicativi sono costruite attorno ad un' architettura 
+core con varianti che soddisfano particolari esigenze del cliente. 
+Quando si progetta un’architettura di un sistema si deve decidere cosa hanno in 
+comune il sistema e le classi di applicazioni più generali e stabilire quanto può essere 
+riusato da queste architetture applicative 
+L' architettura di un sistema può essere progettata intorno a uno o più modelli o stili 
+architettonici.  
+Questi catturano l' essenza di un' architettura e possono essere istanziati in modi 
+diversi.
+17
+
+===== PAGE 18 =====
+Viste architetturali
+Uno schema architetturale è una descrizione dell’organizzazione del sistema 
+Quali punti di vista o prospettive sono utili per progettare e documentare 
+l'architettura di un sistema? 
+Quali notazioni dovrebbero essere usate per descrivere i modelli architettonici? 
+Ogni modello architettonico mostra una sola vista o prospettiva del sistema.  
+Potrebbe mostrare come un sistema viene scomposto in moduli, come interagiscono i 
+processi di run-time o i diversi modi in cui i componenti del sistema sono distribuiti 
+su una rete.  
+Sia per il design che per la documentazione, di solito è necessario presentare viste 
+multiple dell' architettura software. 
+18
+
+===== PAGE 19 =====
+19
+System
+architecture
+Logical
+view
+Physical
+view
+Process
+view
+Development
+view
+
+===== PAGE 20 =====
+4 + 1 modelli di visualizzazione dell' architettura software
+Una vista logica, che mostra le principali astrazioni nel sistema come oggetti 
+o classi di oggetti.  
+Una vista del processo, che mostra come, al tempo di esecuzione, il sistema sia 
+composto da processi interagenti.  
+Una vista di sviluppo, che mostra come il software viene decomposto per lo 
+sviluppo. 
+Una vista fisica, che mostra l' hardware del sistema e come i componenti 
+software sono distribuiti tra i processori del sistema. 
+Casi o scenari di utilizzo correlati (+1) 
+20
+
+===== PAGE 21 =====
+Rappresentare le viste architetturali
+Alcuni sostengono che l' Unified Modeling Language (UML) sia una 
+notazione appropriata per descrivere e documentare le architetture di sistema. 
+C’è chi non è d' accordo perché UML potrebbe non includere appropriate viste 
+astratte per una descrizione di alto livello del sistema. 
+Linguaggi di descrizione architettonica (ADL) sono stati sviluppati, ma non 
+sono ampiamente utilizzati
+21
+
+===== PAGE 22 =====
+Pattern architetturali
+I modelli sono un mezzo per rappresentare, condividere e riutilizzare la 
+conoscenza. 
+Un modello architetturale è una descrizione stilizzata delle buone pratiche di 
+progettazione, che è stata sperimentata e testata in diversi ambienti. 
+I modelli dovrebbero includere informazioni su quando sono e quando non 
+sono utili. 
+Gli schemi possono essere rappresentati utilizzando descrizioni tabulari e 
+grafiche.
+22
+
+===== PAGE 23 =====
+Architettura Model View Controller 
+23
+Name MVC (Model-View-Controller)
+Description Separates presentation and interaction from the system data. The system is 
+structured into three logical components that interact with each other. The Model 
+component manages the system data and associated operations on that data. The 
+View component deﬁnes and manages how the data is presented to the user. The 
+Controller component manages user interaction (e.g., key presses, mouse clicks, 
+etc.) and passes these interactions to the View and the Model. See Figure 6.3.
+Example Figure 6.4 shows the architecture of a web-based application system organized 
+using the MVC pattern.
+When used Used when there are multiple ways to view and interact with data. Also used when 
+the future requirements for interaction and presentation of data are unknown. 
+Advantages Allows the data to change independently of its representation and vice versa. 
+Supports presentation of the same data in different ways with changes made in 
+one representation shown in all of them. 
+Disadvantages Can involve additional code and code complexity when the data model and 
+interactions are simple.
+
+===== PAGE 24 =====
+Architettura Model/View/Controller
+I sottosistemi sono classificati in tre diversi tipi: 
+Model subsystem - responsabile di mantenere la  conoscenza del dominio 
+View subsystem - responsabile di esibire gli elementi del dominio all’utente  
+Controller subsystem - responsabile di gestire la sequenza delle interazioni 
+con l’utente
+24
+
+===== PAGE 25 =====
+25
+C o n tr o lle r V ie w
+M o d e l
+V ie w
+s e le c tio n
+S ta te
+c h a n g e
+C h a n g e
+n o tific a tio n
+S ta te  q u e ry
+U s e r e v e n ts
+M a p s  u s e r a c tio n s
+to  m o d e l u p d a te s
+S e le c ts  v ie w
+R e n d e rs  m o d e l
+R e q u e s ts  m o d e l u p d a te s
+S e n d s  u s e r e v e n ts  to
+c o n tr o lle r
+E n c a p s u la te s  a p p lic a tio n
+s ta te
+N o tifie s  v ie w  o f s ta te
+c h a n g e s
+
+===== PAGE 26 =====
+Architettura Model View Controller 
+26
+
+
+===== PAGE 27 =====
+Architettura Model/View/Controller
+MVC è un caso speciale della architettura repository 
+I sottosistemi model implementano la struttura dati centrale e i sottosistemi 
+controller esplicitamente dettano il flusso di controllo
+27
+Controller
+Model
+subscriber
+notifier
+initiator
+*
+repository1
+1
+*
+View
+
+===== PAGE 28 =====
+Architettura Repository 
+I sottosistemi devono scambiare dati. Ciò può avvenire in due modi: 
+I dati condivisi sono conservati in una banca dati o in un archivio centrale 
+e possono essere consultati da tutti i sottosistemi; 
+Ogni sottosistema mantiene il proprio database e trasmette i dati 
+esplicitamente ad altri sottosistemi. 
+Quando si devono condividere grandi quantità di dati, il modello di 
+condivisione del repository è più comunemente utilizzato 
+è un meccanismo di condivisione dei dati efficiente.
+28
+
+===== PAGE 29 =====
+Architettura Repository
+29
+Name Repository
+Description All data in a system is managed in a central repository that is
+accessible to all system components . Components do not
+interact directly, only through the repository .
+Example Figure 6.9 is an example of an IDE where the components use
+a repository of system design information .Each software tool
+generates information which is then available for use by other
+tools .
+When used Yo u should use this pattern when you have a system in which
+large volumes of information are generated that has to be
+stored for a long time . Yo u may also use it in data -driven
+systems where the inclusion of data in the repository triggers
+an action or tool .
+Advantages Components can be independent —they do not need to know
+of the existence of other components .Changes made by one
+component can be propagated to all components .All data can
+be managed consistently (e.g., backups done at the same
+time) as itis all in one place .
+Disadvantages The repository is a single point of failure so problems in the
+repository affect the whole system . May be inefficiencies in
+organizing all communication through the repository .
+Distributing the repository across several computers may be
+difficult .
+
+===== PAGE 30 =====
+Una Repository per un IDE
+30
+P ro je c t
+r e p o s ito ry
+D e s ig n
+tr a n s la to r
+J a v a
+e d ito r
+U M L
+e d ito rs
+C o d e
+g e n e r a to rs
+D e s ig n
+a n a ly z e r
+R e p o r t
+g e n e r a to r
+P y th o n
+e d ito r
+
+===== PAGE 31 =====
+Architettura Repository
+I sottosistemi accedono o modificano dati da una singola struttura 
+dati 
+I sottosistemi sono scarsamente accoppiati - interagiscono solo 
+attraverso repository 
+Il flusso di controllo è dettato da repository centrale o dai sottosistemi
+31
+System Design Concepts 239
+Repository
+In the repository architectural style  (see Figure 6-13), subsystems access and modify a
+single data structure called the central repository . Subsystems are relatively independent and
+interact only through the repo sitory. Control flow can be dictated either by the central repository
+(e.g., triggers on the data invoke peripheral systems) or by the subsystems (e.g., independent
+flow of control and synchronization through locks in the repository).
+Repositories are typically used for database management systems, such as a payroll
+system or a bank system. The central location of the data makes it easier to deal with
+concurrency and integrity issues between subsystems. Compilers and software development
+environments also follow a repository architectural style (Figure 6-14). The different subsystems
+of a compiler access and update a central parse tree and a symbol table. Debuggers and syntax
+editors access the symbol table as well.
+The repository subsystem can also be used for impl ementing the global control flow. In
+the compiler example of Figure 6-14, each individual tool (e.g., the compiler, the debugger, and
+the editor) is invoked by the user. The repository only ensures that concurrent accesses are
+serialized. Conversely, the repository can be used to in voke the subsystem s based on the state of
+the central data structure. These systems are called “blackboard systems.” The HEARSAY II
+speech understanding system [Erman et al., 1980], one of the first blackboard systems, invoked
+tools based on the current state of the blackboard. 
+Repositories are well suited for applications with constantly changing, complex data-
+processing tasks. Once a central repository is well defined, we can easily add new services in the
+form of additional subsystems. The main disadvantage of repo sitory systems is that the central
+repository can quickly become a bottleneck, both fr om a performance asp ect and a modifiability
+aspect. The coupling between each subsystem and the repository is high, thus making it difficult
+to change the repository without having  an impact on all subsystems.
+Figure 6-13 Repository architectural style (UML component diagram). Every Subsystem  depends only
+on a central data structure called the Repository . The Repository  h a s  n o  k n o w l e d g e  o f  t h e  o t h e r
+Subsystems .
+createData()
+setData()
+getData()
+searchData()
+Subsystem1
+Repository
+«provided interfaces»
+Subsystem2
+
+===== PAGE 32 =====
+Architettura Repository
+Una architettura repository è tipica per i database management system 
+Il principale svantaggio: il repository centrale può spesso diventare un 
+collo di bottiglia
+32
+
+===== PAGE 33 =====
+Architettura Client - Server
+Modello di sistema distribuito che mostra come i dati e l' elaborazione sono distribuiti su una 
+serie di componenti e come questi sono organizzati a runtime. 
+Può essere implementato su un singolo computer. 
+I principali modelli di questo sistema sono: 
+Set di server stand-alone che forniscono servizi ad altri sottosistemi, per esempio servizi 
+specifici come la stampa, la gestione dei file, ecc. I server sono componenti software e molti di 
+questi possono essere eseguiti nello stesso computer. 
+Set di client che ricorrono a questi servizi, richiedono servizi a questi server. Di solito si tratta 
+di varie istanze di programmi client eseguiti contemporaneamente su computer diversi. 
+Rete che consente ai client di accedere ai servizi. Di solito i sistemi client-server sono 
+implementati come distribuiti e collegati attraverso protocolli internet.
+33
+
+===== PAGE 34 =====
+Architettura Client - Server
+34
+Name Client -server
+Description In a client –server architecture, the functionality of the system is
+organized into services, with each service delivered from a
+separate server . Clients are users of these services and access
+servers to make use of them .
+Example Figure 6.11 is an example of a film and video/DVD library organized
+as a client –server system .
+When used Used when data in a shar ed database has to be accessed from a
+range of locations .Because servers can be replicated, may also be
+used when the load on a system is variable .
+Advantages The principal advantage of this model is that servers can be
+distributed across a network . General functionality (e.g.,a printing
+service) can be available to all clients and does not need to be
+implemented by all services .
+Disadvantages Each service is a single point of failure so susceptible to deni al of
+service attacks or server failure .Performance may be unpredictable
+because it depends on the network as well as the system .May be
+management problems if servers are owned by different
+organizations .
+
+===== PAGE 35 =====
+Un' architettura client-server per una cineteca 
+35
+C a ta lo g
+s e rv e r
+L ib ra ry
+c a ta lo g u e
+V id e o
+s e rv e r
+F ilm  s to r e
+P ic tu re
+s e rv e r
+P h o to  s to r e
+W e b
+s e rv e r
+F ilm  a n d
+p h o to  in fo .
+C lie n t 1 C lie n t 2 C lie n t 3 C lie n t 4
+In te rn e t
+
+===== PAGE 36 =====
+Architettura Client Server
+Uno o più server forniscono servizi ad istanze di sottosistemi chiamati client 
+Il client chiama il server che fornisce un servizio e ritorna un risultato 
+il client conosce l'interfaccia (interface) del server 
+Il server non ha bisogno di conoscere l’ interfaccia del client 
+La risposta in generale è immediata 
+L'utente interagisce solo con il client
+36
+
+===== PAGE 37 =====
+Architettura Client Server
+Un sistema informatico con un database centrale è un esempio di 
+architettura client/server 
+Le architetture sono adatte per sistemi distribuiti che gestiscono un 
+grande numero di dati
+37
+Client
+Server
+service1()
+service2()
+serviceN()
+…
+**
+requester provider
+
+===== PAGE 38 =====
+Architettura Peer-to-peer
+E’ una generalizzazione della architettura client/server 
+I client possono essere server e vice-versa 
+Il flusso di controllo può provocare deadlock
+38
+Peer
+service1()
+service2()
+serviceN()
+…
+requester
+provider
+*
+*
+
+===== PAGE 39 =====
+Architettura a Layer
+E’ un altro modo per ottenere separazione ed indipendenza - permettono di localizzare le modifiche 
+primo modo MVC, per esempio posso cambiare una view o aggiungerne un’altra senza cambiare i dati nel 
+model. 
+Utilizzato per modellare l' interfacciamento di sottosistemi. 
+Organizza il sistema in un insieme di livelli (o macchine astratte) ciascuno dei quali fornisce un insieme di 
+servizi. 
+Le funzionalità del sistema sono organizzate in strati separati. 
+Ogni strato si basa sulle funzionalità e sui servizi offerti dallo strato immediatamente sottostante. 
+Supporta lo sviluppo incrementale di sottosistemi in diversi livelli.  
+Uno strato più esteso può essere implementato senza modificare le sue interfacce e quindi senza influenzare 
+il livello sottostante. 
+Quando l' interfaccia di un livello cambia, solo il livello adiacente viene influenzato.
+39
+
+===== PAGE 40 =====
+Architettura a Layer
+40
+Name Layered architecture
+Description Organizes the system into layers with related functionality
+associated with each layer .Alayer provides services to the layer
+above itso the lowest -level layers represent core services that
+are likely to be used throughout the system .See Figure 6.6.
+Example A layered model of asystem for sharing copyright documents
+held indifferent libraries, as shown inFigure 6.7.
+When used Used when building new facilities on top of existing systems ;
+when the development isspread across several teams with each
+team responsibility for alayer of functionality ;when there is a
+requirement for multi -level security .
+Advantages Allows replacement of entire layers so long as the interface is
+maintained .Redundant facilities (e.g.,authentication) can be
+provided in each layer to increase the dependability of the
+system .
+Disadvantages In practice, providing a clean separation between layers is often 
+difficult and a high -level layer may have to interact directly with 
+lower -level layers rather than through the layer immediately 
+below it. Performance can be a problem because of multiple 
+levels of interpretation of a service request as it is processed at 
+each layer .
+
+===== PAGE 41 =====
+Architettura a Layer
+41
+U s e r  in t e r fa c e
+C o r e  b u s in e s s  lo g ic / a p p lic a t io n  fu n c t io n a lity
+S y s t e m  u t ilit ie s
+S y s t e m  s u p p o r t  ( O S , d a t a b a s e  e tc .)
+U s e r  in t e r fa c e  m a n a g e m e n t
+A u t h e n t ic a t io n  a n d  a u t h o r iz a t io n
+
+===== PAGE 42 =====
+Esempio del iLearn system
+42
+
+
+===== PAGE 43 =====
+Architettura Three-tier 
+Questa architettura organizza i sottosistemi in tre layers 
+interface layer: include tutti gli oggetti boundary che interagiscono con 
+l'utente includendo windows, form e pagine web 
+Application logic layer: include tutti gli oggetti control ed entity 
+realizzando così elaborazione vera e propria, il controllo sulle regole etc 
+Storage layer: realizza lo storage, il reperimento e le query sugli oggetti 
+persistenti
+43
+
+===== PAGE 44 =====
+44
+System Design Concepts 245
+The three-tier architectural style was initially described in the 1970s for information
+systems. The storage layer, an analog to the Repository  subsystem in the repository
+architectural style, can be shared by several different applications operating on the same data. In
+turn, the separation between the interface layer and the application logic layer enables the
+development or modification of different user interfaces for the same application logic.
+Four-tier
+The four-tier architectural style  is a three-tier architecture in which the Interface layer is
+decomposed into a Presentation Client  l a y e r  a n d  a  Presentation Server  l a y e r
+(Figure 6-23). The Presentation Client  l a y e r  i s  l o c a t e d  o n  t h e  u s e r  m a c h i n e s ,  w h e r e a s  t h e
+Presentation Server  layer can be located on one or more servers. The four-tier architecture
+enables a wide range of different presentation clients in the application, wh ile reusing some of
+the presentation objects across clients. For example, a bank ing information system can include a
+host of different clients, such as a Web browser interface for home users, an Automated Teller
+Machine, and an application client for bank employees. Forms shared by all three clients can
+then be defined and processed in the Presentation Server  layer , thus removing redundancy
+across clients.
+Pipe and filter
+In the pipe and filter architectural style  (Figure 6-24), subsystems process data received
+from a set of inputs and send results to other subs ystems via a set of outputs. The subsystems are
+called “filters,” and the associations between the subsystems are called “pipes.” Each filter
+knows only the content and the format of the data received on the input pipes, not the filters that
+Figure 6-22 Three-tier architectural style (UML component diagram). Objects are organized into three
+layers realizing the user interface, the processing, and the storage.
+Interface
+Connection
+Form
+Query
+Application Logic
+Storage
+
+===== PAGE 45 =====
+Architettura Pipe and Filter
+Le trasformazioni funzionali elaborano i loro ingressi per produrre uscite. 
+Può essere definito come un modello di “tubo e filtro” (come in UNIX shell). 
+Le varianti di questo approccio sono molto comuni. Quando le 
+trasformazioni sono sequenziali, si tratta di un modello sequenziale batch 
+che viene ampiamente utilizzato nei sistemi di elaborazione dati. 
+Non proprio adatto per sistemi interattivi.
+45
+
+===== PAGE 46 =====
+Architettura Pipe and Filter
+46
+Name Pipe and filter
+Description The processing of the data in a system is organized so that each
+processing com ponent (filter) is discrete and carries out one type of
+data transformation .The data flows (as in a pipe) from one component
+to another for processing .
+Example Figure 6.13 is an example of a pipe and filter system used for
+processing invoices .
+When used Commonly used in data processing applications (both batch - and
+transaction -based) where inputs are processed in separ ate stages to
+generate related outputs .
+Advantages Easy to understand and suppor ts transformation reuse .Workflow style
+matches the structure of many business processes . Evolution by
+adding transformations is straightforward . Can be implemented as
+either asequential or concurrent system .
+Disadvantages The format for data transfer has to be agreed upon between
+communicating transformations . Each transformation must parse its
+input and unparse its output to the agreed form .This increases system
+overhead and may mean that it is impossible to reuse functional
+transformations that use incompatible data structures .
+
+===== PAGE 47 =====
+Architettura Pipe and Filter - esempio di un sistema di pagamento
+47
+R e a d  is s u e d
+in v o ic e s
+I d e n t ify
+p a y m e n t s
+Is s u e
+r e c e ip t s
+F in d
+p a y m e n t s
+d u e
+R e c e ip t s
+Is s u e
+p a y m e n t
+r e m in d e r
+R e m in d e r s
+I n v o ic e s P a y m e n t s
+
+===== PAGE 48 =====
+System Design ed 
+UML
+
+===== PAGE 49 =====
+UML deployment diagram
+E’ usato per rappresentare le relazioni tra componenti runtime e nodi hardware 
+Rappresenta la allocazione dei componenti in diversi nodi e le dipendenze tra i componenti 
+I componenti sono entità auto contenute che forniscono servizi ad altri componenti o attori 
+Un nodo è qualsiasi cosa possa mandare in esecuzione del software e può appartenere a due 
+categorie 
+Un dispositivo - hardware, può essere un computer o un componente hardware più 
+semplice collegato al sistema 
+Ambiente di esecuzione - pezzo di software che può contenere ed eseguire un altro 
+software
+49
+
+===== PAGE 50 =====
+UML deployment diagram
+I nodi contengono elaborati -manifestazione fisiche 
+del software 
+Tipicamente si tratta di file 
+File jar o file eseguibili, anche file dati o di 
+configurazione, documenti HTML etc.
+50
+:Planner 
+:PC 
+:Scheduler
+:HostMachine 
+<<database>> 
+meetingsDB 
+Compile Time
+Dependency
+Runtime
+Dependency
+
+===== PAGE 51 =====
+UML deployment diagram
+51
+
+
+===== PAGE 52 =====
+Identiﬁcare i sottosistemi
+Trovare i sottosistemi durante il sistema design è simile a trovare gli 
+object durante l’analisi.
+52
+System Design Activities: From Objects to Subsystems 253
+6.4.3 Identifying Subsystems
+Finding subsystems during system design is similar to finding objects during analysis. For
+example, some of the object identifi cation techniques we described in Chapter 5, Analysis , such
+as Abbotts’s heuristics, are applicable to subsystem identification. Moreover, subsystem
+decomposition is constantly re vised whenever new issues are addressed: several subsystems are
+merged into one subsystem, a complex subsyst em is split into parts, and some subsystems are
+added to address new functionality. The first iterations over subsystem decomposition can
+introduce drastic changes in the system design m odel. These are often best handled through
+brainstorming.
+The initial subsystem decomposition should be de rived from the f unctional requirements.
+For example, in the MyTrip  s y s t e m ,  w e  i d e n t i f y  t w o  m a j o r  g r o u p s  o f  o b j e c t s :  t h o s e  t h a t  a r e
+involved during the PlanTrip  use case and those that are involved during the ExecuteTrip  use
+case. The Trip , Direction , Crossing , Segment , and Destination  classes are shared between
+both use cases. This set of classes is tightly coupled as it is used as a whole to represent a Trip .
+We decide to assign them with PlanningService  to the PlanningSubsystem , and the remainder
+of the classes are assigned to the RoutingSubsystem  (Figure 6-29). This leads to only one
+association crossing subsystem boundaries. No te that this subsystem decomposition is a
+repository in which the PlanningSubsystem  is responsible for the central data structure.
+Another heuristic for subsystem identificati on is to keep functionally related objects
+together. A starting point is to assign the participating objects that have been identified in each
+use case to the subsystems. Some group of objects, as the Trip  group in MyTrip , are shared and
+used for communicating information from one subsystem to another. We can either create a new
+subsystem to accommodate them or assign them to the subsystem that creates these objects.
+Encapsulating subsystems with the Facade design pattern
+Subsystem decomposition reduces the complexity of the solutio n domain by minimizing
+coupling among subsystems. The Facade design pattern  (see Appendix A.6 and [Gamma et al.,
+1994]) allows us to further reduce dependencies between classes by encapsulating a subsystem
+with a simple, unified interface. For example, in Figure 6-30, the Compiler  c l a s s  i s  a  f a ç a d e
+hiding the classes CodeGenerator , Optimizer , ParseNode , Parser , and Lexer . The façade
+provides access only to the public services offered by the subsystem and hides all other details,
+effectively reducing coupling between subsystems. 
+Heuristics for grouping objects into subsystems
+•A s s i g n  o b j e c t s  i d e n t i f i e d  i n  o n e  u s e  c a s e  i n t o  t h e  s a m e  s u b s y s t e m .
+•C r e a t e  a  d e d i c a t e d  s u b s y s t e m  f o r  o b j e c t s  u s e d  f o r  m o v i n g  d a t a  a m o n g  s u b s y s t e m s .
+•M i n i m i z e  t h e  n u m b e r  o f  a s s o c i a t i o n s  c r o s s i n g  s u b s y s t e m  b o u n d a r i e s .
+•A l l  o b j e c t s  i n  t h e  s a m e  s u b s y s t e m  s h o u l d  b e  f u n c t i o n a l l y  r e l a t e d .
+
+===== PAGE 53 =====
+Modellare i sottosistemi
+53
+
+
+===== PAGE 54 =====
+Modellare i sottosistemi
+54
+
+
+===== PAGE 55 =====
+Component diagram
+Un component diagram mostra i vari componenti in un sistema e le loro 
+dipendenze 
+Un componente rappresenta il modulo fisico del codice 
+Di solito un componente coincide con il package 
+Le dipendenze tra componenti mostrano come i cambiamenti ad un 
+componente possono causare cambiamenti ad altri componenti
+55
+
+===== PAGE 56 =====
+Diagrammi dei componenti
+56
+
+
+===== PAGE 57 =====
+Diagramma dei componenti
+57
+
+
+===== PAGE 58 =====
+58
+266 Chapter 7  •  System Design: Addressing Design Goals
+7.4.2 Identifying and Storing Persistent Data
+Persistent data  outlive a single execution of the system. For example, at the end of the day, an
+author saves his work into a file on a word processor. The file can then be reopened later. The
+word processor need not run for the file to exist. Similarly, information related to employees,
+their employment status, and their paychecks live in a database management system. This allows
+all the programs that operate on employee data to do so consistently. Moreover, storing data in a
+database enables the system to perform complex queries on a large data set (e.g., the records of
+several thousand employees).
+Where and how data is stored in the system affects system decomposition. In some cases,
+for example, in a repository architectural style (see Section 6.3.5), a subsystem can be
+completely dedicated to the storage of data. The selection of a specific database management
+system can also have implications on the overall control strategy and concurrency management.
+For example, in MyTrip , we decide to store the current Trip  in a file on a removable disk
+to allow the recovery of the Trip  in case the driver shuts off the car before reaching the final
+CommunicationSubsystem The CommunicationSubsystem  is responsible for transporting objects
+from the PlanningSubsystem  to the RoutingSubsystem .
+Connection A Connection  r e p r e s e n t s  a n  a c t i v e  l i n k  b e t w e e n  t h e  Planning–
+Subsystem  and the RoutingSubsystem . A Connection  object handles
+exceptional cases associated with loss of network services.
+Message A Message  represents a Trip  and its related Destinations , Segments ,
+Crossings , and Directions , encoded for transport.
+Figure 7-5  Revised design model for MyTrip  (UML component diagram). 
+Trip
+Location
+PlanningService
+Segment
+Crossing
+RouteAssistant
+Direction
+Destination
+TripProxy
+SegmentProxy
+Message
+Connection
+RoutingSubsystem PlanningSubsystem
+CommunicationSubsystem
+
+===== PAGE 59 =====
+59
+System Design Activities: Addressing Design Goals 267
+Destination . Using a file is the simplest and most efficient solution in this case, given that the
+RoutingSubsystem  will only store complete Trips  to the file before shutdown and load the file
+at start-up. In the PlanningSubsystem , however, the Trips  will be stored in a database. This
+subsystem can then be used to manage all Trips  for many drivers, as well as the maps needed to
+generate the Trips . Using a database for this subsystem allo ws us to perform complex queries
+on these data. We add the TripFileStoreSubsystem  and the MapDBStoreSubsystem  subsystems
+to MyTrip  to reflect these decisions, as illustrated in Figure 7-6.
+Identifying persi stent objects
+First, we identify which data must be persisten t. The entity objects identified during
+analysis are obvious candidates for persistency. In MyTrip , Trips  a n d  t h e i r  r e l a t e d  c l a s s e s
+(Crossing , Destination , PlanningService , and Segment ) must be stored. Note that not all
+entity objects must be persistent. For example, Location  a n d  Direction  a r e  c o n s t a n t l y
+recomputed as the car moves. Persistent objects are not limited to entity objects, however. In a
+multi-user system, inf ormation related to users (e.g., Drivers ) is persistent, as well as some
+attributes of the boundary objects (e.g., window positions, user interface preferences, state of
+long-running control objects). In general, we can id entify persistent objects by examining all the
+classes that must survive system shutdown, either in case of a controlled shutdown or an
+unexpected crash. The system will then restore these long-lived objects by retrieving their
+TripFileStoreSubsystem The TripFileStoreSubsystem  is responsible for storing trips in files
+on the onboard computer. Because this functionality is only used for
+storing trips when the car shuts down, this subsystem only supports the
+fast storage and loading of whole trips.
+MapDBStoreSubsystem The MapDBStoreSubsystem  is responsible for storing maps and trips in
+a database for the PlanningSubsystem . This subsystem supports
+multiple concurrent Drivers  and planning agents.
+Figure 7-6  S u b s y s t e m  d e c o m p o s i t i o n  o f  MyTrip  a f t e r  d e c i d i n g  o n  t h e  i s s u e  o f  d a t a  s t o r e s  ( U M L
+component diagram).
+RoutingSubsystem
+TripFileStoreSubsystem CommunicationSubsystem
+PlanningSubsystem
+MapDBStoreSubsystem
+
+===== PAGE 60 =====
+60
+278 Chapter 7  •  System Design: Addressing Design Goals
+By focusing on dependencies between subsystems, we refine the subsystem
+responsibilities, we find omissi ons in our decomposition, and we validate the current software
+architecture. By focusing on services (as opposed to attri butes or operations), we remain at the
+architectural abstraction level, allowing us to  r e a s s i g n  r e s p o n s i b i l i t i e s  b e t w e e n  s u b s y s t e m s ,
+without changing many modeling elements.
+For example, let us focus on the interfaces of the CommunicationSubsystem  of MyTrip .
+The responsibility of the CommunicationSubsystem  is to transport trips from the
+PlanningSubsystem  to the RoutingSubsystem . The RoutingSubsystem  initiates the connection,
+as the PlanningSubsystem  is a server that is always available, while the RoutingSubsystem  runs
+only while the car is powered. This asymmetry leads us to define three interfaces (Figure 7-14):
+• ConnectionManager  allows a subsystem to register with the CommunicationSubsystem ,
+to authenticate, find other nodes, and initiate and close connections.
+• TripRequester  a l l o w s  a  s ub s y s t e m  t o r e qu e s t  a  l i s t  o f  a v a i l a b l e  t r i p s  a nd  do w n l oa d
+selected trips. 
+• TripProvider  allows a subsystem  to pro vide a list of trips that are available for the
+specified car driver and respond to specific trip requests.  
+While we have not yet specified any operations of the CommunicationSubsystem , naming
+services provides us with enough detail for identifying missing functionality and discussing
+design trade-offs. For example:
+Figure 7-14 Refining the subsystem decompositions by identifying subsystem services (UML component
+diagram). The CommunicationSubsystem  p r o v i d e s  t h r e e  s e r v i c e s  f o r  m a n a g i n g  c o n n e c t i o n s ,  u p l o a d i n g
+trips, and downloading trips.
+RoutingSubsystem
+CommunicationSubsystem
+PlanningSubsystem
+TripRequester TripProvider
+ConnectionManager
+
+===== PAGE 61 =====
+System Design Document - SDD
+61
+Managing System Design 285
+• Subsystem decomposition describes the decomposition into subsystems and the
+responsibilities of each. This is the main product of system design.
+• Hardware/software mapping describes how subsystems are assigned to hardware and
+off-the-shelf components. It also lists the issues introduced by multiple nodes and
+software reuse.
+• Persistent data management describes the persistent data stor ed by the system and the
+data management infrastructure required for it. This section typically includes the
+description of data schemes, the selection of a database, and the description of the
+encapsulation of the database.
+• Access control and security  d e s c r i b e s  t h e  u s e r  m o d e l  o f  t h e  s y s t e m  i n  t e r m s  o f  a n
+access matrix. This section also describes security issues, such as the selection of an
+authentication mechanism, the use of encryption, and the management of keys.
+• Global software control describes how the global software cont rol is implemented. In
+particular, this section should describe how requests are initiated and how subsystems
+synchronize. This section should list and address synchronization and concurrency
+issues.
+• Boundary conditions  d e s c r i b e s  t h e  s t a r t - u p ,  s h u t d o w n ,  a n d  e r r o r  b e h a v i o r  o f  t h e
+system. (If new use cases are discovered for system administration, these should be
+included in the requirements analysis document, not in this section.)
+System Design Document
+1. Introduction
+1.1 Purpose of the system
+1.2 Design goals
+1.3 Definitions, acronyms, and abbreviations
+1.4 References
+1.5 Overview
+2. Current software architecture
+3. Proposed software architecture
+3.1 Overview
+3.2 Subsystem decomposition
+3.3 Hardware/software mapping
+3.4 Persistent data management
+3.5 Access control and security
+3.6 Global software control
+3.7 Boundary conditions
+4. Subsystem services
+Glossary
+Figure 7-18 Example outline for the System Design Document (SDD).
+
+===== PAGE 62 =====
+62

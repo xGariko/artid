@@ -6,19 +6,17 @@ export const load: PageServerLoad = async ({ locals }) => {
 		throw error(401, 'Non autenticato');
 	}
 
-	const artids = await locals.api.GET('/api/artids');
-
-	// const [resources, artids] = await Promise.all([
-	//     locals.api.GET("/api/resources"),
-	//     locals.api.GET("/api/artids"),
-	// ]);
+	const [artids, tags] = await Promise.all([
+		locals.api.GET('/api/artids'),
+		locals.api.GET('/api/tags')
+	]);
 
 	if (!artids.data) {
-		throw error(500, 'Errore nel caricamento della pagina risorse');
+		throw error(500, 'Errore nel caricamento della pagina artid');
 	}
 
 	return {
-		// resources: resources.data,
-		artids: artids.data
+		artids: artids.data,
+		tags: tags.data
 	};
 };

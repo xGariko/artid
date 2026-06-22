@@ -6,6 +6,7 @@
 	import { sanitizeHtml } from '$lib/sanitize';
 	import { type ResourceType, resourceTypeFromMime } from '$lib/utilities';
 	import ArtidDocumentFileCard from '$lib/components/pages/artid/cards/artid-document-file-card.svelte';
+	import ArtidImageFileCard from '$lib/components/pages/artid/cards/artid-image-file-card.svelte';
 
 	// `data` fonde i load degli antenati + quello della pagina:
 	//  - `data.artid`   ← +layout.server.ts del livello [id]
@@ -76,6 +77,9 @@
 
 					{#if filetype === "document"}
 						<ArtidDocumentFileCard {resource}></ArtidDocumentFileCard>
+					{:else if filetype === "image"}
+						<ArtidImageFileCard {resource}></ArtidImageFileCard>
+						{:else}
 					{/if}
 					<li class="d-flex align-items-center gap-2">
 						<i class="bi bi-file-earmark" aria-hidden="true"></i>

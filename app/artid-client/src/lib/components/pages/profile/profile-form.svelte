@@ -7,6 +7,9 @@
 	import 'quill/dist/quill.snow.css';
 	import type { Profile } from '$lib/api/types';
 	import ArtidSpidButton from '$lib/components/ui/artid-spid-button.svelte';
+	import ArtidEditorModal from '$lib/components/ui/artid-editor-modal.svelte';
+	import { goto } from '$app/navigation';
+	import { resolve } from '$app/paths';
 
 	let { profile }: { profile: Profile } = $props();
 
@@ -49,19 +52,19 @@
 	// "Salva" attivo solo se almeno un campo differisce dallo snapshot.
 	let isDirty = $derived(
 		model.name !== baseline.name ||
-		model.surname !== baseline.surname ||
-		model.birthdate !== baseline.birthdate ||
-		model.birthplace !== baseline.birthplace ||
-		model.address !== baseline.address ||
-		model.biography !== baseline.biography ||
-		model.linkedinId !== baseline.linkedinId ||
-		model.facebookId !== baseline.facebookId ||
-		model.instagramId !== baseline.instagramId ||
-		model.profession !== baseline.profession ||
-		model.phone !== baseline.phone ||
-		model.businessEmail !== baseline.businessEmail ||
-		model.isPublic !== baseline.isPublic ||
-		model.internalShareEnabled !== baseline.internalShareEnabled
+			model.surname !== baseline.surname ||
+			model.birthdate !== baseline.birthdate ||
+			model.birthplace !== baseline.birthplace ||
+			model.address !== baseline.address ||
+			model.biography !== baseline.biography ||
+			model.linkedinId !== baseline.linkedinId ||
+			model.facebookId !== baseline.facebookId ||
+			model.instagramId !== baseline.instagramId ||
+			model.profession !== baseline.profession ||
+			model.phone !== baseline.phone ||
+			model.businessEmail !== baseline.businessEmail ||
+			model.isPublic !== baseline.isPublic ||
+			model.internalShareEnabled !== baseline.internalShareEnabled
 	);
 
 	let fieldErrors = $state<Record<string, string>>({});
@@ -126,7 +129,10 @@
 
 	// Quill su vuoto produce "<p><br></p>": lo normalizzo a undefined per il salvataggio.
 	function bioForSave(): string | undefined {
-		const plain = model.biography.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ').trim();
+		const plain = model.biography
+			.replace(/<[^>]*>/g, '')
+			.replace(/&nbsp;/g, ' ')
+			.trim();
 		return plain ? model.biography : undefined;
 	}
 
@@ -240,9 +246,150 @@
 			isSaving = false;
 		}
 	}
+
+	let deleteAccountModalOpen = $state(false);
+	let password = $state('');
+	let elimina = $state('');
+
+	function deleteAccountModal() {
+		deleteAccountModalOpen = true;
+		console.log('Close account');
+	}
+
+	async function deleteAccount(): Promise<void> {
+		if (!password.trim() || !elimina.trim()) {
+			toast.error('Compila tutti i campi per procedere');
+			return;
+		}
+
+		if (elimina.toLowerCase() !== 'conferma chiusura') {
+			toast.error('Digita: "Conferma chiusura" per procedere');
+			return;
+		}
+
+		isSaving = true;
+
+		try {
+			const verifyResponse = await api.POST('/api/auth/verify-password', {
+				body: { password }
+			});
+
+			const isPasswordValid = verifyResponse?.data?.['passwordCorretta'] ?? false;
+
+			if (!isPasswordValid) {
+				toast.error('Errore: Password Sbagliata');
+				isSaving = false;
+				return;
+			}
+
+			const actualUserId = profile?.id; // Letto sul momento, al click, quindi è sicuro al 100%
+			if (actualUserId === undefined || actualUserId === null) {
+				toast.error("Impossibile recuperare l'ID identificativo dell'utente.");
+				return;
+			}
+
+			const deleteResponse = await api.DELETE('/api/users/{id}', {
+				params: {
+					path: { id: actualUserId }
+				}
+			});
+
+			if (!deleteResponse.response.ok) {
+				toast.error("Errore nella rimozione dell'account dal sistema");
+				return;
+			}
+
+			toast.success('ACCOUNT ELIMINATO CON SUCCESSO');
+			deleteAccountModalOpen = false;
+			logoutLocal();
+		} catch (e) {
+			// Gestione di crash di rete o errori del server
+			console.error(e);
+			toast.error(e instanceof Error ? e.message : 'Errore di rete o del server');
+		} finally {
+			isSaving = false;
+		}
+	}
+
+	async function logoutLocal() {
+		localStorage.clear();
+		await goto(resolve('/welcome'));
+	}
+
+	// --- Collega SPID (RAD, caso d'uso COL_SPID). Il provider è mockato lato server: qui inviamo le
+	// credenziali della schermata del provider e, al successo, l'anagrafica viene SOVRASCRITTA con i
+	// dati del provider (e l'account risulta verificato). ---
+	const spidProviders = [
+		'PosteID',
+		'Aruba ID',
+		'Lepida ID',
+		'InfoCert ID',
+		'Namirial ID',
+		'Sielte ID',
+		'SpidItalia',
+		'TIM id'
+	];
+
+	let spidLinked = $state(profile.spidLinked ?? false);
+	let spidModalOpen = $state(false);
+	let spidBusy = $state(false);
+	let spidCreds = $state({ providerId: 'PosteID', username: '', password: '' });
+
+	function openSpidModal() {
+		spidCreds = { providerId: 'PosteID', username: '', password: '' };
+		spidModalOpen = true;
+	}
+
+	async function linkSpid(): Promise<void> {
+		if (spidBusy) return;
+		if (!spidCreds.username.trim() || !spidCreds.password.trim()) {
+			toast.error('Inserisci codice fiscale e password');
+			return;
+		}
+		spidBusy = true;
+		try {
+			const { data, response } = await api.POST('/api/profile/spid', {
+				body: {
+					providerId: spidCreds.providerId,
+					username: spidCreds.username.trim(),
+					password: spidCreds.password
+				}
+			});
+			if (!response.ok || !data) {
+				if (response.status === 409) {
+					toast.error('Questa identità SPID è già collegata a un altro account ArtID');
+				} else if (response.status === 401) {
+					toast.error('Credenziali SPID non valide');
+				} else {
+					toast.error('Errore: impossibile contattare il provider');
+				}
+				return;
+			}
+			// L'anagrafica è stata sostituita dal provider: riallineo form e snapshot così il
+			// dirty-check non segnala modifiche "fantasma" sui campi appena sovrascritti.
+			model.name = data.name ?? '';
+			model.surname = data.surname ?? '';
+			model.birthdate = data.birthdate ?? '';
+			model.birthplace = data.birthplace ?? '';
+			baseline.name = model.name;
+			baseline.surname = model.surname;
+			baseline.birthdate = model.birthdate;
+			baseline.birthplace = model.birthplace;
+			spidLinked = data.spidLinked ?? true;
+			spidModalOpen = false;
+			toast.success('SPID collegato: profilo verificato');
+			invalidateAll();
+		} catch (e) {
+			toast.error(e instanceof Error ? e.message : 'Errore di rete');
+		} finally {
+			spidBusy = false;
+		}
+	}
 </script>
 
-<div class="bg-artid-section h-100 mh-100 overflow-y-auto w-md-75 w-100 rounded-3 border border-artid-border p-4 d-flex flex-column gap-3">
+<div
+	class="bg-artid-section h-100 mh-100 overflow-y-auto w-md-75 w-100 rounded-3 border border-artid-border p-4 d-flex flex-column gap-3"
+>
 	<div class="row flex-grow-1">
 		<!-- Propic -->
 		<div class="col-12 col-md-2 d-flex flex-column align-items-center gap-2">
@@ -291,7 +438,6 @@
 					{/if}
 				</div>
 			</div>
-
 		</div>
 
 		<!-- Dati -->
@@ -301,7 +447,12 @@
 					<ArtidInput name="name" label="Nome" bind:value={model.name} error={err('name')} />
 				</div>
 				<div class="col-12 col-md-4 p-1">
-					<ArtidInput name="surname" label="Cognome" bind:value={model.surname} error={err('surname')} />
+					<ArtidInput
+						name="surname"
+						label="Cognome"
+						bind:value={model.surname}
+						error={err('surname')}
+					/>
 				</div>
 				<div class="col-12 col-md-4 p-1">
 					<!-- Email = identità di login: sola lettura -->
@@ -321,47 +472,97 @@
 
 			<div class="row">
 				<div class="col-12 col-md-4 p-1">
-					<ArtidInput type="date" name="birthdate" label="Data di nascita" bind:value={model.birthdate} error={err('birthdate')} />
+					<ArtidInput
+						type="date"
+						name="birthdate"
+						label="Data di nascita"
+						bind:value={model.birthdate}
+						error={err('birthdate')}
+					/>
 				</div>
 				<div class="col-12 col-md-4 p-1">
-					<ArtidInput name="birthplace" label="Luogo di nascita" bind:value={model.birthplace} error={err('birthplace')} />
+					<ArtidInput
+						name="birthplace"
+						label="Luogo di nascita"
+						bind:value={model.birthplace}
+						error={err('birthplace')}
+					/>
 				</div>
 				<div class="col-12 col-md-4 p-1">
-					<ArtidInput name="profession" label="Professione" bind:value={model.profession} error={err('profession')} />
+					<ArtidInput
+						name="profession"
+						label="Professione"
+						bind:value={model.profession}
+						error={err('profession')}
+					/>
 				</div>
 			</div>
 
 			<div class="row">
 				<div class="col-12 col-md-4 p-1">
-					<ArtidInput name="address" label="Indirizzo" bind:value={model.address} error={err('address')} />
+					<ArtidInput
+						name="address"
+						label="Indirizzo"
+						bind:value={model.address}
+						error={err('address')}
+					/>
 				</div>
 				<div class="col-12 col-md-4 p-1">
-					<ArtidInput type="tel" name="phone" label="Telefono" bind:value={model.phone} error={err('phone')} />
+					<ArtidInput
+						type="tel"
+						name="phone"
+						label="Telefono"
+						bind:value={model.phone}
+						error={err('phone')}
+					/>
 				</div>
 				<div class="col-12 col-md-4 p-1">
-					<ArtidInput type="email" name="businessEmail" label="Email aziendale" bind:value={model.businessEmail} error={err('businessEmail')} />
+					<ArtidInput
+						type="email"
+						name="businessEmail"
+						label="Email aziendale"
+						bind:value={model.businessEmail}
+						error={err('businessEmail')}
+					/>
 				</div>
 			</div>
 
-			<hr class="mt-3">
+			<hr class="mt-3" />
 
 			<div class="row">
 				<div class="col-12 col-md-4 p-1">
-					<ArtidInput name="linkedinId" label="LinkedIn" bind:value={model.linkedinId} error={err('linkedinId')} />
+					<ArtidInput
+						name="linkedinId"
+						label="LinkedIn"
+						bind:value={model.linkedinId}
+						error={err('linkedinId')}
+					/>
 				</div>
 				<div class="col-12 col-md-4 p-1">
-					<ArtidInput name="facebookId" label="Facebook" bind:value={model.facebookId} error={err('facebookId')} />
+					<ArtidInput
+						name="facebookId"
+						label="Facebook"
+						bind:value={model.facebookId}
+						error={err('facebookId')}
+					/>
 				</div>
 				<div class="col-12 col-md-4 p-1">
-					<ArtidInput name="instagramId" label="Instagram" bind:value={model.instagramId} error={err('instagramId')} />
+					<ArtidInput
+						name="instagramId"
+						label="Instagram"
+						bind:value={model.instagramId}
+						error={err('instagramId')}
+					/>
 				</div>
 			</div>
 
-			<hr class="mt-3">
+			<hr class="mt-3" />
 
 			<div class="row">
 				<div class="col-12 p-1">
-					<label for="biography" class="text-primary small fw-medium ps-1 mb-1 d-block">Biografia</label>
+					<label for="biography" class="text-primary small fw-medium ps-1 mb-1 d-block"
+						>Biografia</label
+					>
 					<!-- Wrapper: Quill inserisce .ql-toolbar come sibling del container. -->
 					<div class="bio-editor">
 						<div id="biography" bind:this={bioContainer}></div>
@@ -404,7 +605,9 @@
 	<!-- Action bar -->
 	<!-- flex-wrap: su viewport stretti i bottoni vanno a capo invece di traboccare.
 	     Su desktop stanno su una riga, quindi justify-content-between resta invariato. -->
-	<div class="d-flex flex-wrap align-items-center justify-content-between gap-3 border-top border-artid-border pt-3">
+	<div
+		class="d-flex flex-wrap align-items-center justify-content-between gap-3 border-top border-artid-border pt-3"
+	>
 		<div class="d-flex flex-wrap gap-3">
 			<ArtidButton
 				label={isSaving ? 'Salvataggio…' : 'Salva'}
@@ -418,24 +621,153 @@
 				label="Cambia password"
 				icon="pencil-square"
 				btnStyle="primary"
-				onclick={()=>{}}
+				onclick={() => {}}
 				fullWidth={false}
 			/>
 
-			<ArtidSpidButton
-				label="Associa SPID"
-			/>
+			{#if spidLinked}
+				<ArtidSpidButton label="SPID COLLEGATO" disabled fullWidth={false} onclick={() => {}} />
+			{:else}
+				<ArtidSpidButton label="Associa SPID" fullWidth={false} onclick={openSpidModal} />
+			{/if}
 		</div>
 		<div>
 			<ArtidButton
 				label="Chiudi account"
 				btnStyle="danger"
-				onclick={()=>{}}
+				onclick={deleteAccountModal}
 				fullWidth={false}
 			/>
 		</div>
 	</div>
 </div>
+
+<ArtidEditorModal bind:isOpen={deleteAccountModalOpen} customHeight="40">
+	<div class="d-flex flex-column align-items-start justify-content-around w-100 h-100 flex-fill">
+		<div class="text-artid-primary fw-semibold w-100">
+			<i class="bi bi-person-x fs-5 text-danger"></i>
+			<span>Chiudi account</span>
+		</div>
+
+		<div class="w-100 mb-3">
+			<div class="my-2">
+				<ArtidInput
+					type="password"
+					name="password"
+					label="Password"
+					placeholder="Password"
+					bind:value={password}
+					addClass="mb-2"
+				/>
+			
+				<hr>
+				<span class="text-muted fst-italic">Digita <span class="fw-semibold">"Elimina"</span> per procedere</span>
+				<ArtidInput
+					type="text"
+					name="confirm_close"
+					label="Elimina"
+					placeholder="Elimina"
+					bind:value={elimina}
+					addClass="mb-2"
+				/>
+			</div>
+		</div>
+
+		<div class="w-100">
+			<div class="d-flex justify-content-end gap-2">
+				<ArtidButton
+					label="Chiudi"
+					fullWidth={false}
+					btnStyle="secondary"
+					outline={true}
+					disabled={isSaving}
+					onclick={() => (deleteAccountModalOpen = false)}
+				/>
+				<ArtidButton
+					label="Elimina account"
+					fullWidth={false}
+					btnStyle="danger"
+					icon="exclamation-triangle-fill"
+					disabled={isSaving}
+					onclick={deleteAccount}
+				/>
+			</div>
+		</div>
+	</div>
+</ArtidEditorModal>
+
+<ArtidEditorModal bind:isOpen={spidModalOpen} customHeight="65" customWidth="40">
+	<div class="d-flex flex-column w-100 h-100">
+		<div class="text-artid-primary fw-semibold w-100 mb-2">
+			<i class="bi bi-shield-check fs-5 text-primary"></i>
+			<span>Associa SPID</span>
+		</div>
+
+		<div class="alert alert-warning d-flex gap-2 align-items-start" role="alert">
+			<i class="bi bi-exclamation-triangle-fill mt-1"></i>
+			<div>
+				Collegando SPID i tuoi dati anagrafici (<strong
+					>nome, cognome, data e luogo di nascita</strong
+				>) verranno
+				<strong>sostituiti</strong> con quelli forniti dal provider.
+			</div>
+		</div>
+
+		<div class="mb-2">
+			<label for="spidProvider" class="text-primary small fw-medium ps-1 mb-1 d-block">
+				Provider
+			</label>
+			<select
+				id="spidProvider"
+				class="form-select bg-artid-section"
+				bind:value={spidCreds.providerId}
+			>
+				{#each spidProviders as provider (provider)}
+					<option value={provider}>{provider}</option>
+				{/each}
+			</select>
+		</div>
+
+		<ArtidInput
+			name="spidUsername"
+			label="Codice fiscale"
+			bind:value={spidCreds.username}
+			addClass="mb-2"
+		/>
+		<ArtidInput
+			type="password"
+			name="spidPassword"
+			label="Password"
+			bind:value={spidCreds.password}
+			addClass="mb-2"
+		/>
+
+		<p class="text-secondary small mb-0">
+			Demo: es. <code>RSSMRA85M01H501Z</code> / <code>Spid!2024</code>.
+		</p>
+
+		<div class="mt-auto w-100">
+			<div class="d-flex justify-content-end gap-2">
+				<ArtidButton
+					label="Annulla"
+					fullWidth={false}
+					btnStyle="secondary"
+					outline={true}
+					disabled={spidBusy}
+					onclick={() => (spidModalOpen = false)}
+				/>
+				<ArtidButton
+					label={spidBusy ? 'Collegamento…' : 'Collega SPID'}
+					fullWidth={false}
+					btnStyle="primary"
+					icon="shield-check"
+					disabled={spidBusy}
+					onclick={linkSpid}
+				/>
+			</div>
+		</div>
+	</div>
+</ArtidEditorModal>
 
 <style lang="scss">
 	.propic-btn {

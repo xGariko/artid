@@ -9,8 +9,6 @@ public record ArtidResponse(
         String description,
         Boolean favourite,
         OffsetDateTime createdAt,
-        OffsetDateTime lastModified,
-        Boolean isPublic,
-        Boolean isPrivate
+        OffsetDateTime lastModified
 ) {
 }

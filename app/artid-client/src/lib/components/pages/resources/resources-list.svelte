@@ -109,7 +109,7 @@
 			);
 			await invalidateAll();
 			if (results.some((r) => r.error)) {
-				toast.error('Errore nell\'eliminazione di alcune risorse');
+				toast.error('Errore nell\'eliminazione delle risorse');
 			} else {
 				toast.success('Risorse eliminate con successo');
 			}

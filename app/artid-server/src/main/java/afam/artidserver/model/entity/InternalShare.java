@@ -1,7 +1,7 @@
 package afam.artidserver.model.entity;
 
-import jakarta.validation.constraints.NotNull;
 import lombok.Data;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
@@ -9,9 +9,21 @@ import org.springframework.data.relational.core.mapping.Table;
 @Table("internal_share")
 public class InternalShare {
 
-    @Column("id_user")
-    private Long idUser;
+    @Id
+    private Long id;
 
-    @Column("id")
+    @Column("id_user_from")
+    private Long idUserFrom;
+
+    @Column("id_user_to")
+    private Long idUserTo;
+
+    @Column("id_artid")
     private Long idArtid;
+
+    @Column("recipient_mail")
+    private String recipientMail;
+
+    @Column("is_accepted")
+    private Boolean isAccepted;
 }

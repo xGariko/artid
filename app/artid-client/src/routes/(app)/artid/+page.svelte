@@ -20,9 +20,18 @@
 	let isOpen = $state(false);
 	let isSaving = $state(false);
 
+	let isTagOpen = $state(false);
+
+	let title = $state('');
+	let tag = $state('');
+
 	function handleNewArtid(): void {
 		isOpen = true;
 		console.log('New artid');
+	}
+
+	function handleNewTag(): void {
+		isTagOpen = true;
 	}
 
 	async function createNewArtid(): Promise<void> {
@@ -51,6 +60,36 @@
 
 			// redirect al dettaglio dell'ArtID appena creato
 			await goto(resolve('/(app)/artid/details/[id]', { id: String(data.id) }));
+		} catch (e) {
+			toast.error(e instanceof Error ? e.message : 'Errore di rete');
+		} finally {
+			isSaving = false;
+		}
+	}
+
+	async function createNewTag(): Promise<void> {
+		if (isSaving) return;
+
+		const trimmed = tag.trim();
+		if (trimmed.length <= 0) {
+			toast.error('Inserisci il nome del tag');
+			return;
+		}
+
+		isSaving = true;
+		try {
+			const { data, error: err } = await api.POST('/api/tags', {
+				body: { tag: trimmed }
+			});
+
+			if (err || !data?.id) {
+				console.log(err);
+				toast.error('Errore nella creazione del tag');
+				return;
+			}
+
+			isOpen = false;
+			tag = '';
 		} catch (e) {
 			toast.error(e instanceof Error ? e.message : 'Errore di rete');
 		} finally {
@@ -101,7 +140,6 @@
 	const sidebarButtonGroups: SidebarButtonGroup[] = $derived([
 		{
 			label: 'Raccolte',
-			type: 'button',
 			buttons: [
 				{ icon: 'folder', label: 'Tutti', value: 'all', count: filterCounts.all },
 				{ icon: 'file-earmark-richtext', label: 'I miei', value: 'mine', count: filterCounts.mine },
@@ -117,20 +155,16 @@
 		},
 		{
 			label: 'Tag',
-			type: 'button',
-			buttons: [
-				// { icon: "clock", label: "Recenti", value: "recent", count: filterCounts.recent },
-				// { icon: "star", label: "Preferiti", value: "favourite", count: filterCounts.favourite },
-				// { icon: "share", label: "Condivisi", value: "shared", count: filterCounts.shared },
-			]
+			tags: (data.tags ?? []).map((tag) => {
+				return { id: tag.id!, title: tag.title!, color: tag.color! };
+			})
 		}
 	]);
 
 	const sidebarActions: SidebarAction[] = [
-		{ label: 'Nuovo ArtID', icon: 'plus-lg', callback: handleNewArtid, type: 'button' }
+		{ label: 'Nuovo ArtID', icon: 'plus-lg', callback: handleNewArtid, type: 'button' },
+		{ label: 'Nuovo Tag +', icon: '', callback: handleNewTag, type: 'tag' }
 	];
-
-	let title = $state('');
 </script>
 
 <div class="w-100 h-100 d-flex align-items-center justify-content-center gap-4 p-5">
@@ -182,8 +216,31 @@
 	</div>
 </ArtidEditorModal>
 
-<style lang="scss">
-	.new-artid-modal {
-		width: min(22rem, 50vw);
-	}
-</style>
+<ArtidEditorModal bind:isOpen={isTagOpen}>
+	<div class="text-artid-primary fw-semibold new-artid-modal">
+		<i class="bi bi-folder2-open fs-5 text-primary"></i>
+		<span>Nuovo Tag</span>
+		<div class="my-2">
+			<ArtidInput name="tag" label="Tag" bind:value={tag} />
+		</div>
+		<div class="d-flex justify-content-end gap-2">
+			<ArtidButton
+				label="Chiudi"
+				fullWidth={false}
+				btnStyle="secondary"
+				outline={true}
+				disabled={isSaving}
+				onclick={() => (isTagOpen = false)}
+			/>
+			<ArtidButton
+				label="Crea"
+				fullWidth={false}
+				btnStyle="success"
+				icon="check2"
+				disabled={isSaving}
+				onclick={createNewTag}
+			/>
+		</div>
+	</div>
+</ArtidEditorModal>
+

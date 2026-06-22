@@ -2,6 +2,7 @@
 	import type { PublicProfileDetail } from '$lib/api/types';
 	import { avatarColorFor, initialsFor } from '$lib/utilities';
 
+	// comment for CI
 	let { profile }: { profile: PublicProfileDetail } = $props();
 
 	const fullName = $derived(`${profile.name ?? ''} ${profile.surname ?? ''}`.trim());
@@ -55,7 +56,6 @@
 			{/if}
 		</div>
 	</div>
-
 	<div class="d-flex align-items-center gap-2">
 		{#if linkedinUrl}
 			<button
