@@ -180,6 +180,70 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/shares/internal": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getInternalByAuthor"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/shares/internal/count": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["internalCount"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/shares/external": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getExternalByAuthor"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/shares/external/count": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["externalCount"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/shares/count": {
         parameters: {
             query?: never;
@@ -514,9 +578,28 @@ export interface components {
             /** Format: int64 */
             publicArtidCount?: number;
         };
+        InternalShareResponse: {
+            /** Format: int64 */
+            id?: number;
+            /** Format: int64 */
+            idUser?: number;
+        };
         CountResponse: {
             /** Format: int64 */
             count?: number;
+        };
+        ExternalShareResponse: {
+            /** Format: int64 */
+            id?: number;
+            /** Format: int64 */
+            idArtid?: number;
+            /** Format: int64 */
+            clickCounter?: number;
+            isActive?: boolean;
+            /** Format: date-time */
+            expirationDate?: string;
+            /** Format: date-time */
+            lastOpened?: string;
         };
         ProfileCompletionResponse: {
             /** Format: int32 */
@@ -981,6 +1064,86 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["PublicProfileResponse"][];
+                };
+            };
+        };
+    };
+    getInternalByAuthor: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["InternalShareResponse"][];
+                };
+            };
+        };
+    };
+    internalCount: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["CountResponse"];
+                };
+            };
+        };
+    };
+    getExternalByAuthor: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ExternalShareResponse"][];
+                };
+            };
+        };
+    };
+    externalCount: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["CountResponse"];
                 };
             };
         };

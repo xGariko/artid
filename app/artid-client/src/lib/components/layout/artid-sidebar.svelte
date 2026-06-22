@@ -11,15 +11,17 @@
 
 <div
 	class="bg-artid-section h-100 d-flex flex-column w-15 rounded-3 border border-artid-border sidebar p-3 overflow-y-auto">
-	<div class="mb-4">
-		{#each sidebarActions as action, index (index)}
-			<ArtidButton
-				label={action.label}
-				icon={action.icon}
-				onclick={action.callback}
-			></ArtidButton>
-		{/each}
-	</div>
+	{#if sidebarActions.length > 0}
+		<div class="mb-4">
+			{#each sidebarActions as action, index (index)}
+				<ArtidButton
+					label={action.label}
+					icon={action.icon}
+					onclick={action.callback}
+				></ArtidButton>
+			{/each}
+		</div>
+	{/if}
 
 	{#each buttonsGroups as buttonsGroup, index (index)}
 		<span class="fw-bold text-artid-text-muted">{buttonsGroup.label}</span>

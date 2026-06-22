@@ -133,3 +133,11 @@ export function avatarColorFor(seed: string | null | undefined): string {
 }
 
 export type ArtIdFilterType = 'all' | 'mine' | 'sharedWithMe' | 'recent' | 'favourite';
+
+export function isExpired(isoDate: string | null | undefined): boolean {
+	if (!isoDate) {
+		return false; // O true, a seconda della logica di business se la data manca
+	}
+
+	return new Date(isoDate).getTime() < Date.now();
+}
