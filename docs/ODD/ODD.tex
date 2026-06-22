@@ -138,19 +138,40 @@
 
     % --- INTESTAZIONE NELLA FASCIA BLU CON LOGO UNIPA ---
     \color{white}\sffamily
-    \noindent
-    \begin{minipage}[c]{0.20\textwidth}
-        \flushleft
-        % Logo UniPa inserito dentro la fascia blu
+\begin{center}
+
+\renewcommand{\tabularxcolumn}[1]{m{#1}}
+\begin{tabularx}{\textwidth}{@{} c X @{}}
+    % Prima Colonna: Immagine dentro la parbox centrata
+    \cellcolor{cyan!60}
+    \parbox[c]{2cm}{
+      \centering
         \includegraphics[height=1.8cm]{Immagini/Unipa.png} 
-    \end{minipage}%
-    \begin{minipage}[c]{0.80\textwidth}
-        \flushleft
-        \vspace{0.1cm}
-        {\large \textbf{UNIVERSIT\`A DEGLI STUDI DI PALERMO}} \\
-        {\small DIPARTIMENTO DI INGEGNERIA} \\
-        {\small CORSO DI LAUREA IN INGEGNERIA INFORMATICA}
-    \end{minipage}
+    }
+    &
+    % Seconda Colonna: Testo con i giusti a capo
+    \cellcolor{cyan!30}
+    \parbox[c]{\textwidth}{
+    {\large \textbf{UNIVERSIT\`A DEGLI STUDI DI PALERMO}} \newline
+    {\small DIPARTIMENTO DI INGEGNERIA} \newline
+    {\small CORSO DI LAUREA IN INGEGNERIA INFORMATICA}}
+\end{tabularx}
+\end{center}
+
+
+    % \noindent
+    % \begin{minipage}[c]{0.20\textwidth}
+    %     \flushleft
+    %     % Logo UniPa inserito dentro la fascia blu
+    %     \includegraphics[height=1.8cm]{Immagini/Unipa.png} 
+    % \end{minipage}%
+    % \begin{minipage}[c]{0.80\textwidth}
+    %     \flushleft
+    %     \vspace{0.1cm}
+    %     {\large \textbf{UNIVERSIT\`A DEGLI STUDI DI PALERMO}} \\
+    %     {\small DIPARTIMENTO DI INGEGNERIA} \\
+    %     {\small CORSO DI LAUREA IN INGEGNERIA INFORMATICA}
+    % \end{minipage}
 
     \vspace*{4.5cm} 
     

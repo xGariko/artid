@@ -9,16 +9,18 @@
 \clearpage
 
 \paragraph{Visualizza ArtID condiviso tramite link}
-\par{\noindent Il seguente caso d'uso permette la visualizzazione di un ArtID associato a un link di condivisione e di notificare l'autore dell'ArtID dell'avvenuta visione.}
+\par{\noindent Il seguente caso d'uso permette la visualizzazione di un ArtID associato a un link di condivisione e di notificare l'autore dell'ArtID dell'avvenuta visione.\\
+\textit{Il caso d'uso non prevede l'interazione da parte di nessun attore umano all'interno del sistema, ma si presume che un Guest abbia interagito con il link al di fuori del nostro sistema e visualizzi passivamente i dati che vengono mostrati.}}
 
 \begin{tabularx}{\textwidth}{|C|X|}
 \hline
 \rigaTabella{Caso d'uso}{Visualizza ArtID condiviso tramite link}
 \rigaTabella{ID}{VIS\_ARTID\_COND\_LINK}
 \rigaTabella{Attori}{DBMS}
-\rigaTabella{Precondizione}{Il sistema ha rilevato l'apertura di un link contenente l'ID di un token}
+\rigaTabella{Precondizione}{Il sistema ha rilevato l'apertura di un link contenente il riferimento ad un token}
 \rigaTabella{Flusso degli eventi}{\begin{enumerate}
     \item Il sistema mostra a schermo la pagina ``ARTID PREVIEW - GUEST''
+    \item Il sistema ottiene il riferimento al token dal link
     \item Il sistema interroga il DBMS per ottenere i dati relativi al token
     \item Il sistema controlla se il token esiste
     \item \textbf{SE} il token esiste:
@@ -36,14 +38,16 @@
                     \item Il sistema richiede al DBMS i contenuti dell'ArtID
                     \item Il sistema richiede al DBMS le informazioni sull'autore
                     \item Il sistema mostra a schermo i contenuti dell'ArtID e le informazioni sul Membro autore
+                    \item Il sistema controlla se il link \`e stato aperto per la prima volta
                     \item \textbf{SE} il link \`e stato aperto per la prima volta:
                     \begin{enumerate}
-                        \item Il sistema interroga il DBMS per aggiornare le informazioni relative al token (conteggio e l'orario di ultima visione)
+                        \item Il sistema interroga il DBMS per ottenere l'email dell'autore
+                        \item Il sistema interroga il DBMS per aggiornare le informazioni relative al token compresa la prima visione
                         \item Il sistema invia una mail di conferma di avvenuta visione al Membro autore
                     \end{enumerate}
                     \item \textbf{ALTRIMENTI}:
                     \begin{enumerate}
-                        \item Il sistema interroga il DBMS per aggiornare le informazioni relative al token compresa la prima visione
+                        \item Il sistema interroga il DBMS per aggiornare le informazioni relative al token (conteggio e l'orario di ultima visione)
                     \end{enumerate}
                 \end{enumerate}
                 \item \textbf{ALTRIMENTI}:
@@ -56,17 +60,14 @@
                 \item Il sistema mostra il messaggio: ``L'ArtID desiderato non esiste pi\`u.''
             \end{enumerate}
         \end{enumerate}
-        \item \textbf{ALTRIMENTI}:
-        \begin{enumerate}
-            \item \textbf{SE} il token \`e scaduto:
+        \item \textbf{ALTRIMENTI SE} il token \`e scaduto:
             \begin{enumerate}
                 \item Il sistema mostra il messaggio: ``Il link non \`e pi\`u valido.''
             \end{enumerate}
-            \item \textbf{ALTRIMENTI}:
+        \item \textbf{ALTRIMENTI}:
             \begin{enumerate}
                 \item Il sistema mostra il messaggio: ``Questo link \`e stato momentaneamente disattivato. Contatta l'autore per sapere quando torner\`a attivo.''
             \end{enumerate}
-        \end{enumerate}
     \end{enumerate}
     \item \textbf{ALTRIMENTI}:
     \begin{enumerate}
@@ -74,7 +75,9 @@
     \end{enumerate}
 \end{enumerate}
 }
-\rigaTabella{Postcondizione}{Il sistema ha mostrato a video la schermata ``ARTID PREVIEW - GUEST'' con i contenuti dell'ArtID associato al token, e informazioni sul Membro autore del suddetto ArtID OPPURE Il sistema ha mostrato a video la schermata ``ArtID PREVIEW'' con un messaggio di errore}
+\rigaTabella{Postcondizione}{Il sistema ha mostrato a video la schermata ``ARTID PREVIEW - GUEST'' con i contenuti dell'ArtID associato al token, e informazioni sul Membro autore del suddetto ArtID \newline 
+\textbf{OPPURE} \newline 
+Il sistema ha mostrato a video la schermata ``ARTID PREVIEW - GUEST'' con un messaggio di errore}
 \rigaTabella{Requisiti Speciali}{Per essere visibile tramite link un'ArtID deve avere visibilit\`a impostata come ``PUBBLICO'' o ``UNLISTED''. \newline Oggetto della mail: ``ARTID - IL TUO ARTID E' STATO VISUALIZZATO''. \newline Corpo della mail: ``La informiamo che il suo ArtID: [ArtID] \`e stato visualizzato per la prima volta.''}
 \hline
 \end{tabularx}
@@ -117,22 +120,19 @@
             \item Il sistema mostra il messaggio: ``L'ArtID desiderato non esiste pi\`u.''
         \end{enumerate}
     \end{enumerate}
-    \item \textbf{ALTRIMENTI}:
-    \begin{enumerate}
-        \item \textbf{SE} il token \`e scaduto:
+    \item \textbf{ALTRIMENTI SE} il token \`e scaduto:
         \begin{enumerate}
             \item Il sistema mostra il messaggio: ``Il link non \`e pi\`u valido.''
         \end{enumerate}
-        \item \textbf{ALTRIMENTI}:
+    \item \textbf{ALTRIMENTI}:
         \begin{enumerate}
             \item Il sistema mostra il messaggio: ``Questo link \`e stato momentaneamente disattivato. Contatta l'autore per sapere quando torner\`a attivo.''
         \end{enumerate}
-    \end{enumerate}
 \end{enumerate}
 }
 \rigaTabella{Postcondizione}{Il sistema ha mostrato a video la schermata ``ARTID PREVIEW'' con i contenuti dell'ArtID associato al token, e informazioni sul Membro autore del suddetto ArtID\newline
                             \textbf{OPPURE}\newline 
-                            Il sistema ha mostrato a video la schermata ``ArtID PREVIEW'' con un messaggio di errore}
+                            Il sistema ha mostrato a video la schermata ``ARTID PREVIEW'' con un messaggio di errore}
 \rigaTabella{Requisiti Speciali}{Per essere visibile tramite link un'ArtID deve avere visibilit\`a impostata come ``PUBBLICO'' o ``UNLISTED''.}
 \hline
 \end{tabularx}
@@ -164,9 +164,9 @@
     \item Il sistema mostra la modale ``GESTISCI LINK'' contenente un form per inserire una descrizione del link (Es: a chi lo ha mandato, per promemoria personale)
     \item Il Membro inserisce la descrizione
     \item Il Membro clicca sul pulsante ``CONFERMA''
-    \item Il sistema genera il token ID
-    \item Il sistema interroga il DBMS per salvare il token e associarlo al relativo ArtID
-    \item Il sistema mostra a schermo il link generato, contenente l'ID del token
+    \item Il sistema interroga il DBMS per salvare il token e associarlo al relativo ArtID e alla data di creazione
+    \item Il sistema genera un link contenente il riferimento al token
+    \item Il sistema mostra a schermo il link generato
     \item Il Membro clicca sul pulsante ``CHIUDI'' \label{chiudi link}
     \item Il sistema mostra la schermata ``GESTIONE ARTID''
 \end{enumerate}
@@ -202,7 +202,14 @@ Il flusso riprende dal punto \ref{chiudi link}
 \end{enumerate}
 }
 \rigaTabella{Postcondizione}{Il sistema ha mostrato la schermata ``BACHECA CONDIVISIONI'' contenente la lista di ArtID condivisi}
-\rigaTabella{Note}{Il Membro pu\`o eventualmente utilizzare dei filtri per visualizzare solamente una parte delle condivisioni. Pu\`o filtrare per: Condivisioni esterne (link), Condivisioni esterne scadute, Condivisioni interne da lui create. \newline Solamente una di queste categorie pu\`o essere visualizzata alla volta. Inizialmente viene mostrata quella di ``Condivisioni esterne''.}
+\rigaTabella{Note}{Il Membro pu\`o eventualmente utilizzare dei filtri per visualizzare solamente una parte delle condivisioni. 
+Pu\`o filtrare per: 
+\begin{itemize}
+    \item Condivisioni esterne (link)
+    \item Condivisioni esterne scadute
+    \item Condivisioni interne da lui create
+\end{itemize}
+Solamente una di queste categorie pu\`o essere visualizzata alla volta. Inizialmente viene mostrata quella di ``Condivisioni esterne''.}
 \hline
 \end{tabularx}
 
@@ -239,8 +246,8 @@ Il flusso riprende dal punto \ref{chiudi link}
         \item \textbf{SE} il contenuto non \`e stato visualizzato:
         \begin{enumerate}
             \item Il sistema mostra a schermo il messaggio: ``Il link \`e scaduto ma il contenuto non \`e stato ancora visualizzato. Puoi annullare la cancellazione e rimandare la scadenza del link con l'apposito pulsante. Eliminare comunque?''
+            \item Il Membro AFAM clicca su ``CONFERMA''
         \end{enumerate}
-        \item Il Membro AFAM clicca su ``CONFERMA''
     \end{enumerate}
     \item Il sistema comunica al DBMS la cancellazione del token di condivisione (disabilitando quindi il relativo link per chi lo possiede)
     \item Il sistema mostra la schermata ``BACHECA CONDIVISIONI'' aggiornata
@@ -250,7 +257,7 @@ Il flusso riprende dal punto \ref{chiudi link}
 \begin{enumerate}
     \item Il Membro seleziona pi\`u di un link
     \item Il Membro clicca sul pulsante ``ELIMINA''
-    \item Il sistema mostra a schermo il messaggio: ``Eliminare i [numeroLink] selezionati?''
+    \item Il sistema mostra a schermo il messaggio: ``Eliminare i [numeroLink] link selezionati?''
     \item Il Membro clicca su ``CONFERMA''
     \item Il sistema controlla che tutti i link selezionati siano scaduti
     \item \textbf{SE} almeno un link non \`e scaduto:
@@ -260,8 +267,8 @@ Il flusso riprende dal punto \ref{chiudi link}
     \item \textbf{ALTRIMENTI}:
     \begin{enumerate}
         \item Il sistema comunica al DBMS la cancellazione dei link
-        \item Il sistema mostra il messaggio: ``Link eliminati con successo.''
         \item Il sistema mostra la schermata ``BACHECA CONDIVISIONI'' aggiornata.
+        \item Il sistema mostra il messaggio: ``Link eliminati con successo.''
     \end{enumerate}
 \end{enumerate}
 }
@@ -272,7 +279,7 @@ Il flusso riprende dal punto \ref{chiudi link}
 \clearpage
 
 \paragraph{Visualizza schermata ``Dettagli ArtID'' condiviso}
-\par{\noindent Questo caso d'uso permette al Membro AFAM di accedere ai dettagli specifici di un ArtID associato a una condivisione interna o esterna (tramite link) attiva o passata.}
+\par{\noindent Questo caso d'uso permette al Membro AFAM di accedere ai dettagli specifici di un ArtID associato a una condivisione interna o esterna.}
 
 \begin{tabularx}{\textwidth}{|C|X|}
 \hline
@@ -286,7 +293,7 @@ Il flusso riprende dal punto \ref{chiudi link}
     \item Il sistema controlla che l'ArtID esista
     \item \textbf{SE} l'ArtID esiste:
     \begin{enumerate}
-        \item Il sistema mostra a schermo la schermata ``DETTAGLI ARTID'' relativa all'ArtID selezionato.
+        \item Il sistema mostra a video la schermata ``DETTAGLI ARTID'' relativa all'ArtID selezionato.
     \end{enumerate}
     \item \textbf{ALTRIMENTI}:
     \begin{enumerate}
@@ -294,7 +301,9 @@ Il flusso riprende dal punto \ref{chiudi link}
     \end{enumerate}
 \end{enumerate}
 }
-\rigaTabella{Postcondizione}{Il sistema ha mostrato la schermata ``DETTAGLI ARTID'' relativa all'ArtID selezionato OPPURE Il sistema ha mostrato l'errore: ``L'ArtID selezionato \`e stato cancellato.''}
+\rigaTabella{Postcondizione}{Il sistema ha mostrato la schermata ``DETTAGLI ARTID'' relativa all'ArtID selezionato. \newline 
+\textbf{OPPURE} \newline
+Il sistema ha mostrato l'errore: ``L'ArtID selezionato \`e stato cancellato.''}
 \hline
 \end{tabularx}
 
@@ -310,8 +319,9 @@ Il flusso riprende dal punto \ref{chiudi link}
 \rigaTabella{Attori}{Membro AFAM, DBMS}
 \rigaTabella{Precondizione}{Il sistema ha mostrato la schermata ``BACHECA CONDIVISIONI'' con un filtro del tipo ``Condivisioni esterne'' o ``Condivisioni esterne scadute''}
 \rigaTabella{Flusso degli eventi}{\begin{enumerate}
-    \item Il Membro seleziona il link di cui vuole modificare la durata e clicca sul pulsante ``MODIFICA SCADENZA''
-    \item Il sistema mostra a schermo la modale ``Gestisci link'' contenente un form per modificare la data di scadenza
+    \item Il Membro seleziona il link di cui vuole modificare la durata
+    \item Il Membro clicca sul pulsante ``MODIFICA SCADENZA''
+    \item Il sistema mostra a schermo la modale ``GESTISCI LINK'' contenente un form per modificare la data di scadenza
     \item Il Membro seleziona la data di scadenza desiderata
     \item Il sistema controlla la data di scadenza
     \item \textbf{FINCH\`E} la data di scadenza \`e inferiore alla data corrente:
@@ -440,7 +450,7 @@ Il flusso riprende dal punto \ref{chiudi link}
 \end{enumerate}
 }
 \rigaTabella{Postcondizione}{Il sistema ha mostrato a video la schermata ``BACHECA CONDIVISIONI'' aggiornata con un messaggio di successo}
-\rigaTabella{Note}{Non \`e possibile cliccare sul bottone ``DISATTIVA'' se il link \`e gi\`a disabilitato. \newline Il Membro pu\`o eventualmente selezionare pi\`u link. \newline Se il Membro seleziona pi\`u di un link, il bottone ``DISATTIVA'' \`e attivo solamente se almeno uno dei link non \`e gi\`a disattivato.}
+\rigaTabella{Note}{Non \`e possibile cliccare sul bottone ``DISATTIVA'' se il link \`e gi\`a disabilitato. \newline \newline Il Membro pu\`o eventualmente selezionare pi\`u link. \newline Se il Membro seleziona pi\`u di un link, il bottone ``DISATTIVA'' \`e attivo solamente se almeno uno dei link non \`e gi\`a disattivato.}
 \hline
 \end{tabularx}
 
@@ -460,11 +470,11 @@ Il flusso riprende dal punto \ref{chiudi link}
     \item Il Membro clicca sul pulsante ``ATTIVA''
     \item Il sistema interroga il DBMS per attivare tutte le condivisioni esterne selezionate
     \item Il sistema mostra la schermata ``BACHECA CONDIVISIONI'' aggiornata
-    \item Il sistema mostra il messaggio: ``Link attivati con successo. Puoi disabilitarli in qualsiasi momento.''
+    \item Il sistema mostra il messaggio: ``Link attivati con successo. Puoi disattivarli in qualsiasi momento.''
 \end{enumerate}
 }
 \rigaTabella{Postcondizione}{Il sistema ha mostrato a video la schermata ``BACHECA CONDIVISIONI'' aggiornata con un messaggio di successo}
-\rigaTabella{Note}{Non \`e possibile cliccare sul bottone ``ATTIVA'' se il link \`e gi\`a attivato. \newline Il Membro pu\`o eventualmente selezionare pi\`u link. \newline Se il Membro seleziona pi\`u di un link, il bottone ``ATTIVA'' \`e attivo solamente se almeno uno dei link non \`e gi\`a attivato.}
+\rigaTabella{Note}{Non \`e possibile cliccare sul bottone ``ATTIVA'' se il link \`e gi\`a attivato. \newline \newline Il Membro pu\`o eventualmente selezionare pi\`u link. \newline Se il Membro seleziona pi\`u di un link, il bottone ``ATTIVA'' \`e attivo solamente se almeno uno dei link non \`e gi\`a attivato.}
 \hline
 \end{tabularx}
 
@@ -482,7 +492,7 @@ Il flusso riprende dal punto \ref{chiudi link}
 \rigaTabella{Flusso degli eventi}{\begin{enumerate}
     \item Il Membro seleziona il link di cui vuole modificare la descrizione
     \item Il Membro clicca sul pulsante ``MODIFICA DESCRIZIONE''
-    \item Il sistema mostra a schermo la modale ``Gestisci link'' con un form per modificare la descrizione
+    \item Il sistema mostra a schermo la modale ``GESTISCI LINK'' con un form per modificare la descrizione
     \item Il Membro inserisce la descrizione desiderata
     \item Il Membro clicca sul pulsante ``CONFERMA''
     \item Il sistema interroga il DBMS per aggiornare la descrizione

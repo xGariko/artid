@@ -123,28 +123,4 @@ Questo package gestisce la persistenza degli asset digitali (Materiali, allegati
 \subsubsection{\texttt{security}}
 Questo package centralizza l'intera infrastruttura di autenticazione e controllo degli accessi dell'applicativo basata su \textbf{Spring Security}. Configurato in modalità rigorosamente \textbf{stateless} tramite l'utilizzo di token \textbf{JWT}, gestisce il ciclo di vita delle sessioni utente senza sovraccaricare il server. 
 
-Al suo interno risiedono le componenti per la generazione e validazione crittografica dei token, il filtro per l'intercettazione e il controllo delle richieste HTTP, la configurazione della catena di sicurezza con la definizione dei permessi delle rotte.
-
-
-\subsection*{Nota sulla Nomenclatura e Convenzioni Linguistiche}
-Si specifica che all'interno del presente documento è stata adottata una convenzione linguistica ibrida, finalizzata a massimizzare la chiarezza descrittiva e l'aderenza agli standard industriali:
-\begin{itemize}
-    \item \textbf{Documentazione e Diagrammi:} I componenti di analisi (\textit{Boundary, Control, Entity}), le descrizioni dei casi d'uso e i messaggi scambiati nei diagrammi di sequenza utilizzano la lingua italiana per facilitare la comprensione concettuale delle funzionalità e dei flussi applicativi.
-    \item \textbf{Codice Sorgente:} L'implementazione effettiva del software (nomi delle classi, variabili, firme dei metodi, commenti nel codice e rotte API) è interamente sviluppata in lingua inglese, in conformità con le \textit{best practice} globali dello sviluppo software e per garantire la piena compatibilità con i framework utilizzati.
-\end{itemize}
-
-\subsection{Mappatura delle Classi di Entità}
-Al fine di garantire la tracciabilità tra la fase di analisi concettuale (RAD) e l'effettiva implementazione nel database relazionale, si riporta la tabella di corrispondenza tra i componenti \textit{Entity} descritti in lingua italiana e le rispettive classi Java.
-
-\arrayrulecolor{SlateGray} % Mantiene il colore delle linee della tabella impostato nel tuo documento
-\begin{tabularx}{\textwidth}{|c|X|}
-\hline
-\headerTabella{Oggetti Entità (RAD)}{Classe Java / Tabella DB (Codice)}
-\rigaTabella{Membro}{ \texttt{User} }
-\rigaTabella{ArtID}{ \texttt{Artid} }
-\rigaTabella{Materiale}{ \texttt{Resource} / \texttt{File} \newline \textit{(Scissa tra i metadati logici della risorsa e l'asset fisico su Supabase S3)} }
-\rigaTabella{Certificato}{ \texttt{Certification} }
-\rigaTabella{Token}{ \texttt{ExternalShare} }
-\rigaTabella{Condivisione}{ \texttt{InternalShare} }
-\hline
-\end{tabularx}
+Al suo interno risiedono le componenti per la generazione e validazione crittografica dei token JWT, il filtro per l'intercettazione e il controllo delle richieste HTTP, la configurazione della catena di sicurezza con la definizione dei permessi delle rotte.

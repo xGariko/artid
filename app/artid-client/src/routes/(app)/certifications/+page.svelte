@@ -1,12 +1,22 @@
 <script lang="ts">
-	import ResourceEditor from "$lib/components/pages/resources/resource-editor.svelte";
-	import ResourcesList from "$lib/components/pages/resources/resources-list.svelte";
-	import type { CertificationResponse } from "$lib/api/types";
+	import CertificationList from "$lib/components/pages/certifications/certifications-list.svelte";
+	import CertificationEditor from "$lib/components/pages/certifications/certifications-editor.svelte";
 	import type { PageData } from "./$types";
+
+	export interface CertificationResponse {
+		id?: number;
+		title?: string;
+		description?: string;
+		isPublic?: boolean;
+		public?: boolean;
+		extension?: string;
+		fileSize?: number;
+		createdAt?: string;
+		lastModified?: string;
+	}
 
 	let { data }: { data: PageData } = $props();
 
-	// Editor condiviso tra "Nuovo" (sidebar) e "Modifica" (list): undefined = add mode.
 	let editorOpen = $state(false);
 	let editingCertification = $state<CertificationResponse | undefined>(undefined);
 
@@ -15,14 +25,25 @@
 		editorOpen = true;
 	}
 
-	function handleEditRequest(resource: CertificationResponse): void {
-		editingCertification = resource;
+	function handleEditRequest(certification: CertificationResponse): void {
+		editingCertification = certification;
 		editorOpen = true;
 	}
 </script>
 
-<div class="w-100 h-100 d-flex align-items-center justify-content-center gap-4 p-5">
-	<ResourcesList resources={visibleCertification} onEditRequest={handleEditRequest} />
+<div class="w-100 h-100 d-flex align-items-center justify-content-center p-5 page-background">
+	<CertificationList
+		certifications={data.certifications || []}
+		onEditRequest={handleEditRequest}
+		onNewRequest={handleNewCertification}
+	/>
 </div>
 
-<ResourceEditor bind:isOpen={editorOpen} resource={editingCertification} certifications={data.certifications}/>
+<CertificationEditor bind:isOpen={editorOpen} certification={editingCertification} />
+
+<style>
+    .page-background {
+        background-color: #f8fafc;
+        min-height: calc(100vh - 120px);
+    }
+</style>
