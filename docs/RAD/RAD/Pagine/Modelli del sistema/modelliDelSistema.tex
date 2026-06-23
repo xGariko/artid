@@ -1,0 +1,133 @@
+\section{Modelli del sistema}
+
+\subsection{Modello dei casi d'uso}
+Nei seguenti diagrammi, quando il Membro dovrà scegliere tra due opzioni
+(``Si'' e ``No'', ``Conferma'' e ``Chiudi'' ecc.) supponiamo che scelga la 
+risposta affermativa in quanto, selezionando quella negativa, il sistema ritorna alle condizioni precedenti.
+
+\subsubsection{Attori coinvolti}
+Gli attori coinvolti nei seguenti casi d'uso vengono di seguito definiti.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth, height=0.95\textheight, keepaspectratio]{Immagini/Vista degli attori.png}
+\end{figure}
+
+\clearpage
+
+\subsubsection{Vista d'insieme}
+Di seguito la vista d'insieme del sistema proposto:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth, height=0.95\textheight, keepaspectratio]{Immagini/Vista d'insieme.png}
+\end{figure}
+
+\clearpage
+
+\subsubsection{Macro-casi d'uso}
+\begin{tabularx}{\textwidth}{|C|X|}
+\hline
+\rigaTabella{Autenticazione}{Questo macro-caso d'uso si occupa di gestire l'accesso sicuro e l'identificazione del Membro all'interno dell'applicazione in tutte le sue declinazioni (Login, Registrazione, Logout). Fornisce i meccanismi di protezione dell'account e le opzioni di chiusura definitiva dell'account, si articola in:
+\begin{itemize}
+    \item \textbf{Verifica dell'identit\`a:} Processo di registrazione e verifica dell'account supportato da sistemi di autenticazione forte (One-Time Password) o certificato tramite l'integrazione con i sistemi ufficiali di identit\`a digitale (SPID).
+    \item \textbf{Gestione delle credenziali:} Procedure per il ripristino, il recupero e la modifica delle credenziali di accesso in caso di smarrimento.
+\end{itemize}}
+
+\rigaTabella{Gestione Profilo}{Questo macro-caso d'uso racchiude tutte le operazioni relative alla personalizzazione e manutenzione delle informazioni personali, professionali, di contatto e di formazione del Membro AFAM. Include l'amministrazione delle impostazioni generali di sicurezza, le preferenze sulla ricezione delle condivisioni e la gestione dei Certificati, che include il caricamento, la modifica e l'eliminazione degli stessi e dei relativi file scaricabili.}
+
+\rigaTabella{Gestione Materiale}{Questo macro-caso d'uso si occupa di governare l'intero ciclo di vita degli elementi multimediali e didattici caricati dal Membro AFAM per la costruzione del proprio portfolio digitale. Nello specifico, coordina:
+\begin{itemize}
+    \item \textbf{Materiali multimediali:} Caricamento, organizzazione, filtraggio e rimozione di file di svariata natura, con supporto alla gestione dei preferiti.
+    \item \textbf{ArtID:} Strutturazione dell'identit\`a artistica/professionale tramite la creazione di ArtID dedicati, l'associazione di metadati, l'assegnazione di Tag descrittivi e la definizione dei permessi di visibilit\`a.
+\end{itemize}}
+
+\rigaTabella{Condivisione}{Questo macro-caso d'uso disciplina la distribuzione controllata e il monitoraggio degli ArtID verso l'esterno o verso altri Membri attraverso la schermata ``Bacheca condivisioni''. Supporta due logiche distinte:
+\begin{itemize}
+    \item \textbf{Condivisione interna:} Trasferimento mirato e privato degli ArtID verso specifiche email di membri registrati, con gestione automatica delle notifiche tramite email.
+    \item \textbf{Condivisione esterna:} Generazione di token temporanei e link per Guest, con la facolt\`a di definire descrizioni-promemoria e date di scadenza, nonch\'e di modificare, disattivare, riattivare o revocare massivamente i link monitorando i contatori di prima visione.
+\end{itemize}}
+
+\rigaTabella{Discovery}{Questo macro-caso d'uso abilita le funzionalit\`a di esplorazione, ricerca e consultazione pubblica dei contenuti della piattaforma, destinate principalmente a Guest, recruiter o potenziali datori di lavoro. Permette l'individuazione dei Membri tramite barra di ricerca (anche per corrispondenza parziale del nome), limitando l'esposizione ai soli profili impostati come pubblici e ai relativi ArtID autorizzati, offrendo interfacce dedicate all'anteprima ospite degli ArtID e delle informazioni dell'autore.}
+\hline
+\end{tabularx}
+
+\clearpage
+
+\paragraph{Comportamento eccezionale - Comunicazione DBMS fallita}
+\par{\noindent Il seguente caso d'uso riguarda una situazione eccezionale che può verificarsi durante il flusso degli eventi
+di molti altri casi d'uso, durante la comunicazione con il DBMS.}
+
+\begin{tabularx}{\textwidth}{|C|X|}
+\hline
+\rigaTabella{Caso d'uso}{Errore comunicazione col DBMS}
+\rigaTabella{ID}{ERR\_DBMS}
+\rigaTabella{Attori}{DBMS}
+\rigaTabella{Precondizione}{Il sistema non riceve risposta dal DBMS entro il tempo limite prefissato (timeout di 5000ms) oppure restituisce un codice di errore di rete critico}
+\rigaTabella{Flusso degli eventi}{\begin{enumerate}
+    \item Il sistema azzera il numero di tentativi di riconnessione
+    \item Il sistema attende 2 secondi
+    \item Il sistema tenta di effettuare la riconnessione al DBMS
+    \item Il sistema incrementa il numero di tentativi di riconnessione effettuati
+    \item Il sistema controlla il numero di tentativi di riconnessione effettuati
+    \item Il sistema controlla se ha ricevuto risposta dal DBMS
+    \item \textbf{FINCH\`E} il numero di tentativi effettuati \`e inferiore a 3 \textbf{E} il sistema non riceve risposta dal DBMS:
+    \begin{enumerate}
+        \item Il sistema attende 2 secondi
+        \item Il sistema tenta di effettuare la riconnessione al DBMS
+        \item Il sistema incrementa il numero di tentativi di riconnessione effettuati
+        \item Il sistema controlla il numero di tentativi di riconnessione effettuati
+        \item Il sistema controlla se ha ricevuto risposta dal DBMS
+    \end{enumerate}
+    \item \textbf{SE} il sistema riceve risposta di avvenuta riconnessione dal DBMS:
+        \begin{enumerate}
+            \item Il sistema riprende il normale flusso del caso d'uso principale che era stato interrotto
+        \end{enumerate}
+    \item \textbf{ALTRIMENTI}
+    \begin{enumerate}
+        \item Il sistema interrompe l'operazione in corso
+        \item Il sistema mostra a video l'errore: ``Errore di sistema: Comunicazione con il server non riuscita. Si prega di riprovare pi\`u tardi''
+    \end{enumerate}
+\end{enumerate}
+}
+\rigaTabella{Postcondizione}{Il sistema ha ripreso il normale flusso del caso d'uso principale che era stato interrotto\newline
+\textbf{OPPURE}\newline
+Il sistema è tornato nella condizione precedente al verificarsi dell'errore}
+\rigaTabella{Note}{Questo caso d'uso estende i casi d'uso in cui vi è comunicazione tra il sistema e il DBMS}
+\hline
+\end{tabularx}
+
+\clearpage
+
+\paragraph{Note dei casi d'uso}
+In qualunque schermata, ad eccezione della schermata ``WELCOME'', ``LOGIN'', ``REGISTRAZIONE'', ``VERIFICA OTP'', è presente una barra ``HEADER'' nella quale sono presenti i pulsanti: ``ArtID'', ``Materiali'', ``Condivisioni'', ``Certificazioni'', ``Profilo'', per navigare alle relative pagine, indipendentemente da quale schermata sia attualmente mostrata, e il pulsante ``AZIONI PROFILO'' per raggiungere la schermata ``GESTIONE PROFILO'' o effettuare il logout.\\
+Il Guest, invece, vedrà solamente il pulsante ``ACCEDI'' per poter effettuare il login qualora sia in possesso di un account.\\
+Qualsiasi notifica di errore o messaggio di conferma possono essere rimossi dalla schermata interagendoci.
+
+\clearpage
+
+\input{Pagine/Modelli del sistema/Macro casi d'uso/autenticazione}
+\input{Pagine/Modelli del sistema/Macro casi d'uso/gestioneProfilo}
+\input{Pagine/Modelli del sistema/Macro casi d'uso/gestioneMateriali}
+\input{Pagine/Modelli del sistema/Macro casi d'uso/condivisione}
+\input{Pagine/Modelli del sistema/Macro casi d'uso/discovery}
+
+\subsection{Modelli degli oggetti}
+\input{Pagine/Modelli del sistema/Modelli degli oggetti/entity}
+\clearpage
+\input{Pagine/Modelli del sistema/Modelli degli oggetti/boundary}
+\clearpage
+\input{Pagine/Modelli del sistema/Modelli degli oggetti/control}
+
+\newpage
+
+\subsubsection{Diagrammi delle classi}
+\input{Pagine/Modelli del sistema/Modelli degli oggetti/diagrammiDelleClassi}
+
+\newpage
+
+\input{Pagine/Modelli del sistema/Modelli dinamici/modelliDinamici}
+
+\newpage
+
+\input{Pagine/Modelli del sistema/mockups/mockups}
