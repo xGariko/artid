@@ -14,16 +14,20 @@
 </script>
 
 <div
-	class="bg-artid-section h-100 d-flex flex-column w-15 rounded-3 border border-artid-border sidebar p-3 overflow-y-auto"
->
-	<div class="mb-4">
-		{#each sidebarActions as action, index (index)}
-			{#if action.type !== 'tag'}
-				<ArtidButton label={action.label} icon={action.icon} onclick={action.callback}
+	class="bg-artid-section h-100 d-flex flex-column w-15 rounded-3 border border-artid-border sidebar p-3 overflow-y-auto">
+	{#if sidebarActions.length > 0}
+		<div class="mb-4">
+			{#each sidebarActions as action, index (index)}
+			  {#if action.type !== 'tag'}
+				<ArtidButton
+					label={action.label}
+					icon={action.icon}
+					onclick={action.callback}
 				></ArtidButton>
-			{/if}
-		{/each}
-	</div>
+			  {/if}
+			{/each}
+		</div>
+	{/if}
 
 	{#each buttonsGroups as buttonsGroup, index (index)}
 		<span class="fw-bold text-artid-text-muted">{buttonsGroup.label}</span>

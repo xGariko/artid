@@ -28,4 +28,7 @@ public class ExternalShare {
 
     @Column("last_opened")
     private OffsetDateTime lastOpened;
+
+    @Column("created_at")
+    private OffsetDateTime createdAt;
 }
