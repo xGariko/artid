@@ -825,7 +825,7 @@ export interface components {
             /** Format: int64 */
             count?: number;
         };
-        ExternalShareResponse: {
+        ExternalShareArtIDResponse: {
             /** Format: int64 */
             id?: number;
             /** Format: int64 */
@@ -837,6 +837,11 @@ export interface components {
             expirationDate?: string;
             /** Format: date-time */
             lastOpened?: string;
+            /** Format: date-time */
+            createdAt?: string;
+            title?: string;
+            /** Format: int64 */
+            idThumbnail?: number;
         };
         ProfileCompletionResponse: {
             /** Format: int32 */
@@ -1744,7 +1749,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["ExternalShareResponse"][];
+                    "*/*": components["schemas"]["ExternalShareArtIDResponse"][];
                 };
             };
         };

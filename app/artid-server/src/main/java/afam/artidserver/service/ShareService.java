@@ -2,6 +2,7 @@ package afam.artidserver.service;
 
 import afam.artidserver.dao.ExternalShareDAO;
 import afam.artidserver.dao.InternalShareDAO;
+import afam.artidserver.model.dto.ExternalShareArtIDResponse;
 import afam.artidserver.model.dto.ExternalShareResponse;
 import afam.artidserver.model.dto.InternalShareResponse;
 import afam.artidserver.model.entity.ExternalShare;
@@ -35,13 +36,13 @@ public class ShareService {
         return toResponsesInt(internalShareDAO.getInternalSharesByUserID(userId));
     }
 
-    public List<ExternalShareResponse> getExternalByUser(Long userId) {
-        return toResponsesExt(externalShareDAO.getExternalSharesByUserID(userId));
+    public List<ExternalShareArtIDResponse> getExternalByUser(Long userId) {
+        return externalShareDAO.getExternalSharesByUserID(userId);
     }
 
     public InternalShareResponse toResponse(InternalShare share) {
         return new InternalShareResponse(
-            share.getIdUser(),
+            share.getId(),
             share.getIdArtid()
         );
     }

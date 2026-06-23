@@ -1,6 +1,7 @@
 package afam.artidserver.controller;
 
 import afam.artidserver.model.dto.CountResponse;
+import afam.artidserver.model.dto.ExternalShareArtIDResponse;
 import afam.artidserver.model.dto.ExternalShareResponse;
 import afam.artidserver.model.dto.InternalShareResponse;
 import afam.artidserver.model.entity.ExternalShare;
@@ -44,7 +45,7 @@ public class ShareController {
     }
 
     @GetMapping("/external")
-    public ResponseEntity<List<ExternalShareResponse>> getExternalByAuthor(@AuthenticationPrincipal AuthenticatedUser principal) {
+    public ResponseEntity<List<ExternalShareArtIDResponse>> getExternalByAuthor(@AuthenticationPrincipal AuthenticatedUser principal) {
         return ResponseEntity.ok(shareService.getExternalByUser(principal.getId()));
     }
 }

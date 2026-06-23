@@ -6,130 +6,73 @@
 
 	import { badgeColorForExtension, badgeLabelForExtension, formatFileSize, formatItalianDate } from '$lib/utilities';
 	import { toast } from 'svelte-sonner';
-	import type { InternalShareResponse, ExternalShareResponse } from '$lib/api/types';
+	import type { InternalShareResponse, ExternalShareArtIDResponse } from '$lib/api/types';
 
 	let {
 		shares,
 		filter
 	}: {
-		shares: InternalShareResponse[] | ExternalShareResponse[];
+		shares: InternalShareResponse[] | ExternalShareArtIDResponse[];
 		filter: "externals" | "internals" | "expired";
 	} = $props();
 
-	// Stato locale della UI: query di ricerca e set di id selezionati.
-	let searchQuery = $state('');
-	let selectedResourceIds = $state<Set<number>>(new Set());
+	let selectedSharesIds = $state<Set<number>>(new Set());
 
 	let showDeleteModal = $state(false);
 
-	// Cambiando filtro sidebar il parent passa un nuovo array `resources`:
+	// Cambiando filtro sidebar il parent passa un nuovo array `shares`:
 	// resettiamo la selezione per evitare di trattenere id non più visibili.
 	$effect(() => {
 		shares;
-		selectedResourceIds = new Set();
+		selectedSharesIds = new Set();
 	});
 
-	// Filtra le risorse in base alla query (match su titolo o nome file).
-	const filteredResources = $derived.by(() => {
-		const normalizedQuery = searchQuery.trim().toLowerCase();
-		if (!normalizedQuery) return resources;
-		return resources.filter((resource) => {
-			const titleMatches = (resource.title ?? '').toLowerCase().includes(normalizedQuery);
-			const fileNameMatches = (resource.fileName ?? '').toLowerCase().includes(normalizedQuery);
-			return titleMatches || fileNameMatches;
-		});
+	const filteredShares = $derived.by(() => {
+		return shares;
 	});
 
-	// True se ogni risorsa filtrata è selezionata (controlla lo stato del checkbox header).
 	const areAllFilteredSelected = $derived(
-		filteredResources.length > 0 &&
-		filteredResources.every(
-			(resource) => resource.id != null && selectedResourceIds.has(resource.id)
+		filteredShares.length > 0 &&
+		filteredShares.every(
+			(share) => share.id != null && selectedSharesIds.has(share.id)
 		)
 	);
 
-	const hasSelection = $derived(selectedResourceIds.size > 0);
+	const hasSelection = $derived(selectedSharesIds.size > 0);
 
-	function toggleResourceSelection(resourceId: number | undefined): void {
-		if (resourceId == null) return;
+	function toggleShareSelection(shareId: number | undefined): void {
+		if (shareId == null) return;
 		// eslint-disable-next-line svelte/prefer-svelte-reactivity
-		const nextSelection = new Set(selectedResourceIds);
-		if (nextSelection.has(resourceId)) {
-			nextSelection.delete(resourceId);
+		const nextSelection = new Set(selectedSharesIds);
+		if (nextSelection.has(shareId)) {
+			nextSelection.delete(shareId);
 		} else {
-			nextSelection.add(resourceId);
+			nextSelection.add(shareId);
 		}
-		selectedResourceIds = nextSelection;
+		selectedSharesIds = nextSelection;
 	}
 
-	// La riga è cliccabile: replichiamo il toggle anche da tastiera (Invio/Spazio).
-	function handleRowKeydown(event: KeyboardEvent, resourceId: number | undefined): void {
+	function handleRowKeydown(event: KeyboardEvent, shareId: number | undefined): void {
 		if (event.key === 'Enter' || event.key === ' ') {
 			event.preventDefault();
-			toggleResourceSelection(resourceId);
+			toggleShareSelection(shareId);
 		}
 	}
 
 	function toggleAllFilteredSelection(): void {
 		if (areAllFilteredSelected) {
-			selectedResourceIds = new Set();
+			selectedSharesIds = new Set();
 			return;
 		}
-		selectedResourceIds = new Set(
-			filteredResources
-				.map((resource) => resource.id)
-				.filter((resourceId): resourceId is number => resourceId != null)
+		selectedSharesIds = new Set(
+			filteredShares
+				.map((share) => share.id)
+				.filter((shareId): shareId is number => shareId != null)
 		);
 	}
+	</script>
 
-	function downloadSelectedResources(): void {
-		// Ogni download passa dal proxy SvelteKit che inietta il JWT dal cookie httpOnly.
-		for (const resourceId of selectedResourceIds) {
-			window.open(`/api/resources/${resourceId}/file`, '_blank', 'noopener');
-		}
-	}
-
-	function editSelectedResources(): void {
-		if (selectedResourceIds.size !== 1) {
-			toast.warning('Seleziona una sola risorsa per modificarla');
-			return;
-		}
-		const [targetId] = selectedResourceIds;
-		const targetResource = resources.find((resource) => resource.id === targetId);
-		if (targetResource) onEditRequest?.(targetResource);
-	}
-
-	async function deleteSelectedResources(): Promise<void> {
-		showDeleteModal = false;
-		try {
-			const results = await Promise.all(
-				[...selectedResourceIds].map((id) =>
-					api.DELETE('/api/resources/{id}', { params: { path: { id } } })
-				)
-			);
-			await invalidateAll();
-			if (results.some((r) => r.error)) {
-				toast.error('Errore nell\'eliminazione di alcune risorse');
-			} else {
-				toast.success('Risorse eliminate con successo');
-			}
-		} catch {
-			toast.error('Errore nell\'eliminazione delle risorse');
-		}
-	}
-</script>
-
-<div class="bg-artid-section h-100 w-60 rounded-3 border border-artid-border p-3 d-flex flex-column gap-3 artid-list">
-	<div class="position-relative">
-		<i class="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-3 text-artid-primary"></i>
-		<input
-			type="text"
-			class="form-control rounded-3 ps-5 py-2 search-input"
-			placeholder="Cerca materiali"
-			bind:value={searchQuery}
-		/>
-	</div>
-
+<div class="bg-artid-section h-100 w-80 rounded-3 border border-artid-border p-3 d-flex flex-column gap-3 artid-list">
 	<div class="flex-grow-1 overflow-y-auto rounded-3 border border-artid-border">
 		<div
 			class="row g-0 align-items-center px-3 py-2 sticky-header bg-artid-muted border-bottom border-artid-border text-artid-text small fw-semibold text-nowrap"
@@ -143,82 +86,118 @@
 					aria-label="Seleziona tutto"
 				/>
 			</div>
-			<div class="col-3">Nome</div>
-			<div class="col-2">Dimensioni</div>
-			<div class="col-2">Creato</div>
-			<div class="col-2">Modificato</div>
-			<div class="col-1">Collegato</div>
-			<div class="col-1 text-center">Preferito</div>
+			<div class="col-1">ArtID</div>
+			{#if filter === 'externals' || filter === 'expired'}
+				<div class="col-1">Creazione</div>
+				<div class="col-1">Scadenza</div>
+				<div class="col-1">Numero Vis.</div>
+				<div class="col-1">Prima Vis.</div>
+				<div class="col-1">Ultima Vis.</div>
+				<div class="col-1">Stato</div>
+				<div class="col-3">Descrizione</div>
+				<div class="col-1 text-center">Azioni</div>
+			{:else}
+				<div class="col-2">Condiviso con</div>
+			{/if}
 		</div>
 
-		{#each filteredResources as resource (resource.id)}
-			{@const isResourceSelected = resource.id != null && selectedResourceIds.has(resource.id)}
+		{#each filteredShares as share (share.id)}
+			{@const isShareSelected = share.id != null && selectedSharesIds.has(share.id)}
+
+			{#if filter === 'externals' || filter === 'expired'}
+				{@const extShare = share as ExternalShareArtIDResponse}
 			<div
-				class="row g-0 align-items-center px-3 py-2 border-bottom border-artid-border resource-row"
-				class:selected={isResourceSelected}
+				class="row g-0 align-items-center px-3 py-2 border-bottom border-artid-border share-row"
+				class:selected={isShareSelected}
 				role="button"
 				tabindex="0"
-				onclick={() => toggleResourceSelection(resource.id)}
-				onkeydown={(event) => handleRowKeydown(event, resource.id)}
+				onclick={() => toggleShareSelection(share.id)}
+				onkeydown={(event) => handleRowKeydown(event, share.id)}
 			>
-				<div class="col-1 d-flex align-items-center gap-2">
-					<input
-						type="checkbox"
-						class="form-check-input flex-shrink-0"
-						checked={isResourceSelected}
-						onchange={() => toggleResourceSelection(resource.id)}
-						onclick={(event) => event.stopPropagation()}
-						aria-label={`Seleziona ${resource.title}`}
-					/>
-					<span
-						class="badge-type fw-bold text-white"
-						style:background-color={badgeColorForExtension(resource.extension)}
-					>
-						{badgeLabelForExtension(resource.extension)}
-					</span>
+					<div class="col-1 d-flex align-items-center gap-2">
+						<input
+							type="checkbox"
+							class="form-check-input flex-shrink-0"
+							checked={isShareSelected}
+							onchange={() => toggleShareSelection(share.id)}
+							onclick={(event) => event.stopPropagation()}
+							aria-label={`Seleziona ${extShare.title}`}
+						/>
+						<span
+							class="badge-type fw-bold text-white"
+							style:background-color={badgeColorForExtension("png")}
+						>
+							{badgeLabelForExtension("png")}
+						</span>
+					</div>
+					<div class="col-1">Img</div>
+					<div class="col-2 pe-2 text-truncate fw-medium text-artid-text share-title" title={extShare.title}>
+						{extShare.title}
+					</div>
+					<div class="col-1 text-artid-text text-nowrap">{formatItalianDate(extShare.createdAt)}</div>
+					<div class="col-1 text-artid-text text-nowrap">{formatItalianDate(extShare.expirationDate)}</div>
+					<div class="col-1 text-artid-text">Oggi</div>
+					<div class="col-1 text-artid-text">Domani</div>
+					<div class="col-1 text-artid-text">In uso</div>
+					<div class="col-3 text-artid-text text-nowrap">
+						BLABLABLA super desc
+					</div>
+				<div class="col-1 d-flex align-items-center justify-content-center gap-3">
+					<button class="btn btn-link p-0 text-artid-text" title="Apri">
+						<i class="bi bi-box-arrow-up-right fs-6"></i>
+					</button>
+					<button class="btn btn-link p-0 text-artid-text" title="Copia">
+						<i class="bi bi-copy fs-6"></i>
+					</button>
 				</div>
-				<div class="col-3 pe-3 text-truncate fw-medium text-artid-text resource-title" title={resource.title}>
-					{resource.title}
 				</div>
-				<div class="col-2 text-artid-text">{formatFileSize(resource.fileSize)}</div>
-				<div class="col-2 text-artid-text text-nowrap">{formatItalianDate(resource.createdAt)}</div>
-				<div class="col-2 text-artid-text text-nowrap">{formatItalianDate(resource.lastModified)}</div>
-				<div class="col-1 text-artid-text text-nowrap">
-					{resource.artidCount ?? 0}
-					<span class="text-artid-text-muted ms-1">ArtID</span>
-				</div>
-				<div class="col-1 text-center">
-					<i
-						class="bi bi-star{resource.favorite ? '-fill text-warning' : ' text-artid-text-muted'} fs-5"
-					></i>
-				</div>
-			</div>
-		{/each}
+				{/if}
+			{/each}
 
-		{#if filteredResources.length === 0}
+		{#if filteredShares.length === 0}
 			<div class="text-center text-artid-text-muted py-5">
 				<i class="bi bi-folder2-open fs-2 d-block mb-2"></i>
-				Nessun materiale trovato
+				Nessuna condivisione trovata
 			</div>
 		{/if}
 	</div>
 
 	<div class="d-flex align-items-center gap-2">
-		<ArtidButton
-			label="Scarica"
-			icon="download"
-			disabled={!hasSelection}
-			fullWidth={false}
-			onclick={downloadSelectedResources}
-		/>
-		<ArtidButton
-			label="Modifica"
-			icon="pencil-square"
-			outline={true}
-			disabled={!hasSelection}
-			fullWidth={false}
-			onclick={editSelectedResources}
-		/>
+		{#if filter === 'externals' || filter === 'expired'}
+			<ArtidButton
+				label="Prolunga scadenza"
+				icon="hourglass"
+				disabled={!hasSelection}
+				fullWidth={false}
+				onclick={()=>{return;}}
+			/>
+			<ArtidButton
+				label="Attiva"
+				icon="arrow-clockwise"
+				outline={true}
+				btnStyle="success"
+				disabled={!hasSelection}
+				fullWidth={false}
+				onclick={()=>{return;}}
+			/>
+			<ArtidButton
+				label="Disattiva"
+				icon="ban"
+				btnStyle="warning"
+				outline={true}
+				disabled={!hasSelection}
+				fullWidth={false}
+				onclick={()=>{return;}}
+			/>
+			<ArtidButton
+				label="Modifica descrizione"
+				icon="pencil-square"
+				btnStyle="secondary"
+				disabled={!hasSelection}
+				fullWidth={false}
+				onclick={()=>{return;}}
+			/>
+		{/if}
 		<ArtidButton
 			icon="trash"
 			btnStyle="danger"
@@ -234,7 +213,7 @@
 <ArtidModal
 	bind:isOpen={showDeleteModal}
 	title="Conferma eliminazione"
-	onConfirm={deleteSelectedResources}
+	onConfirm={()=>{return;}}
 	message="Una volta eliminata la risorsa non sarà recuperabile."
 	btnStyle="danger"
 />
@@ -245,14 +224,14 @@
         min-width: 60rem;
     }
 
-    .search-input {
-        border-color: var(--artid-border);
-    }
+    /*.search-input {*/
+    /*    border-color: var(--artid-border);*/
+    /*}*/
 
-    .search-input:focus {
-        border-color: var(--artid-primary);
-        box-shadow: 0 0 0 0.2rem var(--artid-primary-subtle);
-    }
+    /*.search-input:focus {*/
+    /*    border-color: var(--artid-primary);*/
+    /*    box-shadow: 0 0 0 0.2rem var(--artid-primary-subtle);*/
+    /*}*/
 
     /* Header sticky: resta sopra le righe ma sotto le modali (z-index basso). */
     .sticky-header {
@@ -262,24 +241,24 @@
     }
 
     /* Righe cliccabili con feedback hover (sostituisce .table-hover). */
-    .resource-row {
+    .share-row {
         transition: 0.2s ease all;
         cursor: pointer;
     }
 
-    .resource-row:hover {
+    .share-row:hover {
         transition: 0.2s ease all;
         background-color: var(--artid-surface);
     }
 
     /* Riga selezionata: tinta brand, evidenziata anche in hover. */
-    .resource-row.selected {
+    .share-row.selected {
         transition: 0.2s ease all;
         box-shadow: inset 6px 0px 0px -3px var(--artid-primary);
     }
 
     /* Consente al titolo di troncare con ellissi dentro la colonna flex. */
-    .resource-title {
+    .share-title {
         min-width: 0;
     }
 

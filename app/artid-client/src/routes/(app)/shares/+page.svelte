@@ -55,8 +55,8 @@
 			label: "Raccolte",
 			type: "button",
 			buttons: [
-				{ icon: "share-fill", label: "Esterne", value: "external", count: filterCounts.externals },
-				{ icon: "person", label: "Interne", value: "internal", count: filterCounts.internals },
+				{ icon: "share-fill", label: "Esterne", value: "externals", count: filterCounts.externals },
+				{ icon: "person", label: "Interne", value: "internals", count: filterCounts.internals },
 				{ icon: "clock-history", label: "Scadute", value: "expired", count: filterCounts.expired },
 			],
 		},
