@@ -1,0 +1,34 @@
+\subsubsection{Oggetti Control}
+
+\arrayrulecolor{SlateGray}
+\begin{tabularx}{\textwidth}{|c|X|}
+\hline
+\headerTabella{Oggetto Control}{Descrizione}
+\rigaTabella{loginControl}{Control che gestisce le operazioni di autenticazione del Membro AFAM. Interroga il DBMS per verificare la validità delle credenziali immesse; in caso di successo consente l'accesso alla home, mentre in caso di credenziali errate o account inesistente comanda la visualizzazione dei relativi messaggi tramite l'apposita boundary di errore. Gestisce inoltre il reindirizzamento alla schermata di recupero password.}
+\rigaTabella{registrazioneControl}{Control preposta alla gestione del flusso di iscrizione dei nuovi Membri. Si occupa di raccogliere i dati anagrafici, effettua la validazione dei campi e interroga il DBMS per verificare che l'indirizzo e-mail non sia già associato a un profilo esistente. In caso di esito positivo, salva i dati autentica il Membro AFAM.}
+\rigaTabella{verificaOTPControl}{Control incaricata di supervisionare la procedura di validazione a due fattori. Genera il codice numerico One-Time Password, ne convalida l'inserimento rispetto ai parametri di scadenza temporale e, in caso di esito negativo, emette un avviso di errore bloccando la procedura. Se il codice risulta valido, interroga il DBMS per consolidare l'attivazione o la modifica dell'account.}
+\rigaTabella{identit\`aDigitaleControl}{Control che si occupa di gestire l'integrazione con il sistema SPID. Gestisce le chiamate verso i gateway degli Identity Provider accreditati e ne acquisisce le asserzioni sicure; in caso di fallimento della comunicazione remota o di rifiuto delle credenziali, interrompe il flusso mostrando un errore a video, mentre in caso di successo interroga il DBMS per mappare stabilmente l'identità digitale al profilo dell Membro.}
+
+\rigaTabella{materialiControl}{Control preposta alla gestione del ciclo di vita dei materiali multimediali del Membro AFAM. Interroga il DBMS per estrarre la collezione dei Materiali associati al Membro o per effettuarne il filtraggio. Coordina inoltre il caricamento di nuovi Materiali verificandone la conformità e governa le operazioni di persistenza, rimozione, modifica e aggiunta ai preferiti di quest'ultimi.}
+\rigaTabella{ArtIDControl}{Control che si occupa di gestire il ciclo di vita degli ArtID del Membro AFAM. Interroga il DBMS per recuperare l'elenco completo degli ArtID associati al Membro o per effettuare il filtraggio. Coordina le routine per la creazione di un nuovo ArtID e gestisce i flussi di cancellazione, aggiunta ai preferiti e di creazione di Tag descrittivi.}
+\rigaTabella{dettagliArtIDControl}{Control incaricata di gestire la modifica interna di uno specifico ArtID. Interroga il DBMS per estrarre i metadati di dettaglio, gestisce i moduli per l'associazione di nuovi Materiali multimediali, governa il collegamento di Tag descrittivi, permette la condivisione interna ed esterna e la preview pubblica.}
+
+\rigaTabella{previewArtIDControl}{Control che gestisce la visualizzazione in anteprima dei contenuti di un ArtID e delle informazioni sul relativo autore. Interroga il DBMS per verificare l'esistenza, la validit\`a e i permessi di visibilit\`a del token di condivisione o dello stato pubblico dell'ArtID; in caso di esito positivo ne mostra i dettagli a video, mentre in caso di token scaduto, disattivato o inesistente comanda la visualizzazione dei relativi messaggi di errore. Inoltre, qualora l'accesso avvenga tramite link esterno per la prima volta, aggiorna le metriche del token sul DBMS e notifica l'autore via email.}
+
+\rigaTabella{profiloControl}{Control preposta alla gestione dei dati personali, dei contatti e delle impostazioni generali dell'account del Membro AFAM. Permette di accedere alle funzionalità di modifica della password, di chiusura dell'account e all'associazione della propria identità digitale (SPID) al fine di verificare l'account.}
+\rigaTabella{certificatiControl}{Control che si occupa di gestire i Certificati del Membro AFAM. Interroga il DBMS per estrarre la lista dei Certificati, permette il caricamento di nuovi Certificati, la loro modifica ed eliminazione fornendo anche la possibilità di scaricarli.}
+
+\rigaTabella{condivisioniControl}{Control incaricata di supervisionare la bacheca e le operazioni relative alla condivisione degli ArtID. Interroga il DBMS per estrarre i link di condivisione esterna e le condivisioni interne, gestendo l'applicazione dei relativi filtri. Coordina i flussi per la generazione di nuovi token (validandone date di scadenza), per la modifica delle descrizioni e dei termini di scadenza, per la disattivazione o riattivazione temporanea dei link, e per la revoca definitiva o il rifiuto delle condivisioni interne ed esterne selezionate dal Membro.}
+
+\rigaTabella{discoveryControl}{Control preposta alla gestione delle funzionalità di esplorazione pubblica della piattaforma da parte di Guest. Gestisce la barra di ricerca permettendo il filtraggio e l'individuazione dei Membri in base al nome (anche parziale), interrogando il DBMS per estrarre esclusivamente i profili impostati come pubblici e il quantitativo di ArtID accessibili ad essi associati. Governa inoltre il reindirizzamento del Guest verso le schermate di esplorazione del profilo e di anteprima degli ArtID pubblici.}
+
+
+
+
+
+
+
+
+
+\hline
+\end{tabularx}
