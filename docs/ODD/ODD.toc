@@ -1,0 +1,45 @@
+\contentsline {section}{\numberline {1}Introduzione}{2}{section.1}%
+\contentsline {subsection}{\numberline {1.1}Prestazioni e costi}{2}{subsection.1.1}%
+\contentsline {subsection}{\numberline {1.2}Tempi di risposta}{2}{subsection.1.2}%
+\contentsline {subsection}{\numberline {1.3}Overview del sistema}{2}{subsection.1.3}%
+\contentsline {subsection}{\numberline {1.4}Sviluppo Front-End}{3}{subsection.1.4}%
+\contentsline {subsubsection}{\numberline {1.4.1}Librerie Front-End}{3}{subsubsection.1.4.1}%
+\contentsline {subsection}{\numberline {1.5}Sviluppo Back-End}{3}{subsection.1.5}%
+\contentsline {subsubsection}{\numberline {1.5.1}Librerie Back-End}{4}{subsubsection.1.5.1}%
+\contentsline {subsection}{\numberline {1.6}Linee guida per la documentazione delle interfacce}{4}{subsection.1.6}%
+\contentsline {subsection}{\numberline {1.7}Linee guida per la documentazione del DBMS}{4}{subsection.1.7}%
+\contentsline {subsection}{\numberline {1.8}Linee guida per la documentazione dello storage dei file}{5}{subsection.1.8}%
+\contentsline {subsubsection}{\numberline {1.8.1}Gestione e Sicurezza dei File}{5}{subsubsection.1.8.1}%
+\contentsline {subsection}{\numberline {1.9}Convenzioni di Nomenclatura e Mappatura delle Entità}{5}{subsection.1.9}%
+\contentsline {section}{\numberline {2}Packages}{7}{section.2}%
+\contentsline {subsection}{\numberline {2.1}\texttt {artid-client/src}}{8}{subsection.2.1}%
+\contentsline {subsubsection}{\numberline {2.1.1}\texttt {routes}}{8}{subsubsection.2.1.1}%
+\contentsline {paragraph}{\numberline {2.1.1.1}Autenticazione}{8}{paragraph.2.1.1.1}%
+\contentsline {paragraph}{\numberline {2.1.1.2}Gestione Profilo}{8}{paragraph.2.1.1.2}%
+\contentsline {paragraph}{\numberline {2.1.1.3}Gestione Materiali}{8}{paragraph.2.1.1.3}%
+\contentsline {paragraph}{\numberline {2.1.1.4}Condivisione}{9}{paragraph.2.1.1.4}%
+\contentsline {paragraph}{\numberline {2.1.1.5}Discovery}{9}{paragraph.2.1.1.5}%
+\contentsline {subsubsection}{\numberline {2.1.2}\texttt {lib}}{9}{subsubsection.2.1.2}%
+\contentsline {paragraph}{\numberline {2.1.2.1}\texttt {components}}{9}{paragraph.2.1.2.1}%
+\contentsline {paragraph}{\numberline {2.1.2.2}\texttt {models}}{9}{paragraph.2.1.2.2}%
+\contentsline {paragraph}{\numberline {2.1.2.3}\texttt {stores}}{9}{paragraph.2.1.2.3}%
+\contentsline {paragraph}{\numberline {2.1.2.4}\texttt {api}}{10}{paragraph.2.1.2.4}%
+\contentsline {subsection}{\numberline {2.2}\texttt {java/afam/artid-server}}{10}{subsection.2.2}%
+\contentsline {subsubsection}{\numberline {2.2.1}\texttt {controller}}{10}{subsubsection.2.2.1}%
+\contentsline {subsubsection}{\numberline {2.2.2}\texttt {dao}}{10}{subsubsection.2.2.2}%
+\contentsline {subsubsection}{\numberline {2.2.3}\texttt {model}}{10}{subsubsection.2.2.3}%
+\contentsline {paragraph}{\numberline {2.2.3.1}\texttt {dto}}{10}{paragraph.2.2.3.1}%
+\contentsline {paragraph}{\numberline {2.2.3.2}entity}{10}{paragraph.2.2.3.2}%
+\contentsline {subsubsection}{\numberline {2.2.4}\texttt {service}}{10}{subsubsection.2.2.4}%
+\contentsline {subsubsection}{\numberline {2.2.5}\texttt {storage}}{11}{subsubsection.2.2.5}%
+\contentsline {subsubsection}{\numberline {2.2.6}\texttt {security}}{11}{subsubsection.2.2.6}%
+\contentsline {section}{\numberline {3}Overview delle classi}{12}{section.3}%
+\contentsline {subsection}{\numberline {3.1}Autenticazione}{12}{subsection.3.1}%
+\contentsline {subsection}{\numberline {3.2}Gestione Profilo}{13}{subsection.3.2}%
+\contentsline {subsection}{\numberline {3.3}Gestione Materiali}{14}{subsection.3.3}%
+\contentsline {subsection}{\numberline {3.4}Condivisione}{15}{subsection.3.4}%
+\contentsline {subsection}{\numberline {3.5}Discovery}{17}{subsection.3.5}%
+\contentsline {subsection}{\numberline {3.6}DAO}{18}{subsection.3.6}%
+\contentsline {subsection}{\numberline {3.7}UI}{19}{subsection.3.7}%
+\contentsline {subsection}{\numberline {3.8}Entity}{20}{subsection.3.8}%
+\contentsline {section}{\numberline {4}Copyright e diritto d'autore}{21}{section.4}%

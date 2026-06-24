@@ -1,0 +1,456 @@
+PWD c:\Users\andre\Desktop\ODD
+INPUT C:\Users\andre\AppData\Local\MiKTeX\miktex\data\le\pdftex\pdflatex.fmt
+INPUT c:\Users\andre\Desktop\ODD\ODD.tex
+OUTPUT ODD.log
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\latex\base\article.cls
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\latex\base\article.cls
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\latex\base\size10.clo
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\latex\base\size10.clo
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\latex\base\size10.clo
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\latex\lipsum\lipsum.sty
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\latex\lipsum\lipsum.sty
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\latex\l3packages\l3keys2e\l3keys2e.sty
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\latex\l3packages\l3keys2e\l3keys2e.sty
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\latex\l3kernel\expl3.sty
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\latex\l3kernel\expl3.sty
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\latex\l3backend\l3backend-pdftex.def
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\latex\l3backend\l3backend-pdftex.def
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\latex\lipsum\lipsum.ltd.tex
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\latex\lipsum\lipsum.ltd.tex
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\latex\geometry\geometry.sty
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\latex\geometry\geometry.sty
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\latex\graphics\keyval.sty
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\latex\graphics\keyval.sty
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\generic\iftex\ifvtex.sty
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\generic\iftex\ifvtex.sty
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\generic\iftex\iftex.sty
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\generic\iftex\iftex.sty
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\latex\geometry\geometry.cfg
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\latex\geometry\geometry.cfg
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\latex\geometry\geometry.cfg
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\latex\graphics\graphicx.sty
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\latex\graphics\graphicx.sty
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\latex\graphics\graphics.sty
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\latex\graphics\graphics.sty
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\latex\graphics\trig.sty
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\latex\graphics\trig.sty
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\latex\graphics-cfg\graphics.cfg
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\latex\graphics-cfg\graphics.cfg
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\latex\graphics-cfg\graphics.cfg
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\latex\graphics-def\pdftex.def
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\latex\graphics-def\pdftex.def
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\latex\graphics-def\pdftex.def
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\latex\tools\array.sty
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\latex\tools\array.sty
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\latex\titlesec\titlesec.sty
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\latex\titlesec\titlesec.sty
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\latex\enumitem\enumitem.sty
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\latex\enumitem\enumitem.sty
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\latex\xcolor\xcolor.sty
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\latex\xcolor\xcolor.sty
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\latex\graphics-cfg\color.cfg
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\latex\graphics-cfg\color.cfg
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\latex\graphics-cfg\color.cfg
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\latex\graphics\mathcolor.ltx
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\latex\graphics\mathcolor.ltx
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\latex\graphics\mathcolor.ltx
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\latex\colortbl\colortbl.sty
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\latex\colortbl\colortbl.sty
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\latex\graphics\color.sty
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\latex\pgf\frontendlayer\tikz.sty
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\latex\pgf\frontendlayer\tikz.sty
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\latex\pgf\basiclayer\pgf.sty
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\latex\pgf\basiclayer\pgf.sty
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\latex\pgf\utilities\pgfrcs.sty
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\latex\pgf\utilities\pgfrcs.sty
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\generic\pgf\utilities\pgfutil-common.tex
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\generic\pgf\utilities\pgfutil-latex.def
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\generic\pgf\utilities\pgfrcs.code.tex
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\generic\pgf\utilities\pgfrcs.code.tex
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\generic\pgf\utilities\pgfrcs.code.tex
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\generic\pgf\pgf.revision.tex
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\generic\pgf\pgf.revision.tex
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\latex\pgf\basiclayer\pgfcore.sty
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\latex\pgf\basiclayer\pgfcore.sty
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\latex\pgf\systemlayer\pgfsys.sty
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\latex\pgf\systemlayer\pgfsys.sty
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\generic\pgf\systemlayer\pgfsys.code.tex
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\generic\pgf\systemlayer\pgfsys.code.tex
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\generic\pgf\systemlayer\pgfsys.code.tex
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\generic\pgf\utilities\pgfkeys.code.tex
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\generic\pgf\utilities\pgfkeyslibraryfiltered.code.tex
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\generic\pgf\systemlayer\pgf.cfg
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\generic\pgf\systemlayer\pgfsys-pdftex.def
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\generic\pgf\systemlayer\pgfsys-pdftex.def
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\generic\pgf\systemlayer\pgfsys-common-pdf.def
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\generic\pgf\systemlayer\pgfsyssoftpath.code.tex
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\generic\pgf\systemlayer\pgfsyssoftpath.code.tex
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\generic\pgf\systemlayer\pgfsyssoftpath.code.tex
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\generic\pgf\systemlayer\pgfsysprotocol.code.tex
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\generic\pgf\systemlayer\pgfsysprotocol.code.tex
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\generic\pgf\systemlayer\pgfsysprotocol.code.tex
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\generic\pgf\basiclayer\pgfcore.code.tex
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\generic\pgf\basiclayer\pgfcore.code.tex
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\generic\pgf\basiclayer\pgfcore.code.tex
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\generic\pgf\math\pgfmath.code.tex
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\generic\pgf\math\pgfmathutil.code.tex
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\generic\pgf\math\pgfmathparser.code.tex
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\generic\pgf\math\pgfmathfunctions.code.tex
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\generic\pgf\math\pgfmathfunctions.basic.code.tex
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\generic\pgf\math\pgfmathfunctions.trigonometric.code.tex
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\generic\pgf\math\pgfmathfunctions.random.code.tex
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\generic\pgf\math\pgfmathfunctions.comparison.code.tex
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\generic\pgf\math\pgfmathfunctions.base.code.tex
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\generic\pgf\math\pgfmathfunctions.round.code.tex
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\generic\pgf\math\pgfmathfunctions.misc.code.tex
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\generic\pgf\math\pgfmathfunctions.integerarithmetics.code.tex
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\generic\pgf\math\pgfmathcalc.code.tex
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\generic\pgf\math\pgfmathfloat.code.tex
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\generic\pgf\math\pgfint.code.tex
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\generic\pgf\basiclayer\pgfcorepoints.code.tex
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\generic\pgf\basiclayer\pgfcorepathconstruct.code.tex
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\generic\pgf\basiclayer\pgfcorepathusage.code.tex
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\generic\pgf\basiclayer\pgfcorescopes.code.tex
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\generic\pgf\basiclayer\pgfcoregraphicstate.code.tex
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\generic\pgf\basiclayer\pgfcoretransformations.code.tex
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\generic\pgf\basiclayer\pgfcorequick.code.tex
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\generic\pgf\basiclayer\pgfcoreobjects.code.tex
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\generic\pgf\basiclayer\pgfcorepathprocessing.code.tex
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\generic\pgf\basiclayer\pgfcorearrows.code.tex
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\generic\pgf\basiclayer\pgfcoreshade.code.tex
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\generic\pgf\basiclayer\pgfcoreimage.code.tex
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\generic\pgf\basiclayer\pgfcoreexternal.code.tex
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\generic\pgf\basiclayer\pgfcorelayers.code.tex
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\generic\pgf\basiclayer\pgfcoretransparency.code.tex
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\generic\pgf\basiclayer\pgfcorepatterns.code.tex
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\generic\pgf\basiclayer\pgfcorerdf.code.tex
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\generic\pgf\modules\pgfmoduleshapes.code.tex
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\generic\pgf\modules\pgfmoduleplot.code.tex
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\latex\pgf\compatibility\pgfcomp-version-0-65.sty
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\latex\pgf\compatibility\pgfcomp-version-0-65.sty
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\latex\pgf\compatibility\pgfcomp-version-1-18.sty
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\latex\pgf\compatibility\pgfcomp-version-1-18.sty
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\latex\pgf\utilities\pgffor.sty
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\latex\pgf\utilities\pgffor.sty
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\latex\pgf\utilities\pgfkeys.sty
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\latex\pgf\utilities\pgfkeys.sty
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\generic\pgf\utilities\pgfkeys.code.tex
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\generic\pgf\utilities\pgfkeys.code.tex
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\generic\pgf\utilities\pgfkeys.code.tex
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\latex\pgf\math\pgfmath.sty
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\latex\pgf\math\pgfmath.sty
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\generic\pgf\math\pgfmath.code.tex
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\generic\pgf\math\pgfmath.code.tex
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\generic\pgf\math\pgfmath.code.tex
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\generic\pgf\utilities\pgffor.code.tex
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\generic\pgf\utilities\pgffor.code.tex
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\generic\pgf\utilities\pgffor.code.tex
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\generic\pgf\frontendlayer\tikz\tikz.code.tex
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\generic\pgf\frontendlayer\tikz\tikz.code.tex
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\generic\pgf\frontendlayer\tikz\tikz.code.tex
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\generic\pgf\libraries\pgflibraryplothandlers.code.tex
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\generic\pgf\libraries\pgflibraryplothandlers.code.tex
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\generic\pgf\modules\pgfmodulematrix.code.tex
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\generic\pgf\frontendlayer\tikz\libraries\tikzlibrarytopaths.code.tex
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\generic\pgf\frontendlayer\tikz\libraries\tikzlibrarytopaths.code.tex
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\latex\tocloft\tocloft.sty
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\latex\tocloft\tocloft.sty
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\latex\tools\longtable.sty
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\latex\tools\longtable.sty
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\latex\ltablex\ltablex.sty
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\latex\ltablex\ltablex.sty
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\latex\tools\tabularx.sty
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\latex\tools\tabularx.sty
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\latex\float\float.sty
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\latex\float\float.sty
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\latex\hyperref\hyperref.sty
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\latex\hyperref\hyperref.sty
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\latex\kvsetkeys\kvsetkeys.sty
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\latex\kvsetkeys\kvsetkeys.sty
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\generic\kvdefinekeys\kvdefinekeys.sty
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\generic\kvdefinekeys\kvdefinekeys.sty
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\generic\pdfescape\pdfescape.sty
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\generic\pdfescape\pdfescape.sty
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\generic\ltxcmds\ltxcmds.sty
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\generic\ltxcmds\ltxcmds.sty
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\generic\pdftexcmds\pdftexcmds.sty
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\generic\pdftexcmds\pdftexcmds.sty
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\generic\infwarerr\infwarerr.sty
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\generic\infwarerr\infwarerr.sty
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\latex\hycolor\hycolor.sty
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\latex\hycolor\hycolor.sty
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\latex\hyperref\nameref.sty
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\latex\hyperref\nameref.sty
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\latex\refcount\refcount.sty
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\latex\refcount\refcount.sty
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\generic\gettitlestring\gettitlestring.sty
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\generic\gettitlestring\gettitlestring.sty
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\latex\kvoptions\kvoptions.sty
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\latex\kvoptions\kvoptions.sty
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\latex\etoolbox\etoolbox.sty
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\latex\etoolbox\etoolbox.sty
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\generic\stringenc\stringenc.sty
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\generic\stringenc\stringenc.sty
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\latex\hyperref\pd1enc.def
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\latex\hyperref\pd1enc.def
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\latex\hyperref\pd1enc.def
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\generic\intcalc\intcalc.sty
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\generic\intcalc\intcalc.sty
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\latex\hyperref\puenc.def
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\latex\hyperref\puenc.def
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\latex\hyperref\puenc.def
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\latex\url\url.sty
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\latex\url\url.sty
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\generic\bitset\bitset.sty
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\generic\bitset\bitset.sty
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\generic\bigintcalc\bigintcalc.sty
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\generic\bigintcalc\bigintcalc.sty
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\latex\hyperref\hpdftex.def
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\latex\hyperref\hpdftex.def
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\latex\hyperref\hpdftex.def
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\latex\rerunfilecheck\rerunfilecheck.sty
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\latex\rerunfilecheck\rerunfilecheck.sty
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\generic\uniquecounter\uniquecounter.sty
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\generic\uniquecounter\uniquecounter.sty
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\latex\parskip\parskip.sty
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\latex\parskip\parskip.sty
+INPUT .\ODD.aux
+INPUT .\ODD.aux
+INPUT ODD.aux
+INPUT .\Pagine\Introduzione\introduzione.aux
+INPUT .\Pagine\Introduzione\introduzione.aux
+INPUT Pagine\Introduzione\introduzione.aux
+INPUT .\Pagine\Packages\packages.aux
+INPUT .\Pagine\Packages\packages.aux
+INPUT Pagine\Packages\packages.aux
+INPUT .\Pagine\Classes\classes.aux
+INPUT .\Pagine\Classes\classes.aux
+INPUT Pagine\Classes\classes.aux
+INPUT .\Pagine\copyright\copyright.aux
+INPUT .\Pagine\copyright\copyright.aux
+INPUT Pagine\copyright\copyright.aux
+OUTPUT ODD.aux
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\context\base\mkii\supp-pdf.mkii
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\context\base\mkii\supp-pdf.mkii
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\context\base\mkii\supp-pdf.mkii
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\latex\epstopdf-pkg\epstopdf-base.sty
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\latex\epstopdf-pkg\epstopdf-base.sty
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\latex\00miktex\epstopdf-sys.cfg
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\latex\00miktex\epstopdf-sys.cfg
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\tex\latex\00miktex\epstopdf-sys.cfg
+INPUT .\ODD.out
+INPUT .\ODD.out
+INPUT ODD.out
+INPUT ODD.out
+OUTPUT ODD.pdf
+INPUT .\ODD.out
+INPUT .\ODD.out
+OUTPUT ODD.out
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\fonts\tfm\public\cm\cmss10.tfm
+INPUT .\Immagini\Unipa.png
+INPUT .\Immagini\Unipa.png
+INPUT .\Immagini\Unipa.png
+INPUT .\Immagini\Unipa.png
+INPUT .\Immagini\Unipa.png
+INPUT .\Immagini\Unipa.png
+INPUT .\Immagini\Unipa.png
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\fonts\tfm\public\cm\cmss12.tfm
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\fonts\tfm\public\cm\cmssbx10.tfm
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\fonts\tfm\public\cm\cmss9.tfm
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\fonts\tfm\public\cm\cmr17.tfm
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\fonts\tfm\public\cm\cmbx12.tfm
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\fonts\tfm\public\cm\cmr12.tfm
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\fonts\tfm\public\cm\cmcsc10.tfm
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\fonts\tfm\public\cm\cmr12.tfm
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\fonts\tfm\public\cm\cmbx12.tfm
+INPUT .\Immagini\logo.png
+INPUT .\Immagini\logo.png
+INPUT .\Immagini\logo.png
+INPUT .\Immagini\logo.png
+INPUT .\Immagini\logo.png
+INPUT .\Immagini\logo.png
+INPUT .\Immagini\logo.png
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\fonts\tfm\public\cm\cmssbx10.tfm
+INPUT C:\Users\andre\AppData\Local\MiKTeX\fonts\map\pdftex\pdftex.map
+INPUT .\ODD.toc
+INPUT .\ODD.toc
+INPUT ODD.toc
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\fonts\tfm\public\cm\cmbx10.tfm
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\fonts\tfm\public\cm\cmtt10.tfm
+OUTPUT ODD.toc
+INPUT .\Pagine\Introduzione\introduzione.tex
+INPUT .\Pagine\Introduzione\introduzione.tex
+OUTPUT Pagine\Introduzione\introduzione.aux
+INPUT .\Pagine\Introduzione\introduzione.tex
+INPUT .\Pagine\Introduzione\introduzione.tex
+INPUT Pagine\Introduzione\introduzione.tex
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\fonts\tfm\public\cm\cmssbx10.tfm
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\fonts\tfm\public\cm\cmbx12.tfm
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\fonts\tfm\public\cm\cmti10.tfm
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\fonts\tfm\jknappen\ec\tcrm1000.tfm
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\fonts\tfm\public\cm\cmssi10.tfm
+INPUT .\Pagine\Packages\packages.tex
+INPUT .\Pagine\Packages\packages.tex
+OUTPUT Pagine\Packages\packages.aux
+INPUT .\Pagine\Packages\packages.tex
+INPUT .\Pagine\Packages\packages.tex
+INPUT Pagine\Packages\packages.tex
+INPUT .\Immagini\Suddivisione in packages - Client.png
+INPUT .\Immagini\Suddivisione in packages - Client.png
+INPUT .\Immagini\Suddivisione in packages - Client.png
+INPUT .\Immagini\Suddivisione in packages - Client.png
+INPUT .\Immagini\Suddivisione in packages - Client.png
+INPUT .\Immagini\Suddivisione in packages - Client.png
+INPUT .\Immagini\Suddivisione in packages - Client.png
+INPUT .\Immagini\Suddivisione in packages - Server.png
+INPUT .\Immagini\Suddivisione in packages - Server.png
+INPUT .\Immagini\Suddivisione in packages - Server.png
+INPUT .\Immagini\Suddivisione in packages - Server.png
+INPUT .\Immagini\Suddivisione in packages - Server.png
+INPUT .\Immagini\Suddivisione in packages - Server.png
+INPUT .\Immagini\Suddivisione in packages - Server.png
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\fonts\tfm\public\cm\cmtt12.tfm
+INPUT .\Pagine\Classes\classes.tex
+INPUT .\Pagine\Classes\classes.tex
+OUTPUT Pagine\Classes\classes.aux
+INPUT .\Pagine\Classes\classes.tex
+INPUT .\Pagine\Classes\classes.tex
+INPUT Pagine\Classes\classes.tex
+INPUT .\Immagini\classi\Autenticazione Boundary.png
+INPUT .\Immagini\classi\Autenticazione Boundary.png
+INPUT .\Immagini\classi\Autenticazione Boundary.png
+INPUT .\Immagini\classi\Autenticazione Boundary.png
+INPUT .\Immagini\classi\Autenticazione Boundary.png
+INPUT .\Immagini\classi\Autenticazione Boundary.png
+INPUT .\Immagini\classi\Autenticazione Boundary.png
+INPUT .\Immagini\classi\Autenticazione Control.png
+INPUT .\Immagini\classi\Autenticazione Control.png
+INPUT .\Immagini\classi\Autenticazione Control.png
+INPUT .\Immagini\classi\Autenticazione Control.png
+INPUT .\Immagini\classi\Autenticazione Control.png
+INPUT .\Immagini\classi\Autenticazione Control.png
+INPUT .\Immagini\classi\Autenticazione Control.png
+INPUT .\Immagini\classi\Gestione Profilo Boundary.png
+INPUT .\Immagini\classi\Gestione Profilo Boundary.png
+INPUT .\Immagini\classi\Gestione Profilo Boundary.png
+INPUT .\Immagini\classi\Gestione Profilo Boundary.png
+INPUT .\Immagini\classi\Gestione Profilo Boundary.png
+INPUT .\Immagini\classi\Gestione Profilo Boundary.png
+INPUT .\Immagini\classi\Gestione Profilo Boundary.png
+INPUT .\Immagini\classi\Gestione Profilo Control.png
+INPUT .\Immagini\classi\Gestione Profilo Control.png
+INPUT .\Immagini\classi\Gestione Profilo Control.png
+INPUT .\Immagini\classi\Gestione Profilo Control.png
+INPUT .\Immagini\classi\Gestione Profilo Control.png
+INPUT .\Immagini\classi\Gestione Profilo Control.png
+INPUT .\Immagini\classi\Gestione Profilo Control.png
+INPUT .\Immagini\classi\Gestione Materiali Boundary.png
+INPUT .\Immagini\classi\Gestione Materiali Boundary.png
+INPUT .\Immagini\classi\Gestione Materiali Boundary.png
+INPUT .\Immagini\classi\Gestione Materiali Boundary.png
+INPUT .\Immagini\classi\Gestione Materiali Boundary.png
+INPUT .\Immagini\classi\Gestione Materiali Boundary.png
+INPUT .\Immagini\classi\Gestione Materiali Boundary.png
+INPUT .\Immagini\classi\Gestione Materiali Control.png
+INPUT .\Immagini\classi\Gestione Materiali Control.png
+INPUT .\Immagini\classi\Gestione Materiali Control.png
+INPUT .\Immagini\classi\Gestione Materiali Control.png
+INPUT .\Immagini\classi\Gestione Materiali Control.png
+INPUT .\Immagini\classi\Gestione Materiali Control.png
+INPUT .\Immagini\classi\Gestione Materiali Control.png
+INPUT .\Immagini\classi\Condivisione Boundary.png
+INPUT .\Immagini\classi\Condivisione Boundary.png
+INPUT .\Immagini\classi\Condivisione Boundary.png
+INPUT .\Immagini\classi\Condivisione Boundary.png
+INPUT .\Immagini\classi\Condivisione Boundary.png
+INPUT .\Immagini\classi\Condivisione Boundary.png
+INPUT .\Immagini\classi\Condivisione Boundary.png
+INPUT .\Immagini\classi\Condivisione Control.png
+INPUT .\Immagini\classi\Condivisione Control.png
+INPUT .\Immagini\classi\Condivisione Control.png
+INPUT .\Immagini\classi\Condivisione Control.png
+INPUT .\Immagini\classi\Condivisione Control.png
+INPUT .\Immagini\classi\Condivisione Control.png
+INPUT .\Immagini\classi\Condivisione Control.png
+INPUT .\Immagini\classi\Discovery Boundary.png
+INPUT .\Immagini\classi\Discovery Boundary.png
+INPUT .\Immagini\classi\Discovery Boundary.png
+INPUT .\Immagini\classi\Discovery Boundary.png
+INPUT .\Immagini\classi\Discovery Boundary.png
+INPUT .\Immagini\classi\Discovery Boundary.png
+INPUT .\Immagini\classi\Discovery Boundary.png
+INPUT .\Immagini\classi\Discovery Control.png
+INPUT .\Immagini\classi\Discovery Control.png
+INPUT .\Immagini\classi\Discovery Control.png
+INPUT .\Immagini\classi\Discovery Control.png
+INPUT .\Immagini\classi\Discovery Control.png
+INPUT .\Immagini\classi\Discovery Control.png
+INPUT .\Immagini\classi\Discovery Control.png
+INPUT .\Immagini\classi\DAO.png
+INPUT .\Immagini\classi\DAO.png
+INPUT .\Immagini\classi\DAO.png
+INPUT .\Immagini\classi\DAO.png
+INPUT .\Immagini\classi\DAO.png
+INPUT .\Immagini\classi\DAO.png
+INPUT .\Immagini\classi\DAO.png
+INPUT .\Immagini\classi\UI.png
+INPUT .\Immagini\classi\UI.png
+INPUT .\Immagini\classi\UI.png
+INPUT .\Immagini\classi\UI.png
+INPUT .\Immagini\classi\UI.png
+INPUT .\Immagini\classi\UI.png
+INPUT .\Immagini\classi\UI.png
+INPUT .\Immagini\Entity.png
+INPUT .\Immagini\Entity.png
+INPUT .\Immagini\Entity.png
+INPUT .\Immagini\Entity.png
+INPUT .\Immagini\Entity.png
+INPUT .\Immagini\Entity.png
+INPUT .\Immagini\Entity.png
+INPUT .\Pagine\copyright\copyright.tex
+INPUT .\Pagine\copyright\copyright.tex
+OUTPUT Pagine\copyright\copyright.aux
+INPUT .\Pagine\copyright\copyright.tex
+INPUT .\Pagine\copyright\copyright.tex
+INPUT Pagine\copyright\copyright.tex
+INPUT ODD.aux
+INPUT .\Pagine\Introduzione\introduzione.aux
+INPUT .\Pagine\Introduzione\introduzione.aux
+INPUT Pagine\Introduzione\introduzione.aux
+INPUT .\Pagine\Packages\packages.aux
+INPUT .\Pagine\Packages\packages.aux
+INPUT Pagine\Packages\packages.aux
+INPUT .\Pagine\Classes\classes.aux
+INPUT .\Pagine\Classes\classes.aux
+INPUT Pagine\Classes\classes.aux
+INPUT .\Pagine\copyright\copyright.aux
+INPUT .\Pagine\copyright\copyright.aux
+INPUT Pagine\copyright\copyright.aux
+INPUT .\ODD.out
+INPUT .\ODD.out
+INPUT C:\Users\andre\AppData\Local\MiKTeX\fonts\pk\ljfour\jknappen\ec\dpi600\tcrm1000.pk
+INPUT C:\Users\andre\AppData\Local\MiKTeX\fonts\pk\ljfour\jknappen\ec\dpi600\tcrm1000.pk
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\fonts\type1\public\amsfonts\cm\cmbx10.pfb
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\fonts\type1\public\amsfonts\cm\cmbx10.pfb
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\fonts\type1\public\amsfonts\cm\cmbx12.pfb
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\fonts\type1\public\amsfonts\cm\cmbx12.pfb
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\fonts\type1\public\amsfonts\cm\cmcsc10.pfb
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\fonts\type1\public\amsfonts\cm\cmcsc10.pfb
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\fonts\type1\public\amsfonts\cm\cmr10.pfb
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\fonts\type1\public\amsfonts\cm\cmr10.pfb
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\fonts\type1\public\amsfonts\cm\cmss10.pfb
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\fonts\type1\public\amsfonts\cm\cmss10.pfb
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\fonts\type1\public\amsfonts\cm\cmss9.pfb
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\fonts\type1\public\amsfonts\cm\cmss9.pfb
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\fonts\type1\public\amsfonts\cm\cmssbx10.pfb
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\fonts\type1\public\amsfonts\cm\cmssbx10.pfb
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\fonts\type1\public\amsfonts\cm\cmssi10.pfb
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\fonts\type1\public\amsfonts\cm\cmssi10.pfb
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\fonts\type1\public\amsfonts\cm\cmsy10.pfb
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\fonts\type1\public\amsfonts\cm\cmsy10.pfb
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\fonts\type1\public\amsfonts\cm\cmti10.pfb
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\fonts\type1\public\amsfonts\cm\cmti10.pfb
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\fonts\type1\public\amsfonts\cm\cmtt10.pfb
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\fonts\type1\public\amsfonts\cm\cmtt10.pfb
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\fonts\type1\public\amsfonts\cm\cmtt12.pfb
+INPUT C:\Users\andre\AppData\Local\Programs\MiKTeX\fonts\type1\public\amsfonts\cm\cmtt12.pfb

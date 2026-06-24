@@ -3,5 +3,187 @@
 Il livello di memorizzazione è realizzato su un \textbf{DBMS relazionale} interrogato tramite \textbf{interfaccia SQL}, che assicura il rispetto delle proprietà ACID. La permanenza dei file è affidata a un object storage esterno.
 
 \subsection{Diagramma E-R}
+Di seguito viene mostrato il modello Entit\`a - Relazione del database gestito dal sistema:
 
-\placeholderImg
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth, height=0.90\textheight, keepaspectratio]{Immagini/ER_Diagram.png}
+\end{figure}
+
+\clearpage
+
+\subsection{Struttura delle tabelle}
+
+\subsubsection{User}
+
+\begin{tabularx}{\textwidth}{|c|c|c|X|}
+\hline
+\headerTabellaDB{Attributo}{Tipo}{Vincoli}{Descrizione}
+\rigaTabellaDB{id}{bigint}{PK, identity}{Identificativo numerico univoco e auto-incrementale associato al Membro AFAM.}
+\rigaTabellaDB{name}{text}{NOT NULL}{Nome del Membro AFAM.}
+\rigaTabellaDB{surname}{text}{NOT NULL}{Cognome del Membro AFAM.}
+\rigaTabellaDB{mail}{text}{NOT NULL, UNIQUE}{Indirizzo di posta elettronica principale utilizzato per le credenziali di accesso al sistema.}
+\rigaTabellaDB{business\_mail}{text}{NULL}{Indirizzo email secondario ad uso professionale, mostrato pubblicamente per contatti di lavoro.}
+\rigaTabellaDB{passwordHash}{text}{NOT NULL}{Stringa alfanumerica rappresentante l'impronta crittografica della password di accesso, generata tramite algoritmo sicuro BCrypt.}
+\rigaTabellaDB{propic}{text}{NULL}{Riferimento o URL relativo all'immagine del profilo memorizzata nell'Object Storage.}
+\rigaTabellaDB{birthdate}{date}{NULL}{Data di nascita del Membro, utile ai fini delle verifiche anagrafiche di identit\`a.}
+\rigaTabellaDB{birthplace}{text}{NULL}{Luogo o comune di nascita del Membro AFAM.}
+\rigaTabellaDB{address}{text}{NULL}{Indirizzo di residenza o domicilio del Membro.}
+\rigaTabellaDB{phone}{text}{NULL}{Recapito telefonico del Membro per comunicazioni esterne o di servizio.}
+\rigaTabellaDB{spid\_code}{text}{NULL}{Codice identificativo univoco restituito dal Identity Provider in seguito ad autenticazione tramite SPID.}
+\rigaTabellaDB{biography}{text}{NULL}{Blocco di testo adibito alla descrizione biografica o al profilo artistico-curriculare del Membro.}
+\rigaTabellaDB{linkedin\_id}{text}{NULL}{Riferimento o URL testuale al profilo professionale della piattaforma LinkedIn.}
+\rigaTabellaDB{instagram\_id}{text}{NULL}{Riferimento o username associato al profilo social Instagram.}
+\rigaTabellaDB{facebook\_id}{text}{NULL}{Riferimento o link relativo al profilo social Facebook.}
+\rigaTabellaDB{profession}{text}{NULL}{Professione, qualifica accademica o area principale di interesse artistico del Membro all'interno del comparto AFAM.}
+\rigaTabellaDB{is\_public}{boolean}{NOT NULL, DEFAULT false}{Flag booleano atto a regolamentare la visibilit\`a pubblica del profilo.}
+\rigaTabellaDB{internal\_share\_enabled}{boolean}{NOT NULL, DEFAULT true}{Flag booleano che abilita o disabilita la ricezione di condivisioni interne provenienti da altri Membri del sistema.}
+\end{tabularx}
+
+\subsubsection{Registration OTP}
+
+\begin{tabularx}{\textwidth}{|c|c|c|X|}
+\hline
+\headerTabellaDB{Attributo}{Tipo}{Vincoli}{Descrizione}
+\rigaTabellaDB{id}{bigint}{PK, identity}{Identificativo numerico univoco e auto-incrementale della richiesta di registrazione pendente.}
+\rigaTabellaDB{email}{text}{NOT NULL}{Indirizzo email fornito in fase di registrazione, utilizzato come destinazione per l'invio del codice.}
+\rigaTabellaDB{name}{text}{NOT NULL}{Nome del Membro.}
+\rigaTabellaDB{surname}{text}{NOT NULL}{Cognome del Membro.}
+\rigaTabellaDB{password\_hash}{text}{NOT NULL}{Hash crittografico della password scelta dall'utente durante lo step iniziale di compilazione dei dati.}
+\rigaTabellaDB{birthdate}{date}{NOT NULL}{Data di nascita inserita in fase di pre-registrazione.}
+\rigaTabellaDB{birthplace}{text}{NOT NULL}{Luogo di nascita inserito in fase di pre-registrazione.}
+\rigaTabellaDB{code\_hash}{text}{NOT NULL}{Impronta crittografica del codice OTP numerico a 6 cifre generato dal sistema, memorizzato in formato sicuro per impedirne la lettura diretta dal database.}
+\rigaTabellaDB{expires\_at}{timestamptz}{NOT NULL}{Timestamp completo indicante il momento esatto di scadenza della validit\`a del codice (pari a 5 minuti dalla generazione).}
+\rigaTabellaDB{created\_at}{timestamptz}{NOT NULL, DEFAULT now()}{Istante temporale di generazione del record e di invio della mail contenente l'OTP.}
+\end{tabularx}
+
+\clearpage
+
+\subsubsection{OTP}
+
+\begin{tabularx}{\textwidth}{|c|c|c|X|}
+\hline
+\headerTabellaDB{Attributo}{Tipo}{Vincoli}{Descrizione}
+\rigaTabellaDB{id}{bigint}{PK, identity}{Identificativo univoco e sequenziale della transazione dell'OTP.}
+\rigaTabellaDB{id\_user}{bigint}{FK, NOT NULL}{Chiave esterna riferita alla tabella \textit{USER} che identifica il Membro.}
+\rigaTabellaDB{email}{text}{FK, NOT NULL}{Indirizzo di posta elettronica che punta direttamente alla colonna \textit{mail} della tabella \textit{USER} per garantire l'integrit\`a referenziale.}
+\rigaTabellaDB{code\_hash}{text}{NOT NULL}{Hash sicuro del codice numerico monouso generato dal Back-End, utilizzato per la verifica transazionale a due fattori.}
+\rigaTabellaDB{expires\_at}{timestamptz}{NOT NULL}{Istante temporale di decadenza oltre il quale il codice OTP non viene pi\`u ritenuto valido dal sistema per l'autenticazione.}
+\rigaTabellaDB{created\_at}{timestamptz}{NOT NULL, DEFAULT now()}{Data e ora di emissione e tracciamento del record a sistema.}
+\end{tabularx}
+
+\subsubsection{Certification}
+
+\begin{tabularx}{\textwidth}{|c|c|c|X|}
+\hline
+\headerTabellaDB{Attributo}{Tipo}{Vincoli}{Descrizione}
+\rigaTabellaDB{id}{bigint}{PK, identity}{Identificativo univoco e auto-incrementale della certificazione.}
+\rigaTabellaDB{id\_user}{bigint}{FK, NOT NULL}{Chiave esterna riferita alla tabella \textit{USER} che identifica il Membro proprietario.}
+\rigaTabellaDB{id\_file}{bigint}{FK, NOT NULL}{Chiave esterna riferita alla tabella \textit{FILE} che punta all'asset fisico salvato nell'Object Storage.}
+\rigaTabellaDB{title}{text}{NOT NULL}{Titolo o nome della certificazione/attestato.}
+\rigaTabellaDB{is\_public}{boolean}{NOT NULL, DEFAULT false}{Flag per gestire la visibilit\`a della certificazione nel profilo pubblico del Membro.}
+\end{tabularx}
+
+\clearpage
+
+\subsubsection{Internal Share}
+
+\begin{tabularx}{\textwidth}{|c|c|c|X|}
+\hline
+\headerTabellaDB{Attributo}{Tipo}{Vincoli}{Descrizione}
+\rigaTabellaDB{id}{bigint}{PK, identity}{Identificativo univoco della condivisione interna.}
+\rigaTabellaDB{id\_user\_from}{bigint}{FK, NOT NULL}{Chiave esterna riferita al mittente (\textit{USER}) che condivide l'elemento.}
+\rigaTabellaDB{id\_user\_to}{bigint}{FK, NULL}{Chiave esterna riferita al destinatario (\textit{USER}).}
+\rigaTabellaDB{id\_artid}{bigint}{FK, NOT NULL}{Chiave esterna riferita all'\textit{ARTID} oggetto della condivisione.}
+\rigaTabellaDB{recipient\_email}{text}{NOT NULL}{Indirizzo email del destinatario.}
+\rigaTabellaDB{is\_accepted}{boolean}{NOT NULL}{Stato dell'invito di condivisione (\textit{true} se accettato, \textit{false} se rifiutato).}
+\rigaTabellaDB{created\_at}{timestamptz}{NOT NULL, DEFAULT now()}{Data e ora di creazione della richiesta di condivisione.}
+\end{tabularx}
+
+\subsubsection{External Share}
+
+\begin{tabularx}{\textwidth}{|c|c|c|X|}
+\hline
+\headerTabellaDB{Attributo}{Tipo}{Vincoli}{Descrizione}
+\rigaTabellaDB{id}{bigint}{PK, identity}{Identificativo univoco (o token) associato al link di condivisione esterna.}
+\rigaTabellaDB{id\_creator}{bigint}{FK, NOT NULL}{Chiave esterna riferita all'utente (\textit{USER}) proprietario che ha generato il link.}
+\rigaTabellaDB{id\_artid}{bigint}{FK, NOT NULL}{Chiave esterna riferita all'\textit{ARTID} reso accessibile tramite questo specifico link.}
+\rigaTabellaDB{click\_counter}{integer}{NOT NULL, DEFAULT 0}{Contatore incrementale degli accessi effettuati dai Guest su questo link.}
+\rigaTabellaDB{expiration\_date}{timestamptz}{NULL}{Data e ora di scadenza oltre la quale il link viene invalidato dal sistema.}
+\rigaTabellaDB{is\_active}{boolean}{NOT NULL, DEFAULT true}{Flag booleano che indica se il link \`e attualmente attivo o revocato manualmente dall'autore.}
+\rigaTabellaDB{last\_opened}{timestamptz}{NULL}{Timestamp dell'ultimo accesso effettuato tramite il link.}
+\rigaTabellaDB{first\_opened}{timestamptz}{NULL}{Timestamp del primo accesso in assoluto effettuato tramite il link.}
+\rigaTabellaDB{created\_at}{timestamptz}{NOT NULL, DEFAULT now()}{Data e ora di creazione del link.}
+\end{tabularx}
+
+\subsubsection{Tag}
+
+\begin{tabularx}{\textwidth}{|c|c|c|X|}
+\hline
+\headerTabellaDB{Attributo}{Tipo}{Vincoli}{Descrizione}
+\rigaTabellaDB{id}{bigint}{PK, identity}{Identificativo univoco del tag.}
+\rigaTabellaDB{id\_user}{bigint}{FK, NOT NULL, UNIQUE(id\_user, title)}{Chiave esterna riferita al creatore (\textit{USER}) del tag personalizzato. Fa parte del vincolo di unicit\`a composto insieme al titolo.}
+\rigaTabellaDB{title}{text}{NOT NULL, UNIQUE(id\_user, title)}{Testo dell'etichetta. Il vincolo composto garantisce che lo stesso utente non possa creare pi\`u tag con lo stesso nome.}
+\rigaTabellaDB{color}{text}{NULL}{Codice colore esadecimale (es. \#FF5733) associato per la visualizzazione nell'interfaccia grafica.}
+\end{tabularx}
+
+\subsubsection{ArtID Tag}
+
+\begin{tabularx}{\textwidth}{|c|c|c|X|}
+\hline
+\headerTabellaDB{Attributo}{Tipo}{Vincoli}{Descrizione}
+\rigaTabellaDB{id\_tag}{bigint}{FK, composite PK}{Chiave esterna facente parte della PK composta, riferita al tag associato.}
+\rigaTabellaDB{id}{bigint}{FK, composite PK}{Chiave esterna facente parte della PK composta, riferita all'ArtID associato.}
+\end{tabularx}
+
+\subsubsection{ArtID}
+
+\begin{tabularx}{\textwidth}{|c|c|c|X|}
+\hline
+\headerTabellaDB{Attributo}{Tipo}{Vincoli}{Descrizione}
+\rigaTabellaDB{id}{bigint}{PK, identity}{Identificativo univoco dell'ArtID.}
+\rigaTabellaDB{id\_user}{bigint}{FK, NOT NULL}{Chiave esterna che mappa il Membro (\textit{USER}) legittimo proprietario del contenitore.}
+\rigaTabellaDB{id\_thumbnail}{bigint}{FK, NULL}{Chiave esterna opzionale verso \textit{FILE} per impostare un'immagine di copertina visiva.}
+\rigaTabellaDB{title}{text}{NOT NULL}{Titolo identificativo dell'ArtID.}
+\rigaTabellaDB{favourite}{boolean}{NOT NULL, DEFAULT false}{Flag per inserire l'elemento tra i preferiti nella dashboard del Membro.}
+\rigaTabellaDB{created\_at}{timestamptz}{NOT NULL, DEFAULT now()}{Data di creazione del contenitore.}
+\rigaTabellaDB{last\_modified}{timestamptz}{NOT NULL, DEFAULT now()}{Ultimo aggiornamento applicato alla struttura o ai metadati dell'ArtID.}
+\rigaTabellaDB{visibility\_status}{text}{NOT NULL}{Stato logico della visibilit\`a (es. 'PUBLIC', 'PRIVATE', 'UNLISTED').}
+\end{tabularx}
+
+\subsubsection{ArtID Resource}
+
+\begin{tabularx}{\textwidth}{|c|c|c|X|}
+\hline
+\headerTabellaDB{Attributo}{Tipo}{Vincoli}{Descrizione}
+\rigaTabellaDB{id\_resource}{bigint}{FK, composite PK}{Chiave esterna facente parte della PK composta, riferita alla risorsa multimediale.}
+\rigaTabellaDB{id}{bigint}{FK, composite PK}{Chiave esterna facente parte della PK composta, riferita all'ArtID.}
+\rigaTabellaDB{rank}{integer}{NOT NULL, DEFAULT 0}{Valore numerico indicante la posizione sequenziale (\textit{ordinamento}) della risorsa all'interno del relativo ArtID.}
+\end{tabularx}
+
+\subsubsection{Resource}
+
+\begin{tabularx}{\textwidth}{|c|c|c|X|}
+\hline
+\headerTabellaDB{Attributo}{Tipo}{Vincoli}{Descrizione}
+\rigaTabellaDB{id}{bigint}{PK, identity}{Identificativo univoco della risorsa nel catalogo.}
+\rigaTabellaDB{id\_user}{bigint}{FK, NOT NULL}{Chiave esterna che mappa l'autore dell'elemento (\textit{USER}).}
+\rigaTabellaDB{id\_file}{bigint}{FK, NOT NULL}{Chiave esterna verso la tabella \textit{FILE} per associare l'oggetto fisico reale memorizzato su cloud.}
+\rigaTabellaDB{title}{text}{NOT NULL}{Titolo esplicativo del materiale inserito.}
+\rigaTabellaDB{description}{text}{NULL}{Note o descrizione estesa del contenuto artistico della risorsa.}
+\rigaTabellaDB{favourite}{boolean}{NOT NULL, DEFAULT false}{Flag booleano per contrassegnare il materiale come preferito.}
+\rigaTabellaDB{created\_at}{timestamptz}{NOT NULL, DEFAULT now()}{Data di caricamento iniziale della risorsa.}
+\rigaTabellaDB{last\_modified}{timestamptz}{NOT NULL, DEFAULT now()}{Ultima modifica sui metadati descrittivi della risorsa.}
+\end{tabularx}
+
+\subsubsection{File}
+
+\begin{tabularx}{\textwidth}{|c|c|c|X|}
+\hline
+\headerTabellaDB{Attributo}{Tipo}{Vincoli}{Descrizione}
+\rigaTabellaDB{id}{bigint}{PK, identity}{Identificativo univoco e immutabile del file sul DBMS.}
+\rigaTabellaDB{file\_path}{text}{NOT NULL}{Il percorso logico/URL relativo all'interno del \textit{Bucket} di storage sicuro per il recupero dell'oggetto.}
+\rigaTabellaDB{file\_name}{text}{NOT NULL}{Nome originario del file completo del relativo identificativo di upload.}
+\rigaTabellaDB{extension}{text}{NOT NULL}{Estensione del file (es. pdf, mp3, mp4, png) estratta in fase di caricamento.}
+\rigaTabellaDB{mime\_type}{text}{NOT NULL}{Stringa standard standardizzata MIME Type (es. application/pdf, audio/mpeg) utilizzata dal Front-End per interpretare e renderizzare in sicurezza l'asset.}
+\end{tabularx}

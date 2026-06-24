@@ -352,7 +352,7 @@ Il sistema ha mostrato l'errore: ``L'ArtID selezionato \`e stato cancellato.''}
 \rigaTabella{Precondizione}{Il sistema ha mostrato la schermata ``GESTIONE ARTID''}
 \rigaTabella{Flusso degli eventi}{\begin{enumerate}
     \item Il Membro clicca sul filtro ``Condivisi con me''
-    \item Il sistema interroga il DBMS per ottenere tutti gli ArtID condivisi con il Membro
+    \item Il sistema interroga il DBMS per ottenere tutti gli ArtID condivisi con il Membro che non abbiano visibilit\`a ``PRIVATO''
     \item Il sistema mostra a schermo gli ArtID condivisi con il Membro
     \item Il Membro clicca sull'ArtID desiderato
     \item Il sistema interroga il DBMS per ottenere i materiali relativi all'ArtID condiviso, nonch\'e i dati relativi al Membro autore dello stesso
@@ -403,7 +403,8 @@ Il sistema ha mostrato l'errore: ``L'ArtID selezionato \`e stato cancellato.''}
 \end{enumerate}
 }
 \rigaTabella{Postcondizione}{Il sistema ha mostrato a video la schermata ``GESTIONE ARTID'' con eventuali messaggi}
-\rigaTabella{Note}{Non \`e possibile interagire con il pulsante ``CONDIVIDI'' se l'ArtID non ha visualizzazione ``PUBBLICO'' o ``UNLISTED''. \newline Oggetto della mail: ``ARTID - UN ARTID E' STATO CONDIVISO CON TE''. \newline Corpo della mail: ``La informiamo che un ARTID \`e stato condiviso con lei.''}
+\rigaTabella{Note}{Se il Membro condivide dinuovo uno stesso ArtID con lo stesso Membro il sistema sovrascrive la condivisione precedente. \newline
+    Non \`e possibile interagire con il pulsante ``CONDIVIDI'' se l'ArtID non ha visualizzazione ``PUBBLICO'' o ``UNLISTED''. \newline Oggetto della mail: ``ARTID - UN ARTID E' STATO CONDIVISO CON TE''. \newline Corpo della mail: ``La informiamo che un ARTID \`e stato condiviso con lei.''}
 \hline
 \end{tabularx}
 

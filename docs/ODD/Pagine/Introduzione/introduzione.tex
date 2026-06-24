@@ -30,7 +30,8 @@ Il sistema \`e strutturato secondo una scomposizione fisica e logica in due macr
     \begin{itemize}
         \item \textit{REST Controller Layer:} Espone le API RESTful del sistema, intercettando i payload HTTP/HTTPS provenienti dal client e validandone la struttura formale.
         \item \textit{Service Layer (Control centrale):} Custodisce i componenti di controllo centrali in cui risiede la core business logic del sistema (es. gestione delle transazioni, orchestrazione dei flussi di autenticazione e vincoli di integrit\`a).
-\item \textit{DAO Layer (Data Access Object / Repository):} Incapsula i pattern di persistenza delle \textit{Entity} di dominio, interfacciandosi direttamente con il \textit{DBMS}. \textbf{In questo livello, l'adozione dell'architettura \textit{Repository} (tramite Spring Data) si giustifica per elevare il livello di astrazione, permettendo al Service Layer di trattare i dati come collezioni di oggetti in memoria ed isolando completamente la logica di business dai dettagli implementativi del database relazionale.}    \end{itemize}
+        \item \textit{DAO Layer (Data Access Object / Repository):} Incapsula i pattern di persistenza delle \textit{Entity} di dominio, interfacciandosi direttamente con il \textit{DBMS}. In questo livello, l'adozione dell'architettura \textit{Repository} (tramite \textit{Spring Data}) si giustifica per \textbf{elevare il livello di astrazione}, permettendo al Service Layer di trattare i dati come \textbf{collezioni di oggetti in memoria} ed \textbf{isolando completamente la logica di business} dai dettagli implementativi del database relazionale. 
+   \end{itemize}
 \end{itemize}
 
 
@@ -65,6 +66,8 @@ Lo sviluppo lato server adotta \textbf{Spring Boot 4} su piattaforma \textbf{Jav
 Le API sono di tipo REST e \textit{stateless}: ogni richiesta viene autenticata in modo indipendente tramite token \textbf{JWT} (JSON Web Token), abilitando la scalabilit\`a orizzontale del Back-End del sistema. La persistenza relazionale \`e gestita in modo snello con \textbf{Spring Data JDBC} e, dove si rendono necessarie query o aggregazioni puntuali, tramite l'ausilio di \texttt{JdbcTemplate} e \texttt{NamedParameterJdbcTemplate}; l'archiviazione dei contenuti binari e dei file multimediali \`e invece delegata a un \textbf{object storage S3-compatibile}.
 
 La specifica \textbf{OpenAPI} (generata mediante \textit{springdoc-openapi}) costituisce il contratto formale e condiviso dal quale il client genera programmaticamente i propri tipi e modelli di dato, garantendo una coerenza \textit{end-to-end} tra i due nodi. La sicurezza dell'applicazione \`e interamente governata da \textbf{Spring Security} tramite un filtro di intercettazione per i token JWT e l'algoritmo \textbf{BCrypt} per la codifica delle password, mentre l'utilizzo di \textit{Lombok} riduce drasticamente il codice boilerplate all'interno delle classi di dominio.
+
+\clearpage
 
 \subsubsection{Librerie Back-End}
 
@@ -106,12 +109,12 @@ Le caratteristiche principali legate alla gestione e alla sicurezza dei dati inc
 
 I parametri di connessione e autenticazione verso l'istanza remota di Supabase sono centralizzati interamente all'interno del file \texttt{application.properties} del backend (\texttt{src/main/resources/}). Questa scelta garantisce il totale disaccoppiamento tra la logica dei componenti \textit{DAO} e l'infrastruttura di rete.
 
-Per il dettaglio dello schema entit\`a-relazione (ER) e del relativo modello relazionale si rimanda alle sezioni dedicate all'interno del \textit{System Design Document} (§3.6).
+Per il dettaglio dello schema entit\`a-relazione (ER) e del relativo modello relazionale si rimanda alle sezioni dedicate all'interno del \textit{System Design Document} (§4.1).
 
 \subsection{Linee guida per la documentazione dello storage dei file}
 Per la persistenza dei contenuti binari (materiali, attestati e immagini di profilo) è impiegato un servizio di \textbf{object storage S3-compatibile} — nel deployment corrente \textbf{Supabase Storage} — interrogato tramite l'\textit{AWS SDK for Java v2}. La comunicazione avviene su HTTPS verso un servizio specializzato esterno, mantenendo il sistema modulare e scalabile e sgravando il DBMS dalla gestione dei BLOB.
 
-\subsubsection*{Gestione e Sicurezza dei File}
+\subsubsection{Gestione e Sicurezza dei File}
 \begin{itemize}
     \item \textbf{Identificazione:} Ogni file è identificato da una \textit{object key} opaca (UUID) scollegata dal nome originale, così da evitare collisioni e \textit{path traversal}.
     \item \textbf{Metadati:} Le informazioni del file (nome, estensione, tipo MIME, dimensione) risiedono nella tabella \texttt{file}, mentre i byte sono conservati nel bucket.
@@ -129,9 +132,10 @@ Al fine di massimizzare la chiarezza descrittiva e garantire la piena tracciabil
     \item \textbf{Codice Sorgente:} L'implementazione effettiva del software (classi, firme dei metodi, rotte API e tabelle del DBMS) è interamente sviluppata in \textbf{lingua inglese}, in conformità con le \textit{best practice} globali dell'ingegneria del software.
 \end{itemize}
 
+\clearpage
+
 Di seguito viene riportata la corrispondenza terminologica tra le entità descritte nel modello di analisi e le rispettive classi Java/tabelle del database relazionale:
 
-\vspace{0.3cm}
 \arrayrulecolor{SlateGray}
 \begin{tabularx}{\textwidth}{|c|X|}
 \hline
@@ -144,4 +148,3 @@ Di seguito viene riportata la corrispondenza terminologica tra le entità descri
 \rigaTabella{Condivisione}{ \texttt{InternalShare} }
 \hline
 \end{tabularx}
-\vspace{0.3cm}

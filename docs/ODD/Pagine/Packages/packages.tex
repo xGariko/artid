@@ -15,7 +15,7 @@
 \clearpage
 
 \subsection{\texttt{artid-client/src}}
-Questo cartella contiene il \textbf{Front-end} dell'applicazione.\\
+Questa cartella contiene il \textbf{Front-end} dell'applicazione.\\
 La struttura sfrutta il routing basato sul file system e la separazione netta tra l'interfaccia grafica e la logica di caricamento dati.
 
 \subsubsection{\texttt{routes}}
@@ -29,7 +29,7 @@ Il \textbf{punto di accesso} principale all'applicazione è definito nella carte
 \end{itemize}
 La pagina principale dopo l'autenticazione si trova nella cartella:
 \begin{itemize}
-    \item \texttt{dashboard}: contiene il file \texttt{+page.svelte} che implementa l'interfaccia di controllo centrale, esponendo i collegamenti rapidi a tutte le sezioni funzionali dell'applicazione.
+    \item \texttt{home}: contiene il file \texttt{+page.svelte} che implementa l'interfaccia di controllo centrale, esponendo i collegamenti rapidi a tutte le sezioni funzionali dell'applicazione.
 \end{itemize}
 
 Di seguito vengono dettagliati i percorsi raggruppati per macro-casi d'uso:
@@ -37,7 +37,7 @@ Di seguito vengono dettagliati i percorsi raggruppati per macro-casi d'uso:
 \paragraph{Autenticazione}
 Area dedicata alla gestione dell'accesso e dell'identità:
 \begin{itemize}
-    \item \texttt{login}: composta da \texttt{+page.svelte} per la GUI del form e \texttt{+page.server.ts} per la gestione sicura delle richieste di accesso lato server e l'integrazione con lo \texttt{SPID}.
+    \item \texttt{login}: composta da \texttt{+page.svelte} per la GUI del form e \texttt{+page.server.ts} per la gestione sicura delle richieste di accesso lato server e l'integrazione con lo \textbf{SPID}.
     \item \texttt{register}: composta da \texttt{+page.svelte} (interfaccia di registrazione) e \texttt{+page.server.ts} (validazione e invio dei dati di iscrizione al back-end).
 \end{itemize}
 
@@ -58,9 +58,9 @@ Area fulcro dell'applicazione per la manipolazione degli asset digitali:
 \end{itemize}
 
 \paragraph{Condivisione}
-Sezione predisposta per il tracciamento e il trasferimento sicuro dei dati:
+Sezione predisposta per la condivisione degli \textbf{ArtID}:
 \begin{itemize}
-    \item \texttt{shares}: formata da \texttt{+page.svelte} e \texttt{+page.server.ts}; permette al Membro di monitorare, revocare o generare nuovi link e permessi di condivisione.
+    \item \texttt{shares}: formata da \texttt{+page.svelte} e \texttt{+page.server.ts}; permette al Membro di monitorare, revocare o generare nuovi link.
     \item \texttt{artIDGuest}: formata da \texttt{+page.svelte} e \texttt{+page.server.ts}; rappresenta la vista pubblica o ad accesso limitato dedicata ai soggetti esterni che consultano un \textbf{ArtID} condiviso.
 \end{itemize}
 
@@ -72,7 +72,7 @@ Sezione pubblica per la ricerca dei Membri:
 \end{itemize}
 
 \subsubsection{\texttt{lib}}
-Questa cartella agisce da contenitore per tutte le risorse condivise, le logiche riutilizzabili e i moduli trasversali dell'applicazione front-end. Al suo interno risiedono anche i modelli TypeScript speculari a quelli definiti nel server Java.
+Questa cartella agisce da contenitore per tutte le risorse condivise, le logiche riutilizzabili e i moduli trasversali dell'applicazione Front-end. Al suo interno risiedono anche i modelli TypeScript speculari a quelli definiti nel server Java.
 
 \paragraph{\texttt{components}}
 Raccolta dei componenti dell'interfaccia utente, organizzati secondo principi di riusabilità:
@@ -95,12 +95,17 @@ Questa cartella si occupa della gestione dello stato globale dell'applicazione.\
     \item \texttt{auth.ts}: mantiene in memoria l'istanza e i dettagli del Membro correntemente autenticato, esponendo i metodi globali per verificare i permessi di sessione e lo stato dell'autenticazione in tempo reale.
 \end{itemize}
 
+\paragraph{\texttt{api}}
+Centralizza la definizione dei contratti di interfaccia e i meccanismi di comunicazione diretta con il \textbf{Back-end}, implementando un approccio basato su \textbf{API-First Design}:
+\begin{itemize}
+    \item \texttt{schema.d.ts}: file di definizione dei tipi TypeScript generato automaticamente a partire dal file di specifica tramite appositi tool di compilazione; mappa rigorosamente i modelli del database e le risposte del server, azzerando il rischio di disallineamento dei dati e garantendo il controllo statico dei tipi in tutto il Front-end.
+\end{itemize}
 
 \subsection{\texttt{java/afam/artid-server}}
 Questo package costituisce il nucleo del \textbf{Back-end} dell'applicazione, suddiviso nelle seguenti componenti.
 
 \subsubsection{\texttt{controller}}
-Questa cartella contiene i componenti \textbf{REST Controller} responsabili di esporre gli endpoint \textbf{API} verso il \textbf{front-end}. Il loro compito principale è intercettare le richieste HTTP, validare i dati in ingresso e delegare l'esecuzione della logica di business al rispettivo \texttt{service}. Inoltre, i \textbf{Controller} si occupano di mappare e convertire i risultati ricevuti dal service nei relativi \texttt{dto} (Data Transfer Object) prima di impacchettare e restituire la risposta HTTP al front-end.
+Questa cartella contiene i componenti \textbf{REST Controller} responsabili di esporre gli endpoint \textbf{API} verso il \textbf{Front-end}. Il loro compito principale è intercettare le richieste HTTP, validare i dati in ingresso e delegare l'esecuzione della logica di business al rispettivo \texttt{service}. Inoltre, i \textbf{Controller} si occupano di mappare e convertire i risultati ricevuti dal service nei relativi \texttt{dto} (Data Transfer Object) prima di impacchettare e restituire la risposta HTTP al front-end.
 
 \subsubsection{\texttt{dao}}
 Contiene le interfacce \textbf{DAO} (Data Access Object) responsabili dell'interazione diretta con il database relazionale. Sfruttando le specifiche di \textbf{Spring Data JDBC} tramite l'estensione di \texttt{ListCrudRepository}, è sufficiente dichiarare il prototipo del metodo nella firma dell'interfaccia per demandare al framework la generazione automatica della query SQL a runtime. Tuttavia, per operazioni complesse o manipolazioni custom, il sistema consente la scrittura di query personalizzate sfruttando l'annotazione \texttt{@Query}.

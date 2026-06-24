@@ -9,8 +9,8 @@
 \clearpage
 
 \paragraph{Visualizza schermata ``GESTIONE ARTID''}
-\par{ \noindent  Il seguente caso d'uso permette di visualizzare tutti gli ArtIID del Membro AFAM.\\
-\`E prevista la creazione e cancellazione di ArtID da poter condividere.}
+\par{ \noindent  Il seguente caso d'uso permette di visualizzare tutti gli ArtID del Membro AFAM.\\
+\`E prevista la creazione di ArtID da poter condividere.}
 
 \begin{tabularx}{\textwidth}{|C|X|}
 \hline
@@ -32,7 +32,7 @@ I filtri sono ``I miei'', ``Condivisi con me'', ``Recenti'', ``Preferiti''}
 
 \paragraph{Visualizza schermata ``GESTIONE MATERIALI''}
 \par{\noindent Il seguente caso d'uso permette di visualizzare tutti i materiali del Membro AFAM.\\
-\`E previsto l'inserimento e la cancellazione di materiali.}
+\`E previsto l'inserimento, la cancellazione e la modifica di materiali.}
 
 \begin{tabularx}{\textwidth}{|C|X|}
 \hline
@@ -56,7 +56,7 @@ I filtri sono per tipo di materiale [es. audio, video], recenti e preferiti.}
 
 \paragraph{Visualizza schermata ``DETTAGLI ARTID''}
 \par{\noindent Il seguente caso d'uso permette di visualizzare tutti i dettagli dell'ArtID selezionato. \\ 
-\`E prevista la possibilità di aggiungere Materiali e Tag, di aggiungere o rimuovere dai preferiti l'ArtID e di condividerlo.}
+\`E prevista la possibilità di aggiungere Materiali e Tag, di aggiungere o rimuovere dai preferiti l'ArtID, di condividerlo e di eliminarlo definitivamente.}
 
 \begin{tabularx}{\textwidth}{|C|X|}
 \hline
@@ -188,7 +188,7 @@ I filtri sono per tipo di materiale [es. audio, video], recenti e preferiti.}
 \clearpage
 
 \paragraph{Crea ArtID}
-\par{\noindent Questo caso d'uso permette al Membro AFAM di creare un ArtID}
+\par{\noindent Questo caso d'uso permette al Membro AFAM di creare un ArtID.}
 
 \begin{tabularx}{\textwidth}{|C|X|}
 \hline
@@ -240,7 +240,7 @@ I filtri sono per tipo di materiale [es. audio, video], recenti e preferiti.}
 \rigaTabella{Flusso degli eventi}{\begin{enumerate}
     \item Il Membro clicca il pulsante ``AGGIUNGI MATERIALE''
     \item Il sistema interroga il DBMS per ottenere tutti i Materiali del Membro
-    \item Il sistema mostra la schermata ``AGGIUNGI MATERIALE''
+    \item Il sistema mostra la modale ``AGGIUNGI MATERIALE''
     \item Il Membro seleziona uno o pi\`u Materiali dalla lista dei Materiali, opzionalmente, filtrando la lista compilando la barra di ricerca
     \item Il Membro clicca sul pulsante ``AGGIUNGI''
     \item Il sistema interroga il DBMS per aggiungere i Materiali selezionati all'ArtID
@@ -266,14 +266,10 @@ I filtri sono per tipo di materiale [es. audio, video], recenti e preferiti.}
     \item Il Membro clicca sulla ``X'' accanto al Materiale che vuole rimuovere
     \item Il sistema interroga il DBMS per rimuovere il Materiale dall'ArtID
     \item Il sistema mostra a video la schermata ``DETTAGLI ARTID'' aggiornata
+    \item Il sistema mostra a video il messaggio: ``Materiale rimosso con successo''
 \end{enumerate}
 }
 \rigaTabella{Postcondizione}{Il sistema ha mostrato a video la schermata ``DETTAGLI ARTID'' aggiornata}
-\rigaTabella{Sequenze alternative}{
-\begin{enumerate}
-    \item Il Membro opzionalmente clicca sulla ``X'' di un altro Materiale che vuole eliminare, il flusso riprende dal punto.
-\end{enumerate}
-}
 \hline
 \end{tabularx}
 
@@ -301,7 +297,8 @@ I filtri sono per tipo di materiale [es. audio, video], recenti e preferiti.}
 \end{enumerate}
 }
 \rigaTabella{Postcondizione}{Il sistema ha mostrato a video la schermata ``DETTAGLI ARTID'' aggiornata}
-\rigaTabella{Note}{Il pulsante ``SALVA'' rimane disabilitato finch\'e almeno uno tra Titolo, descrizione o immagine non viene modificato, oppure se il campo Titolo \`e vuoto.}
+\rigaTabella{Note}{Il pulsante ``SALVA'' rimane disabilitato finch\'e almeno uno tra titolo, descrizione o immagine non viene modificato, oppure se il campo titolo \`e vuoto.\newline
+Il Membro pu\`o riordinare i materiali in modo da cambiare la loro disposizione nella schermata ``PREVIEW ARTID''.}
 \hline
 \end{tabularx}
 
@@ -323,6 +320,7 @@ I filtri sono per tipo di materiale [es. audio, video], recenti e preferiti.}
     \item Il sistema interroga il DBMS per cancellare l'ArtID e tutti i riferimenti ai Materiali in esso contenuti e tutte le condivisioni interne ad esso riferite
     \item Il sistema interroga il DBMS per ottenere la lista degli ArtID aggiornata
     \item Il sistema mostra a video la schermata ``GESTIONE ARTID'' aggiornata
+    \item Il sistema mostra a video il messaggio: ``ArtID eliminato con successo''
 \end{enumerate}
 }
 \rigaTabella{Postcondizione}{Il sistema ha mostrato a video la schermata ``GESTIONE ARTID'' aggiornata}
@@ -367,7 +365,7 @@ I filtri sono per tipo di materiale [es. audio, video], recenti e preferiti.}
 \rigaTabella{Flusso degli eventi}{\begin{enumerate}
     \item Il Membro seleziona una delle opzioni di visibilit\`a dall'apposito menu a tendina
     \item Il sistema controlla l'opzione selezionata
-    \item \textbf{SE} l'opzione selezionata \`e PRIVATA E precedentemente era UNLISTED ED esistono link per l'ArtID:
+    \item \textbf{SE} l'opzione selezionata \`e PRIVATO E precedentemente era UNLISTED ED esistono link per l'ArtID:
     \begin{enumerate}
         \item Il sistema mostra a video il messaggio: ``Questo ArtID \`e stato gi\`a condiviso, se lo rendi privato chi ha il link non potr\`a pi\`u visualizzarlo. Procedere comunque?''
         \item Il Membro clicca il tasto ``CONFERMA''
@@ -379,8 +377,8 @@ I filtri sono per tipo di materiale [es. audio, video], recenti e preferiti.}
 \rigaTabella{Requisiti Speciali}{I valori di visibilit\`a da cui poter scegliere sono: [Pubblico, Privato, Unlisted]}
 \rigaTabella{Note}{
     \begin{itemize}
-        \item Se la visibilit\`a passa da PUBBLICA a PRIVATA, tutti gli eventuali link creati per condividerlo, se cliccati, mostreranno una pagina contenente un messaggio: ``L'ArtID che cerchi \`e privato''
-        \item Se la visibilit\`a passa da UNLISTED a PRIVATA, tutti gli eventuali link creati per condividerlo, se cliccati, mostreranno una pagina contenente un messaggio: ``L'ArtID che cerchi \`e privato''
+        \item Se la visibilit\`a passa da PUBBLICO a PRIVATO, tutti gli eventuali link creati per condividerlo, se cliccati, mostreranno una pagina contenente un messaggio: ``L'ArtID che cerchi \`e privato''
+        \item Se la visibilit\`a passa da UNLISTED a PRIVATO, tutti gli eventuali link creati per condividerlo, se cliccati, mostreranno una pagina contenente un messaggio: ``L'ArtID che cerchi \`e privato''
     \end{itemize}
     }
 \hline
@@ -403,7 +401,7 @@ I filtri sono per tipo di materiale [es. audio, video], recenti e preferiti.}
     \item Il sistema mostra la modale ``NUOVO TAG''
     \item Il Membro inserisce il nome del Tag
     \item Il sistema controlla il nome del Tag
-    \item \textbf{FINCH\`E} la lunghezza del Tag \`e minore di 3 oppure il nome del Tag contiene parole vietate oppure il tag gi\`a esiste:
+    \item \textbf{FINCH\`E} la lunghezza del Tag \`e minore di 3 OPPURE il nome del Tag contiene parole vietate OPPURE il tag gi\`a esiste:
     \begin{enumerate}
         \item \textbf{SE} la lunghezza del Tag \`e minore di 3:
         \begin{enumerate}
@@ -424,10 +422,11 @@ I filtri sono per tipo di materiale [es. audio, video], recenti e preferiti.}
     \end{enumerate}
     \item Il Membro clicca il pulsante salva
     \item Il sistema interroga il DBMS per salvare il nuovo Tag
+    \item Il sistema mostra a video la schermata "GESTIONE ARTID" aggiornata
 \end{enumerate}
 }
-\rigaTabella{Postcondizione}{}
-\rigaTabella{Requisiti Speciali}{Il tag deve rispettare le seguenti condizioni: 
+\rigaTabella{Postcondizione}{Il sistema ha mostrato a video la schermata "GESTIONE ARTID" aggiornata}
+\rigaTabella{Requisiti Speciali}{Il Tag deve rispettare le seguenti condizioni: 
     \begin{itemize}
         \item lunghezza minima 3 caratteri, lunghezza massima 50 caratteri
         \item NO parole offensive/razziste
@@ -451,15 +450,17 @@ I filtri sono per tipo di materiale [es. audio, video], recenti e preferiti.}
     \item Il Membro clicca il pulsante ``AGGIUNGI TAG''
     \item Il sistema interroga il DBMS per ottenere tutti i Tag del Membro
     \item Il sistema mostra la modale ``AGGIUNGI TAG''
-    \item Il Membro seleziona il Tag da aggiungere
-    \item Il sistema interroga il DBMS per aggiungere il Tag selezionato all'ArtID
-    \item Il sistema mostra la schermata ``DETTAGLI ARTID''
+    \item Il Membro seleziona uno o pi\`u Tag dalla lista dei Tag
+    \item Il Membro clicca sul pulsante ``AGGIUNGI''
+    \item Il sistema interroga il DBMS per aggiungere i Tag selezionati all'ArtID
+    \item Il sistema mostra la schermata ``DETTAGLI ARTID'' con i Tag aggiunti
 \end{enumerate}
 }
-\rigaTabella{Postcondizione}{Il sistema ha mostrato a video la schermata ``DETTAGLI ARTID''}
+\rigaTabella{Postcondizione}{Il sistema ha mostrato a video la schermata ``DETTAGLI ARTID'' con i Tag aggiunti}
 \hline
-\rigaTabella{Requisiti speciali}{Il Membro può inserire un massimo di 5 tag per ArtID}
-\rigaTabella{Note}{Il pulsante ``AGGIUNGI TAG'' è disabilitato se già sono stati inseriti 5 tag}
+\rigaTabella{Requisiti speciali}{Il Membro pu\`o inserire un massimo di 5 tag per ArtID}
+\rigaTabella{Note}{Il pulsante ``AGGIUNGI TAG'' è disabilitato se già sono stati inseriti 5 tag. \newline
+Il pulsante ``AGGIUNGI'' si disabilita se vengono selezionati pi\`u Tag di quelli che un ArtID pu\`o contenere}
 \hline
 \end{tabularx}
 
@@ -480,11 +481,6 @@ I filtri sono per tipo di materiale [es. audio, video], recenti e preferiti.}
     \item Il sistema mostra a video la schermata ``DETTAGLI ARTID'' aggiornata
 \end{enumerate}
 }
-\rigaTabella{Sequenze alternative}{
-\begin{enumerate}
-    \item Il Membro opzionalmente clicca sulla ``X'' di un altro Tag che vuole eliminare, il flusso riprende dal punto
-\end{enumerate}
-}
 \rigaTabella{Postcondizione}{Il sistema ha mostrato a video la schermata ``DETTAGLI ARTID'' aggiornata}
 \hline
 \end{tabularx}
@@ -492,7 +488,7 @@ I filtri sono per tipo di materiale [es. audio, video], recenti e preferiti.}
 \clearpage
 
 \paragraph{Preview ArtID}
-\par{\noindent Questo caso d'uso permette di visualizzare come l'artID verr\`a visto dalle persone a cui \`e condiviso.}
+\par{\noindent Questo caso d'uso permette di visualizzare come l'ArtID verr\`a visto dalle persone a cui \`e condiviso.}
 
 \begin{tabularx}{\textwidth}{|C|X|}
 \hline
@@ -509,7 +505,6 @@ I filtri sono per tipo di materiale [es. audio, video], recenti e preferiti.}
     \end{enumerate}
 }
 \rigaTabella{Postcondizione}{Il sistema ha mostrato a video la schermata ``PREVIEW ARTID''}
-\rigaTabella{Note}{Qualora l'ArtID fosse stato condiviso, la pagina mostrer\`a anche la data di scadenza della condivisione.}
 \end{tabularx}
 
 \clearpage

@@ -4,21 +4,6 @@
 
 \subsection{Panoramica Architetturale}
 
-% Per l'implementazione del sistema è stata scelta un'infrastruttura basata sullo stile \textbf{Client-Server}, strutturata internamente secondo il pattern architetturale \textbf{MVC (Model-View-Controller)} e integrata con il design pattern \textbf{Repository} per il disaccoppiamento dei dati.
-
-% L'adozione del paradigma \textbf{Client-Server} è dettata dalla necessità di garantire una netta \textbf{separazione tra l'utente finale e i dati con cui questo interagisce}, i quali, per la natura stessa dell'applicazione, devono essere centralizzati e protetti.
-
-% A livello applicativo, la logica è organizzata tramite il pattern \textbf{MVC}, il quale suddivide il sistema in tre sottosistemi principali:
-% \begin{itemize}[itemsep=-6pt]
-%     \item \textbf{Model subsystem:} responsabile di mantenere la conoscenza del dominio, gestisce la persistenza, l'integrità e la distribuzione dei dati.
-%     \item \textbf{View subsystem:} responsabile di esibire gli elementi del dominio all'utente, costituisce l'interfaccia grafica attraverso la quale i dati vengono visualizzati.
-%     \item \textbf{Controller subsystem:} responsabile di gestire la sequenza delle interazioni, definisce i metodi con cui l'utente interroga il sistema e determina la logica di business associata.
-% \end{itemize}
-
-% Al fine di ottimizzare la gestione della persistenza all'interno del \textit{Model}, si è deciso di utilizzare il pattern \textbf{Repository}. Questo schema introduce un livello di \textbf{astrazione per accedere alla sorgente dei dati}, \textbf{nascondendo la complessità} derivante dalle interrogazioni dirette al database o da eventuali chiamate ad API esterne, garantendo una maggiore manutenibilità e testabilità del software.
-
-% A livello di deployment, il \textbf{lato Server del sistema e il DBMS dovranno essere installati stabilmente nel nodo dell'istituzione AFAM}, garantendo il controllo istituzionale sui dati. Al contrario, il \textbf{lato Client del sistema potrà essere eseguito su un numero arbitrario di nodi separati}, quali i dispositivi personali degli utenti.
-
 Per il sistema è stato scelto uno stile architetturale \textbf{Client-Server disaccoppiato}, basato sul protocollo di comunicazione stateless HTTP. Il sistema è suddiviso in due macro-sottosistemi principali:
 \begin{itemize}
     \item \textbf{Sottosistema Client:} Front-end eseguito come Single Page Application (SPA) accessibile da browser, strutturato su due livelli: il livello \textbf{Interfaccia} e il livello \textbf{Controller}.
@@ -49,22 +34,22 @@ Il lato Server elabora le richieste provenienti dal client attraverso tre strati
 \end{itemize}
 
 \subsection{Identificazione dei Sottosistemi Funzionali Cross-Platform}
-Sebbene la decomposizione precedentemente introdotta separi fisicamente i componenti in base all'ambiente di esecuzione (\textit{Client} nel browser e \textit{Server} sulla JVM), dal punto di vista logico il sistema è organizzato in \textbf{Sottosistemi Funzionali}. I macro-casi d'uso individuati in fase di analisi (\textit{Gestione profilo, Condivisioni, Discovery, Gestione Materiali, Autenticazione}) si ripresentano come sottosistemi verticali che attraversano l'intera architettura a livelli.
+Sebbene la decomposizione precedentemente introdotta separi fisicamente i componenti in base all'ambiente di esecuzione (\textit{Client} nel browser e \textit{Server} sulla JVM), dal punto di vista logico il sistema è organizzato in \textbf{Sottosistemi Funzionali}. I macro-casi d'uso individuati in fase di analisi (\textit{Gestione Profilo, Condivisioni, Discovery, Gestione Materiali, Autenticazione}) si ripresentano come sottosistemi verticali che attraversano l'intera architettura a livelli.
 
-Le funzionalità di ciascun sottosistema sono quindi fisicamente distribuite ed eseguite in modo collaborativo tra Client e Server. Ogni sottosistema funzionale attraversa i vari strati secondo una catena distributiva, qui esemplificata evidenziando la corrispondenza tra gli oggetti individuati nel RAD e il rispettivo livello di design:
+Le funzionalità di ciascun sottosistema sono quindi fisicamente distribuite ed eseguite in modo collaborativo tra Client e Server. Ogni sottosistema funzionale attraversa i vari strati secondo una catena distributiva, qui esemplificata evidenziando la corrispondenza tra gli oggetti individuati nel RAD e il rispettivo livello di design, utilizzando la terminologia dello schema nella sezione \ref{scomposizione}:
 \begin{enumerate}
-    \item \textbf{Layer di Presentazione Client:} Corrisponde alla parte \texttt{Interfaccia} del sottosistema, contiene gli oggetti \textit{Boundary}.
-    \item \textbf{Layer di Controllo Client:} Corrisponde alla parte \texttt{Controller} del sottosistema lato Client, contiene gli oggetti \textit{Control (Client-side)}.
-    \item \textbf{Layer di Controllo Server (Service Layer):} Corrisponde alla parte \texttt{Controller} del sottosistema lato Server, contiene gli oggetti \textit{Control (Server-side)}.
+    \item \textbf{Livello Interfaccia (Client):} Contiene gli oggetti \textit{Boundary}.
+    \item \textbf{Livello Controller (Client):} Corrisponde alla parte \texttt{Controller} del sottosistema lato Client, contiene gli oggetti \textit{Control (Client-side)}.
+    \item \textbf{Livello Controller (Server):} Corrisponde alla parte \texttt{Controller} del sottosistema lato Server (\textit{da non confondere con il livello ``REST Controller''}), contiene gli oggetti \textit{Control (Server-side)}. Viene implementata nel \textbf{Service Layer}.
 \end{enumerate}
 
-I due ulteriori livelli del Server, ovvero \textbf{REST Controller} e \textbf{DAO/Repository}, non corrispondono direttamente a oggetti logici individuati nella fase di analisi del RAD. Essi svolgono un ruolo prettamente architetturale emerso in questa fase di analisi architetturale, con lo scopo di isolare il livello di Controllo lato Server (Service) rispettivamente dall'interazione HTTP con il Client (\textbf{REST Controller}) e dall'implementazione fisica della persistenza dei dati (\textbf{DAO/Repository}).
+I due ulteriori livelli del Server, ovvero \textbf{REST Controller} e \textbf{DAO/Repository}, non corrispondono direttamente a oggetti logici individuati nella fase di analisi del RAD. Essi svolgono un ruolo prettamente architetturale emerso in questa fase di analisi, con lo scopo di isolare il livello di Controllo lato Server (Service) rispettivamente dall'interazione HTTP con il Client (\textbf{REST Controller}) e dall'implementazione fisica della persistenza dei dati (\textbf{DAO/Repository}).
 
 A livello di deployment, il \textbf{lato Server del sistema e il DBMS dovranno essere installati stabilmente presso il nodo dell'istituzione AFAM}, garantendo il controllo istituzionale e centralizzato sui dati. Al contrario, il \textbf{lato Client del sistema potrà essere eseguito su un numero arbitrario di nodi indipendenti}, quali i dispositivi personali degli utenti finali.
 
 \clearpage
 
-\subsection{Decomposizione in Sottosistemi}
+\subsection{Decomposizione in Sottosistemi} \label{scomposizione}
 
 Di seguito la rappresentazione della suddivisione in sottosistemi del sistema proposto:
 
@@ -73,29 +58,6 @@ Di seguito la rappresentazione della suddivisione in sottosistemi del sistema pr
     \includegraphics[width=0.95\textwidth, height=0.90\textheight, keepaspectratio]{Immagini/Scomposizione in sottosistemi.png}
     \caption{Scomposizione in sottosistemi}
 \end{figure}
-
-% \subsubsection{Gestione Autenticazione}
-% Il sottosistema Gestione Autenticazione comprende i componenti che permettono lo svolgimento delle operazioni di login, registrazione e logout del Membro AFAM tramite credenziali, e autenticazione tramite identità digitale. Comprende inoltre i componenti adibiti a recupero e modifica password, e il componente relativo alla generazione del codice OTP.
-
-% \subsubsection{Gestione Profilo}
-% Il sottosistema Gestione Profilo comprende i componenti che permettono la visualizzazione e aggiornamento dei dati anagrafici e professionali, nonché la modifica dell'immagine di profilo, della visibilità del profilo e il calcolo della percentuale di completamento. Contiene inoltre il componente necessario per il collegamento dell'identità SPID.
-
-% \subsubsection{Gestione Materiali}
-% Il sottosistema Gestione Materiali comprende i componenti necessari al caricamento e gestione (CRUD) dei materiali, nonché le funzionalità di gestione degli ArtID, associazione di tag e stati di visibilità (Pubblico/Privato/Unlisted), gestione dei preferiti e anteprima dell'ArtID.
-
-
-
-% \begin{itemize}
-%     \item \textbf{Gestione Autenticazione:} login, registrazione e logout del Membro AFAM tramite credenziali, con rilascio di token JWT. Predisposti: autenticazione con identità digitale (SPID), verifica a due fattori tramite OTP, recupero e modifica password, eliminazione account.
-%     \item \textbf{Gestione Profilo:} visualizzazione e aggiornamento dei dati anagrafici e professionali, immagine di profilo, impostazione del profilo come pubblico o privato e calcolo della percentuale di completamento. Predisposto: collegamento dell'identità SPID.
-%     \item \textbf{Gestione Materiali:} caricamento e gestione (CRUD) dei materiali con persistenza del contenuto come BLOB, organizzazione in contenitori ArtID, associazione di tag e stati di visibilità (Pubblico/Privato/Unlisted), gestione dei preferiti e anteprima dell'ArtID.
-%     \item \textbf{Gestione Condivisione:} condivisione interna verso altri Membri e condivisione esterna tramite link con scadenza e attivazione/disattivazione, con tracciamento degli accessi (contatore dei clic e data dell'ultimo accesso).
-%     \item \textbf{Gestione Certificazioni:} caricamento, download e rimozione di attestati con metadati descrittivi e livello di visibilità.
-%     \item \textbf{Discovery:} ricerca dei profili pubblici e dei contenuti per dati nominativi e per competenze/tag (predisposto).
-% \end{itemize}
-
-% \section{Architettura del Sistema e Panoramica dei Sottosistemi}
-
 
 %----------------------------------------------------------------------------------------
 %	1. AUTH SUBSYSTEM
@@ -173,22 +135,22 @@ Questo sottosistema costituisce il motore di ricerca e consultazione pubblica de
     \end{itemize}
 \end{itemize}
 
-
 \clearpage
 
 \input{Pagine/Sistema proposto/Sottosistemi/sottosistemi}
 
 \subsection{Mappatura Hardware/Software}
 
-La mappatura dei componenti software sui nodi hardware del sistema riflette la separazione strutturale introdotta dallo stile Client-Server e dal pattern MVC. Il sistema è distribuito su due macro-nodi principali:
+La mappatura dei componenti software sui nodi hardware del sistema riflette la separazione strutturale introdotta dallo stile Client-Server e dall'architettura a livelli. Il sistema è distribuito su due macro-nodi principali:
 
 \begin{itemize}
-    \item \textbf{Nodo ``Dispositivo Utente'' (Client):} Ospita il sottosistema \textit{View} e le componenti di interfaccia del \textit{Controller}. Questo nodo hardware (rappresentato dai dispositivi personali degli utenti) esegue l'applicazione client, gestendo l'interazione diretta con l'utente e l'invio delle richieste verso il server centralizzato.
-    \item \textbf{Nodo Centralizzato ``Server AFAM'':} Rappresenta il nucleo del sistema e ospita la logica di business principale (\textit{Controller} di backend), l'architettura \textit{Repository} e il \textit{DBMS}. Questo nodo gestisce la sicurezza, la persistenza transazionale dei dati all'interno della sorgente dati e l'elaborazione dei portfolio multimediali, esponendo le API necessarie per permettere ai nodi client di comunicare e recuperare o inserire informazioni in modo sicuro.
+    \item \textbf{Nodo Dispositivo Utente'' (Client):} Ospita i primi due livelli dell'architettura, ossia le componenti di \textit{Interfaccia} e il \textit{Controller} lato Client. Questo nodo hardware (rappresentato dai dispositivi personali degli utenti) esegue l'applicazione client, gestendo l'interazione diretta con l'utente e l'invio delle richieste verso il server centralizzato.
+    \item \textbf{Nodo Centralizzato Server AFAM'':} Rappresenta il nucleo del sistema e ospita gli ultimi tre livelli dell'architettura, ossia la logica di business principale nel livello \textit{Service} (\textit{Controller} lato Server) e i due livelli di supporto \textit{REST Controller} e \textit{DAO/Repository}, e infine il \textit{DBMS}. Questo nodo gestisce la sicurezza e la persistenza transazionale dei dati, esponendo le API necessarie per permettere ai nodi Client di comunicare e recuperare o inserire informazioni in modo sicuro.
 \end{itemize}
 
 Le comunicazioni tra il nodo client e il server centrale avvengono tramite canali di rete protetti, isolando completamente l'accesso diretto al DBMS dall'ambiente esterno a garanzia della sicurezza dei dati istituzionali.
 
+Supponiamo inoltre l'utilizzo di un \textbf{Object Storage Cloud S3 compatibile} per la permanenza dei file. Identifichiamo quindi un ulteriore nodo, con cui i due nodi identificati precedentemente comunicano attraverso canali HTTPS.
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.95\textwidth, height=0.90\textheight, keepaspectratio]{Immagini/Mappatura Hardware_Software.png}

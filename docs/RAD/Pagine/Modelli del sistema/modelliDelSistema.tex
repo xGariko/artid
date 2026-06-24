@@ -101,7 +101,15 @@ Il sistema è tornato nella condizione precedente al verificarsi dell'errore}
 
 \paragraph{Note dei casi d'uso}
 In qualunque schermata, ad eccezione della schermata ``WELCOME'', ``LOGIN'', ``REGISTRAZIONE'', ``VERIFICA OTP'', è presente una barra ``HEADER'' nella quale sono presenti i pulsanti: ``ArtID'', ``Materiali'', ``Condivisioni'', ``Certificazioni'', ``Profilo'', per navigare alle relative pagine, indipendentemente da quale schermata sia attualmente mostrata, e il pulsante ``AZIONI PROFILO'' per raggiungere la schermata ``GESTIONE PROFILO'' o effettuare il logout.\\
-Il Guest, invece, vedrà solamente il pulsante ``ACCEDI'' per poter effettuare il login qualora sia in possesso di un account.
+Il Guest, invece, vedrà solamente il pulsante ``ACCEDI'' per poter effettuare il login qualora sia in possesso di un account.\\
+
+Al fine di garantire la leggibilit\`a e la linearit\`a della specifica dei requisiti, la descrizione dei flussi degli eventi all'interno delle schede dei casi d'uso adotta le seguenti convenzioni formali:
+\begin{itemize}
+    \item \textbf{Assunzione di Successo Transazionale:} Salvo ove esplicitamente diversamente specificato (es. rami di controllo condizionali o flussi alternativi di errore critico), i passi dei flussi considerano l'operazione di persistenza o transazione sul DBMS come \textbf{eseguita con successo}.
+    \item \textbf{Messaggi di Feedback non Bloccanti:} Si assume come comportamento standard che, a conclusione di ogni operazione sul database, il sistema fornisca un \textit{feedback} visivo di conferma o di errore. Tali messaggi si presentano come piccoli elementi grafici informativi sovrapposti che \textbf{non bloccano la navigazione o l'interazione con la pagina sottostante}. Inoltre, per garantire il pieno controllo all'utente, qualsiasi messaggio di conferma o di errore pu\`o essere rimosso immediatamente dalla schermata interagendovi direttamente con un click, \textbf{senza la necessit\`a di esplicitare tale interazione in ogni singolo scenario}.
+\end{itemize}
+
+
 
 \clearpage
 

@@ -1,0 +1,45 @@
+\contentsline {section}{\numberline {1}Introduzione}{2}{section.1}%
+\contentsline {subsection}{\numberline {1.1}Obiettivi del sistema}{2}{subsection.1.1}%
+\contentsline {subsection}{\numberline {1.2}Obiettivi di progettazione}{2}{subsection.1.2}%
+\contentsline {subsubsection}{\numberline {1.2.1}Affidabilità, Robustezza e Continuità del Servizio}{2}{subsubsection.1.2.1}%
+\contentsline {subsubsection}{\numberline {1.2.2}Sicurezza e Integrità dei Dati}{2}{subsubsection.1.2.2}%
+\contentsline {subsubsection}{\numberline {1.2.3}Prestazioni ed Efficienza}{3}{subsubsection.1.2.3}%
+\contentsline {subsubsection}{\numberline {1.2.4}Usabilità ed Esperienza Utente}{3}{subsubsection.1.2.4}%
+\contentsline {subsubsection}{\numberline {1.2.5}Estendibilità e Manutenibilità}{3}{subsubsection.1.2.5}%
+\contentsline {subsection}{\numberline {1.3}Definizioni}{3}{subsection.1.3}%
+\contentsline {section}{\numberline {2}Architettura software attuale}{4}{section.2}%
+\contentsline {section}{\numberline {3}Architettura software proposta}{5}{section.3}%
+\contentsline {subsection}{\numberline {3.1}Panoramica Architetturale}{5}{subsection.3.1}%
+\contentsline {subsubsection}{\numberline {3.1.1}Decomposizione Architetturale in Macro-Sottosistemi}{5}{subsubsection.3.1.1}%
+\contentsline {paragraph}{\numberline {3.1.1.1}Macro-Sottosistema Client-Side}{5}{paragraph.3.1.1.1}%
+\contentsline {paragraph}{\numberline {3.1.1.2}Macro-Sottosistema Server-Side}{5}{paragraph.3.1.1.2}%
+\contentsline {subsection}{\numberline {3.2}Identificazione dei Sottosistemi Funzionali Cross-Platform}{5}{subsection.3.2}%
+\contentsline {subsection}{\numberline {3.3}Decomposizione in Sottosistemi}{7}{subsection.3.3}%
+\contentsline {subsubsection}{\numberline {3.3.1}Sottosistema di Autenticazione}{8}{subsubsection.3.3.1}%
+\contentsline {subsubsection}{\numberline {3.3.2}Sottosistema di Gestione Profilo}{8}{subsubsection.3.3.2}%
+\contentsline {subsubsection}{\numberline {3.3.3}Sottosistema di Gestione Materiali}{8}{subsubsection.3.3.3}%
+\contentsline {subsubsection}{\numberline {3.3.4}Sottosistema di Condivisione}{8}{subsubsection.3.3.4}%
+\contentsline {subsubsection}{\numberline {3.3.5}Sottosistema di Discovery}{9}{subsubsection.3.3.5}%
+\contentsline {subsection}{\numberline {3.4}Mappatura degli oggetti nei sottosistemi}{10}{subsection.3.4}%
+\contentsline {subsubsection}{\numberline {3.4.1}Autenticazione}{10}{subsubsection.3.4.1}%
+\contentsline {subsubsection}{\numberline {3.4.2}Gestione Profilo}{11}{subsubsection.3.4.2}%
+\contentsline {subsubsection}{\numberline {3.4.3}Gestione Materiali}{12}{subsubsection.3.4.3}%
+\contentsline {subsubsection}{\numberline {3.4.4}Condivisione}{13}{subsubsection.3.4.4}%
+\contentsline {subsubsection}{\numberline {3.4.5}Discovery}{14}{subsubsection.3.4.5}%
+\contentsline {subsection}{\numberline {3.5}Mappatura Hardware/Software}{15}{subsection.3.5}%
+\contentsline {section}{\numberline {4}Gestione dei Dati Persistenti}{17}{section.4}%
+\contentsline {subsection}{\numberline {4.1}Diagramma E-R}{17}{subsection.4.1}%
+\contentsline {subsection}{\numberline {4.2}Struttura delle tabelle}{18}{subsection.4.2}%
+\contentsline {subsubsection}{\numberline {4.2.1}User}{18}{subsubsection.4.2.1}%
+\contentsline {subsubsection}{\numberline {4.2.2}Registration OTP}{19}{subsubsection.4.2.2}%
+\contentsline {subsubsection}{\numberline {4.2.3}OTP}{20}{subsubsection.4.2.3}%
+\contentsline {subsubsection}{\numberline {4.2.4}Certification}{20}{subsubsection.4.2.4}%
+\contentsline {subsubsection}{\numberline {4.2.5}Internal Share}{21}{subsubsection.4.2.5}%
+\contentsline {subsubsection}{\numberline {4.2.6}External Share}{21}{subsubsection.4.2.6}%
+\contentsline {subsubsection}{\numberline {4.2.7}Tag}{22}{subsubsection.4.2.7}%
+\contentsline {subsubsection}{\numberline {4.2.8}ArtID Tag}{22}{subsubsection.4.2.8}%
+\contentsline {subsubsection}{\numberline {4.2.9}ArtID}{22}{subsubsection.4.2.9}%
+\contentsline {subsubsection}{\numberline {4.2.10}ArtID Resource}{23}{subsubsection.4.2.10}%
+\contentsline {subsubsection}{\numberline {4.2.11}Resource}{23}{subsubsection.4.2.11}%
+\contentsline {subsubsection}{\numberline {4.2.12}File}{23}{subsubsection.4.2.12}%
+\contentsline {section}{\numberline {5}Copyright e diritto d'autore}{24}{section.5}%

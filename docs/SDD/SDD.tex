@@ -61,21 +61,6 @@
 \renewcommand{\cftsecfont}{\color{DeepNavy}\bfseries\sffamily}
 \renewcommand{\cftsecpagefont}{\color{DeepNavy}\bfseries}
 
-% --- Configurazioni Liste Numerate ---
-% \setlist[enumerate]{leftmargin=*, align=left, label*=\arabic*., nosep} 
-% \setlistdepth{9}
-% \setlist[enumerate,1]{label*=\arabic*.}
-% \setlist[enumerate,2]{label*=\arabic*.}
-% \setlist[enumerate,3]{label*=\arabic*.}
-% \setlist[enumerate,4]{label*=\arabic*.}
-% \setlist[enumerate,5]{label*=\arabic*.}
-% \setlist[enumerate,6]{label*=\arabic*.}
-% \setlist[enumerate,7]{label*=\arabic*.}
-% \setlist[enumerate,8]{label*=\arabic*.}
-% \setlist[enumerate,9]{label*=\arabic*.}
-% \renewlist{enumerate}{enumerate}{9}
-% \setlist[itemize]{itemsep=2pt, topsep=2pt} 
-
 
 % 1. Definiamo prima la profondità massima dell'ambiente (fino a 9 livelli)
 \setlistdepth{9}
@@ -107,7 +92,6 @@
 % 4. Opzioni per gli elenchi puntati (itemize)
 \setlist[itemize]{itemsep=2pt, topsep=2pt, leftmargin=*}
 
-% \renewcommand\labelitemi{{\color{DeepNavy}\tiny$\blacksquare$}} % Quadratini al posto dei cerchietti
 
 \setcounter{secnumdepth}{5}
 \setcounter{tocdepth}{3}
@@ -136,6 +120,14 @@
 
 \newcommand{\rigaTabella}[2]{\textbf{#1} & #2 \\ \hline}
 
+% PER LE TABELLE DB
+\newcommand{\headerTabellaDB}[4]{\rowcolor{DeepNavy} \multicolumn{1}{|c|}{\color{white}\textbf{#1}} & 
+\multicolumn{1}{c|}{\color{white}\textbf{#2}} & \multicolumn{1}{c|}{\color{white}\textbf{#3}} & \multicolumn{1}{c|}{\color{white}\textbf{#4}} \\ \hline}
+
+\newcommand{\rigaTabellaDB}[4]{\textbf{#1} & #2 & #3 & #4 \\ \hline}
+
+
+
 \newcommand{\placeholderImg}{%
 \begin{figure}[htbp]
     \centering
@@ -151,21 +143,20 @@
 
 \begin{titlepage}
     
-\newgeometry{left=2.5cm, right=2.5cm, top=1.2cm, bottom=2.5cm}
+\newgeometry{left=2.5cm, right=2.5cm, top=1.1cm, bottom=2.5cm}
     
-    % \vspace*{0.2cm}
-
     % --- INTESTAZIONE NELLA FASCIA BLU CON LOGO UNIPA ---
     \color{white}\sffamily
     \noindent
-    \begin{minipage}[c]{0.20\textwidth}
-        \flushleft
+
+    \begin{minipage}[c]{0.25\textwidth}
+        \flushright
         % Logo UniPa inserito dentro la fascia blu
         \includegraphics[height=1.8cm]{Immagini/Unipa.png} 
     \end{minipage}%
-    \begin{minipage}[c]{0.80\textwidth}
-        \flushleft
-        \vspace{0.1cm}
+    \hspace{1cm}
+    \begin{minipage}[c]{0.70\textwidth}
+        \vspace{-0.1cm}
         {\large \textbf{UNIVERSIT\`A DEGLI STUDI DI PALERMO}} \\
         {\small DIPARTIMENTO DI INGEGNERIA} \\
         {\small CORSO DI LAUREA IN INGEGNERIA INFORMATICA}
@@ -216,9 +207,9 @@
 
 \include{Pagine/Introduzione/introduzione}
 
-
 \include{Pagine/Sistema attuale/sistemaAttuale}
 \include{Pagine/Sistema proposto/sistemaProposto}
 \include{Pagine/Gestione dati persistenti/database}
+\include{Pagine/copyright/copyright}
 
 \end{document}

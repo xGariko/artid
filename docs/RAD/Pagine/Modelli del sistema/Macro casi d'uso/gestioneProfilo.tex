@@ -9,7 +9,7 @@
 \clearpage
 
 \paragraph{Visualizza schermata ``GESTIONE PROFILO''}
-\par{\noindent Questo caso d'uso consente ad un Membro AFAM di accedere alla schermata ``GESTIONE PROFILO'' per gestire i dati personali, associare lo SPID al profilo, gestire gli attestati e chiudere l'account.}
+\par{\noindent Questo caso d'uso consente ad un Membro AFAM di accedere alla schermata ``GESTIONE PROFILO'' per gestire i dati personali, associare lo SPID al profilo e gestire gli attestati.}
 
 \begin{tabularx}{\textwidth}{|C|X|}
 \hline
@@ -76,7 +76,7 @@
 \rigaTabella{Sequenza alternative}{
     \begin{enumerate}[start=2]
         \item Il Membro clicca sull'immagine profilo
-        \item Il sistema mostra l'esplora file del dispositivo su cui si trova il Membro
+        \item Il sistema mostra l'esplora file del dispositivo che sta utilizzando il Membro
         \item Il Membro seleziona l'immagine da caricare
         \item Il sistema interroga il DBMS per aggiornare l'immagine del profilo
     \end{enumerate}
@@ -92,7 +92,8 @@
     \item Impostazione Account (Pubblico o Privato)
     \item Impostazione ricezione condivisioni
 \end{itemize}
-Il pulsante ``SALVA'' è disabilitato se non sono stati modificate le informazioni o se dei campi sono rimasti vuoti}
+Il pulsante ``SALVA'' è disabilitato se non sono stati modificate le informazioni o se dei campi sono rimasti vuoti. \newline
+Le informazioni di contatto e le impostazioni dell'account possono essere vuote.}
 \hline
 \end{tabularx}
 
@@ -112,7 +113,7 @@ Il pulsante ``SALVA'' è disabilitato se non sono stati modificate le informazio
     \item Il sistema mostra la modale ``NUOVO CERTIFICATO''
     \item Il Membro inserisce titolo e visibilit\`a
     \item Il Membro clicca sul riquadro per caricare l'attestato
-    \item Il sistema mostra l'esplora file del dispositivo su cui si trova il Membro
+    \item Il sistema mostra l'esplora file del dispositivo che sta utilizzando il Membro
     \item Il Membro seleziona il Materiale da caricare
     \item Il Membro clicca il tasto ``SALVA'' \label{salva attestato}
     \item Il sistema controlla la correttezza dell'attestato
@@ -136,8 +137,7 @@ Il pulsante ``SALVA'' è disabilitato se non sono stati modificate le informazio
 \rigaTabella{Postcondizione}{Il sistema ha mostrato la schermata ``GESTIONE CERTIFICATI'' aggiornata.}
 \rigaTabella{Requisiti Speciali}{Finch\`e il titolo \`e vuoto il pulsante salva \`e disabilitato. \newline 
 Le dimensioni massime per ogni singolo attestato sono 50 megabyte. \newline
-I formati validi per gli attestati sono: [PDF, PNG, JPG]. \newline
-Le informazioni complementari sono composte da: Titolo, Pubblico o privato.}
+I formati validi per gli attestati sono: [PDF, PNG, JPG]. \newline}
 \hline
 \end{tabularx}
 
@@ -183,6 +183,7 @@ Le informazioni complementari sono composte da: Titolo, Pubblico o privato.}
     \begin{enumerate}
         \item Il sistema interroga il DBMS per cancellare il Certificato selezionato
     \end{enumerate}
+    \item Il sistema mostra a video il messaggio: ``Certificati cancellati con successo''
     \item Il sistema interroga il DBMS per ottenere la lista dei Certificati aggiornata
     \item Il sistema mostra a video la schermata ``GESTIONE CERTIFICATI'' aggiornata
 \end{enumerate}
@@ -241,14 +242,14 @@ Le informazioni complementari sono composte da: Titolo, Pubblico o privato.}
     \end{enumerate}
     \item \textbf{ALTRIMENTI}:
     \begin{enumerate}
-        \item Il sistema ottiene dal provider i dati del Membro
+        \item Il sistema ottiene dal provider i dati del Membro e lo spidCode
         \item Il sistema interroga il DBMS per associare lo spid al Membro
         \item Il sistema mostra a video la schermata ``GESTIONE PROFILO''
     \end{enumerate}
 \end{enumerate}
 }
 \rigaTabella{Postcondizione}{Il sistema ha mostrato la schermata ``GESTIONE PROFILO''}
-\rigaTabella{Note}{Quando il Membro collega lo SPID le informazioni anagrafiche vengono sostituite da quelle che restituisce il provider, verificando inoltre l'account del Membro. Il pulsante ``COLLEGA SPID'' mostrer\`a quindi la scritta ``SPID COLLEGATO''.}
+\rigaTabella{Note}{Quando il Membro collega lo SPID le informazioni anagrafiche vengono sostituite da quelle che restituisce il provider, verificando inoltre l'account del Membro. Il pulsante ``COLLEGA SPID'' mostrer\`a quindi la scritta ``SPID COLLEGATO'' e sarà disabilitato.\newline Lo spidCode \`e un codice univoco rilasciato dal provider.}
 \hline
 \end{tabularx}
 

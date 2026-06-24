@@ -132,54 +132,33 @@
 
 \begin{titlepage}
     
-\newgeometry{left=2.5cm, right=2.5cm, top=1.2cm, bottom=2.5cm}
+\newgeometry{left=2.5cm, right=2.5cm, top=1.1cm, bottom=2.5cm}
     
-    % \vspace*{0.2cm}
-
     % --- INTESTAZIONE NELLA FASCIA BLU CON LOGO UNIPA ---
     \color{white}\sffamily
-\begin{center}
 
-\renewcommand{\tabularxcolumn}[1]{m{#1}}
-\begin{tabularx}{\textwidth}{@{} c X @{}}
-    % Prima Colonna: Immagine dentro la parbox centrata
-    \cellcolor{cyan!60}
-    \parbox[c]{2cm}{
-      \centering
-        \includegraphics[height=1.8cm]{Immagini/Unipa.png} 
-    }
-    &
-    % Seconda Colonna: Testo con i giusti a capo
-    \cellcolor{cyan!30}
-    \parbox[c]{\textwidth}{
-    {\large \textbf{UNIVERSIT\`A DEGLI STUDI DI PALERMO}} \newline
-    {\small DIPARTIMENTO DI INGEGNERIA} \newline
-    {\small CORSO DI LAUREA IN INGEGNERIA INFORMATICA}}
-\end{tabularx}
-\end{center}
-
-
-    % \noindent
-    % \begin{minipage}[c]{0.20\textwidth}
-    %     \flushleft
-    %     % Logo UniPa inserito dentro la fascia blu
-    %     \includegraphics[height=1.8cm]{Immagini/Unipa.png} 
-    % \end{minipage}%
-    % \begin{minipage}[c]{0.80\textwidth}
-    %     \flushleft
-    %     \vspace{0.1cm}
-    %     {\large \textbf{UNIVERSIT\`A DEGLI STUDI DI PALERMO}} \\
-    %     {\small DIPARTIMENTO DI INGEGNERIA} \\
-    %     {\small CORSO DI LAUREA IN INGEGNERIA INFORMATICA}
-    % \end{minipage}
-
+    \noindent
+      
+    \begin{minipage}[c]{0.25\textwidth}
+      \flushright
+      % Logo UniPa inserito dentro la fascia blu
+      \includegraphics[height=1.8cm]{Immagini/Unipa.png} 
+    \end{minipage}%
+    \hspace{1cm}
+    \begin{minipage}[c]{0.70\textwidth}
+      \vspace{-0.1cm}
+      {\large \textbf{UNIVERSIT\`A DEGLI STUDI DI PALERMO}} \\
+      {\small DIPARTIMENTO DI INGEGNERIA} \\
+      {\small CORSO DI LAUREA IN INGEGNERIA INFORMATICA}
+    \end{minipage}
+      
     \vspace*{4.5cm} 
     
     % --- TITOLO PRINCIPALE ---
     \color{black}\rmfamily
     \begin{center}
         {\Huge \textbf{\color{DeepNavy}Object Design Document}}\\[0.4cm]
-        {\large \color{SlateGray}\textsc{Specifiche dei Requisiti Software}}\\[1.5cm]
+        {\large \color{SlateGray}\textsc{Specifiche degli oggetti del Software}}\\[1.5cm]
         \rule{4cm}{1.5pt}\\[1cm]
         {\Large \textbf{ArtID}}\\[0.6cm]
         % Logo ArtID posizionato sotto il titolo del progetto
@@ -221,5 +200,6 @@
 
 \include{Pagine/Packages/packages}
 \include{Pagine/Classes/classes}
+\include{Pagine/copyright/copyright}
 
 \end{document}
