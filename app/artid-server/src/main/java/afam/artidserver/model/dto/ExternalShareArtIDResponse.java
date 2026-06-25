@@ -5,7 +5,7 @@ import java.time.OffsetDateTime;
 public record ExternalShareArtIDResponse(
         Long id,
         Long idArtid,
-        Long clickCounter,
+        Integer clickCounter,
         Boolean isActive,
         OffsetDateTime expirationDate,
         OffsetDateTime lastOpened,

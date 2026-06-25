@@ -830,7 +830,7 @@ export interface components {
             id?: number;
             /** Format: int64 */
             idArtid?: number;
-            /** Format: int64 */
+            /** Format: int32 */
             clickCounter?: number;
             isActive?: boolean;
             /** Format: date-time */

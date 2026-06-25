@@ -46,7 +46,7 @@ public class UserService {
     private static final String SEARCH_PUBLIC_PROFILES_SQL = """
             SELECT u.id, u.name, u.surname, u.profession,
                    (SELECT COUNT(*) FROM artid a
-                     WHERE a.id_user = u.id AND a.is_public = TRUE AND a.deleted_at IS NULL
+                     WHERE a.id_user = u.id AND a.visibility_state = 'public' AND a.deleted_at IS NULL
                    ) AS public_artid_count
             FROM "user" u
             WHERE u.is_public = TRUE
@@ -59,7 +59,7 @@ public class UserService {
                  OR u.profession ILIKE :pattern
                  OR EXISTS (
                         SELECT 1 FROM artid a
-                         WHERE a.id_user = u.id AND a.is_public = TRUE AND a.deleted_at IS NULL
+                         WHERE a.id_user = u.id AND a.visibility_state = 'public' AND a.deleted_at IS NULL
                            AND a.title ILIKE :pattern
                     )
               )
@@ -99,7 +99,7 @@ public class UserService {
                       JOIN resource r ON r.id = ar.id_resource
                      WHERE ar.id = a.id AND r.deleted_at IS NULL) AS resource_count
               FROM artid a
-             WHERE a.id_user = :userId AND a.is_public = TRUE AND a.deleted_at IS NULL
+             WHERE a.id_user = :userId AND a.visibility_state = 'public' AND a.deleted_at IS NULL
              ORDER BY a.created_at DESC
             """;
 

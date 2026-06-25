@@ -17,6 +17,11 @@ public class Resource {
     @Column("id_user")
     private Long idUser;
 
+    // Colonna legacy senza FK, sempre NULL: la visibilità è ora gestita a livello di ArtID
+    // (Artid.visibilityState). Mappata per riflettere lo schema del DB.
+    @Column("id_visibility_state")
+    private Long idVisibilityState;
+
     @Column("id_file")
     private Long idFile;
 

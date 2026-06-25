@@ -82,7 +82,7 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-mail</artifactId>
 		</dependency>
-		<!-- compile (non runtime): il converter JDBC di visibility_state usa org.postgresql.util.PGobject -->
+		<!-- Driver JDBC PostgreSQL -->
 		<dependency>
 			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>

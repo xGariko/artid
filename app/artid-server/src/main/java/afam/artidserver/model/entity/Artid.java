@@ -1,6 +1,5 @@
 package afam.artidserver.model.entity;
 
-import afam.artidserver.model.VISIBILITY_STATE;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
@@ -36,6 +35,9 @@ public class Artid {
     @Column("deleted_at")
     private OffsetDateTime deletedAt;
 
+    // Etichetta dell'enum Postgres visibility_state ('public'/'private'/'unlisted'). Tenuta come
+    // String: in scrittura si passa per un CAST espicito (vedi ArtidService), in lettura il driver
+    // restituisce già il label testuale.
     @Column("visibility_state")
-    private VISIBILITY_STATE visibilityState;
+    private String visibilityState;
 }

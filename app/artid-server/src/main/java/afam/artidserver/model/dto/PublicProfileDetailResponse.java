@@ -5,7 +5,7 @@ import java.util.List;
 /**
  * Read-model del dettaglio di un profilo PUBBLICO (pagina Explore → /explore/[id]).
  * Restituito solo se l'utente è pubblico e non eliminato. Espone esclusivamente dati
- * non sensibili e contenuti marcati pubblici: certificazioni e ArtID con is_public.
+ * non sensibili e contenuti marcati pubblici: certificazioni (is_public) e ArtID (visibility_state = 'public').
  * Campi privati come mail di login, telefono, indirizzo, data di nascita NON compaiono.
  */
 public record PublicProfileDetailResponse(

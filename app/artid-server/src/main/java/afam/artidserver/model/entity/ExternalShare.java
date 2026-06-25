@@ -18,7 +18,7 @@ public class ExternalShare {
     private Long idArtid;
 
     @Column("click_counter")
-    private Long clickCounter;
+    private Integer clickCounter;
 
     @Column("is_active")
     private Boolean isActive;
