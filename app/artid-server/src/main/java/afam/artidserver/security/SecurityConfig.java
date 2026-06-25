@@ -47,6 +47,8 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/users/search").permitAll()
                         // Dettaglio profilo pubblico (Explore → /explore/[id]): aperto senza login.
                         .requestMatchers(HttpMethod.GET, "/api/users/*/public").permitAll()
+                        // Dettaglio ArtID pubblico (Explore → /explore/[id]/artid/[artidId]): senza login.
+                        .requestMatchers(HttpMethod.GET, "/api/users/*/public/artids/*").permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);

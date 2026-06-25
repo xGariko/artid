@@ -58,7 +58,7 @@
 				<div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-3">
 					{#each pageArtids as artid (artid.id)}
 						<div class="col">
-							<ExplorePublicArtidCard {artid} />
+							<ExplorePublicArtidCard {artid} userId={data.userId} />
 						</div>
 					{/each}
 				</div>

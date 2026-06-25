@@ -3,10 +3,12 @@ package afam.artidserver.controller;
 import afam.artidserver.model.dto.ArtidCreateRequest;
 import afam.artidserver.model.dto.ArtidResponse;
 import afam.artidserver.model.dto.CountResponse;
+import afam.artidserver.model.dto.PublicArtidDetailResponse;
 import afam.artidserver.model.dto.ResourceResponse;
 import afam.artidserver.security.AuthenticatedUser;
 import afam.artidserver.service.ArtidService;
 import afam.artidserver.service.ResourceService;
+import afam.artidserver.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -27,6 +29,7 @@ public class ArtidController {
 
     private final ArtidService artidService;
     private final ResourceService resourceService;
+    private final UserService userService;
 
     @GetMapping("/count")
     public ResponseEntity<CountResponse> count(@AuthenticationPrincipal AuthenticatedUser principal) {
@@ -46,6 +49,17 @@ public class ArtidController {
     public ResponseEntity<ArtidResponse> findById(@PathVariable Long id,
             @AuthenticationPrincipal AuthenticatedUser principal) {
         return artidService.findByIdForUser(id, principal.getId())
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    // Anteprima dell'ArtID per il proprietario: stesso contenuto della pagina Explore (autore,
+    // thumbnail, materiali con presigned URL), ma visibile anche se l'ArtID non è pubblico. La
+    // proprietà è verificata nel service (filtro per id_user del principal) → 404 se non è suo.
+    @GetMapping("/{id}/preview")
+    public ResponseEntity<PublicArtidDetailResponse> preview(@PathVariable Long id,
+            @AuthenticationPrincipal AuthenticatedUser principal) {
+        return userService.getOwnerArtidPreview(id, principal.getId())
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }

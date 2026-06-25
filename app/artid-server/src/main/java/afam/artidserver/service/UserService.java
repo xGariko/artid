@@ -1,8 +1,10 @@
 package afam.artidserver.service;
 
 import afam.artidserver.dao.UserDAO;
+import afam.artidserver.model.dto.PublicArtidDetailResponse;
 import afam.artidserver.model.dto.PublicArtidSummaryResponse;
 import afam.artidserver.model.dto.PublicCertificationResponse;
+import afam.artidserver.model.dto.PublicMaterialResponse;
 import afam.artidserver.model.dto.PublicProfileDetailResponse;
 import afam.artidserver.model.dto.PublicProfileResponse;
 import afam.artidserver.model.entity.User;
@@ -19,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
+import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,6 +38,9 @@ public class UserService {
 
     @Value("${supabase.s3.propics-bucket}")
     private String propicsBucket;
+
+    @Value("${supabase.s3.presign-ttl-seconds}")
+    private long presignTtlSeconds;
 
     private static final Logger logger = LoggerFactory.getLogger(UserService.class);
 
@@ -91,16 +97,48 @@ public class UserService {
              ORDER BY id
             """;
 
-    // ArtID pubblici dell'utente col conteggio delle risorse collegate (non eliminate). Nella
-    // join artid_resource la colonna "id" è l'id dell'ArtID, "id_resource" quella della risorsa.
+    // ArtID pubblici dell'utente col conteggio delle risorse collegate (non eliminate) e la
+    // object key della thumbnail (LEFT JOIN: id_thumbnail può essere NULL). Nella join
+    // artid_resource la colonna "id" è l'id dell'ArtID, "id_resource" quella della risorsa.
     private static final String PUBLIC_ARTIDS_SQL = """
-            SELECT a.id, a.title, a.created_at,
+            SELECT a.id, a.title, a.created_at, f.file_path AS thumbnail_path,
                    (SELECT COUNT(*) FROM artid_resource ar
                       JOIN resource r ON r.id = ar.id_resource
                      WHERE ar.id = a.id AND r.deleted_at IS NULL) AS resource_count
               FROM artid a
+              LEFT JOIN file f ON f.id = a.id_thumbnail
              WHERE a.id_user = :userId AND a.visibility_state = 'public' AND a.deleted_at IS NULL
              ORDER BY a.created_at DESC
+            """;
+
+    // Dettaglio di un singolo ArtID pubblico: vincola id + proprietario + visibilità, così la query
+    // è vuota (→ 404) se l'ArtID non esiste, non è pubblico o non appartiene a quell'utente.
+    private static final String PUBLIC_ARTID_DETAIL_SQL = """
+            SELECT a.id, a.title, a.description, a.created_at, f.file_path AS thumbnail_path
+              FROM artid a
+              LEFT JOIN file f ON f.id = a.id_thumbnail
+             WHERE a.id = :artidId AND a.id_user = :userId
+               AND a.visibility_state = 'public' AND a.deleted_at IS NULL
+            """;
+
+    // Variante per l'anteprima del proprietario: nessun vincolo di visibilità (vede anche i privati),
+    // solo proprietà e non eliminato.
+    private static final String OWNER_ARTID_PREVIEW_SQL = """
+            SELECT a.id, a.title, a.description, a.created_at, f.file_path AS thumbnail_path
+              FROM artid a
+              LEFT JOIN file f ON f.id = a.id_thumbnail
+             WHERE a.id = :artidId AND a.id_user = :userId AND a.deleted_at IS NULL
+            """;
+
+    // Materiali collegati all'ArtID (non eliminati) con i metadati del file. Solo letture: la
+    // pubblicità è già garantita dall'ArtID pubblico, le risorse non hanno visibilità propria.
+    private static final String PUBLIC_ARTID_MATERIALS_SQL = """
+            SELECT r.id, r.title, r.description, f.mime_type, f.file_name, f.file_size, f.file_path
+              FROM artid_resource ar
+              JOIN resource r ON r.id = ar.id_resource
+              LEFT JOIN file f ON f.id = r.id_file
+             WHERE ar.id = :artidId AND r.deleted_at IS NULL
+             ORDER BY r.id
             """;
 
     // Object key (bucket risorse di default) dei file collegati a risorse, certificazioni e
@@ -283,9 +321,106 @@ public class UserService {
                         rs.getLong("id"),
                         rs.getString("title"),
                         rs.getObject("created_at", OffsetDateTime.class),
-                        rs.getLong("resource_count")
+                        rs.getLong("resource_count"),
+                        presignObjectKey(rs.getString("thumbnail_path"))
                 )
         );
+    }
+
+    // Riga grezza dell'ArtID (prima di presign e materiali): evita query annidate dentro il RowMapper.
+    private record ArtidDetailRow(Long id, String title, String description, OffsetDateTime createdAt,
+                                  String thumbnailPath) {
+    }
+
+    /**
+     * Dettaglio di un ArtID PUBBLICO (Explore → /explore/[id]/artid/[artidId]). Restituisce dati
+     * SOLO se l'autore è pubblico/non eliminato e l'ArtID è suo, 'public' e non eliminato; in caso
+     * contrario Optional.empty() (il controller risponde 404 indistintamente). Include l'estratto
+     * autore (per header/contatti) e i materiali collegati con presigned URL.
+     */
+    public Optional<PublicArtidDetailResponse> getPublicArtidDetail(Long userId, Long artidId) {
+        User author = userRepository.findById(userId)
+                .filter(u -> Boolean.TRUE.equals(u.getIsPublic()) && u.getDeletedAt() == null)
+                .orElse(null);
+        if (author == null) {
+            return Optional.empty();
+        }
+        return buildArtidDetail(PUBLIC_ARTID_DETAIL_SQL, artidId, userId, author);
+    }
+
+    /**
+     * Anteprima del proprietario (pagina "Anteprima"): stesso read-model della vista Explore, ma
+     * accessibile anche se l'ArtID non è pubblico, purché appartenga all'utente loggato e non sia
+     * eliminato. Optional.empty() (→ 404) se l'ArtID non è suo o non esiste.
+     */
+    public Optional<PublicArtidDetailResponse> getOwnerArtidPreview(Long artidId, Long ownerId) {
+        User author = userRepository.findById(ownerId)
+                .filter(u -> u.getDeletedAt() == null)
+                .orElse(null);
+        if (author == null) {
+            return Optional.empty();
+        }
+        return buildArtidDetail(OWNER_ARTID_PREVIEW_SQL, artidId, ownerId, author);
+    }
+
+    // Costruisce il read-model del dettaglio ArtID dato il vincolo SQL (pubblico vs proprietario) e
+    // l'autore già caricato. Vuoto se la query non trova la riga (ArtID inesistente o non ammesso).
+    private Optional<PublicArtidDetailResponse> buildArtidDetail(String sql, Long artidId, Long userId, User author) {
+        MapSqlParameterSource params = new MapSqlParameterSource()
+                .addValue("artidId", artidId)
+                .addValue("userId", userId);
+
+        List<ArtidDetailRow> rows = namedJdbcTemplate.query(sql, params,
+                (rs, rowNum) -> new ArtidDetailRow(
+                        rs.getLong("id"),
+                        rs.getString("title"),
+                        rs.getString("description"),
+                        rs.getObject("created_at", OffsetDateTime.class),
+                        rs.getString("thumbnail_path")));
+        if (rows.isEmpty()) {
+            return Optional.empty();
+        }
+
+        ArtidDetailRow row = rows.get(0);
+        boolean verified = author.getSpidCode() != null && !author.getSpidCode().isBlank();
+        return Optional.of(new PublicArtidDetailResponse(
+                row.id(),
+                row.title(),
+                row.description(),
+                row.createdAt(),
+                presignObjectKey(row.thumbnailPath()),
+                author.getId(),
+                author.getName(),
+                author.getSurname(),
+                author.getProfession(),
+                avatarService.presignKey(author.getPropicPath()),
+                verified,
+                author.getLinkedinId(),
+                author.getBusinessEmail(),
+                findPublicArtidMaterials(artidId)));
+    }
+
+    private List<PublicMaterialResponse> findPublicArtidMaterials(Long artidId) {
+        return namedJdbcTemplate.query(
+                PUBLIC_ARTID_MATERIALS_SQL,
+                new MapSqlParameterSource("artidId", artidId),
+                (rs, rowNum) -> new PublicMaterialResponse(
+                        rs.getLong("id"),
+                        rs.getString("title"),
+                        rs.getString("description"),
+                        rs.getString("mime_type"),
+                        rs.getString("file_name"),
+                        rs.getObject("file_size") != null ? rs.getLong("file_size") : null,
+                        presignObjectKey(rs.getString("file_path"))
+                )
+        );
+    }
+
+    // Thumbnail e materiali vivono nel bucket di default (risorse): li serviamo via presigned GET
+    // URL, stesso meccanismo dell'avatar. Object key assente → nessuna URL.
+    private String presignObjectKey(String objectKey) {
+        if (objectKey == null || objectKey.isBlank()) return null;
+        return storageService.presignGet(objectKey, Duration.ofSeconds(presignTtlSeconds));
     }
 
     private static String escapeLike(String input) {

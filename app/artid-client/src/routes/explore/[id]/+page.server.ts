@@ -17,5 +17,6 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 		throw error(response.status === 404 ? 404 : 500, "Profilo non trovato");
 	}
 
-	return { profile: data };
+	// userId esplicito (= route param validato): serve alle card per costruire il link al dettaglio ArtID.
+	return { profile: data, userId: id };
 };

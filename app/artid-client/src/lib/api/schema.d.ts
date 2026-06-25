@@ -340,6 +340,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/users/{userId}/public/artids/{artidId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["publicArtid"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/users/{id}/public": {
         parameters: {
             query?: never;
@@ -543,6 +559,22 @@ export interface paths {
         put?: never;
         post?: never;
         delete: operations["delete_3"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/artids/{id}/preview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["preview"];
+        put?: never;
+        post?: never;
+        delete?: never;
         options?: never;
         head?: never;
         patch?: never;
@@ -778,6 +810,36 @@ export interface components {
             /** Format: date-time */
             lastModified?: string;
         };
+        PublicArtidDetailResponse: {
+            /** Format: int64 */
+            id?: number;
+            title?: string;
+            description?: string;
+            /** Format: date-time */
+            createdAt?: string;
+            thumbnailUrl?: string;
+            /** Format: int64 */
+            authorId?: number;
+            authorName?: string;
+            authorSurname?: string;
+            authorProfession?: string;
+            authorAvatarUrl?: string;
+            authorVerified?: boolean;
+            authorLinkedinId?: string;
+            authorBusinessEmail?: string;
+            materials?: components["schemas"]["PublicMaterialResponse"][];
+        };
+        PublicMaterialResponse: {
+            /** Format: int64 */
+            id?: number;
+            title?: string;
+            description?: string;
+            mimeType?: string;
+            fileName?: string;
+            /** Format: int64 */
+            fileSize?: number;
+            url?: string;
+        };
         PublicArtidSummaryResponse: {
             /** Format: int64 */
             id?: number;
@@ -786,6 +848,7 @@ export interface components {
             createdAt?: string;
             /** Format: int64 */
             resourceCount?: number;
+            thumbnailUrl?: string;
         };
         PublicCertificationResponse: {
             /** Format: int64 */
@@ -1650,6 +1713,29 @@ export interface operations {
             };
         };
     };
+    publicArtid: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                userId: number;
+                artidId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["PublicArtidDetailResponse"];
+                };
+            };
+        };
+    };
     publicProfile: {
         parameters: {
             query?: never;
@@ -1935,6 +2021,28 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+        };
+    };
+    preview: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["PublicArtidDetailResponse"];
+                };
             };
         };
     };

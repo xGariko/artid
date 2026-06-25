@@ -59,6 +59,10 @@ public class StorageService {
         delete(defaultBucket, objectKey);
     }
 
+    public String presignGet(String objectKey, Duration ttl) {
+        return presignGet(defaultBucket, objectKey, ttl);
+    }
+
     // --- Overload con bucket esplicito. ---
 
     public void upload(String bucket, String objectKey, InputStream content, long size, String contentType) {

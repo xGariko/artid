@@ -1,5 +1,6 @@
 package afam.artidserver.controller;
 
+import afam.artidserver.model.dto.PublicArtidDetailResponse;
 import afam.artidserver.model.dto.PublicProfileDetailResponse;
 import afam.artidserver.model.dto.PublicProfileResponse;
 import afam.artidserver.model.entity.User;
@@ -35,6 +36,18 @@ public class UserController {
     @GetMapping("/{id}/public")
     public ResponseEntity<PublicProfileDetailResponse> publicProfile(@PathVariable Long id) {
         return userService.getPublicProfileDetail(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    /**
+     * Dettaglio pubblico di un singolo ArtID (Explore → /explore/[id]/artid/[artidId]). Accessibile
+     * senza login. 404 se l'ArtID non esiste, non è pubblico o non appartiene a questo utente pubblico.
+     */
+    @GetMapping("/{userId}/public/artids/{artidId}")
+    public ResponseEntity<PublicArtidDetailResponse> publicArtid(@PathVariable Long userId,
+                                                                 @PathVariable Long artidId) {
+        return userService.getPublicArtidDetail(userId, artidId)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
