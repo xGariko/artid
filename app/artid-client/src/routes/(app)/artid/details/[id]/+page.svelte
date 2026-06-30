@@ -13,6 +13,7 @@
 	import type { ResourceResponse } from '$lib/api/types';
 	import { toast } from 'svelte-sonner';
 	import { api } from '$lib/api/browser-client';
+	import 'quill/dist/quill.snow.css';
 
 	const id = $derived(page.params.id);
 

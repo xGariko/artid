@@ -10,7 +10,6 @@ import afam.artidserver.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.mail.MailException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -40,8 +39,10 @@ public class AuthController {
     private final RegistrationService registrationService;
 
     /**
-     * Step 1 del login: valida le credenziali e, se corrette, invia un OTP via email.
-     * NON rilascia il token: la sessione si ottiene solo dopo {@link #verifyOtp}.
+     * Step 1 del login: valida le credenziali e, se corrette, genera l'OTP e ne avvia l'invio
+     * via email (asincrono: vedi {@link OtpService#generateAndSend}). NON rilascia il token: la
+     * sessione si ottiene solo dopo {@link #verifyOtp}. La risposta torna appena l'OTP è persistito,
+     * senza attendere l'SMTP, così il client passa subito alla schermata di verifica.
      */
     @PostMapping("/login")
     public ResponseEntity<OtpChallengeResponse> login(@RequestBody LoginRequest request) {
@@ -57,13 +58,8 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        try {
-            OffsetDateTime expiresAt = otpService.generateAndSend(user);
-            return ResponseEntity.ok(new OtpChallengeResponse(true, user.getMail(), expiresAt));
-        } catch (MailException e) {
-            // Credenziali ok ma SMTP irraggiungibile: distinguibile dal 401 lato client.
-            return ResponseEntity.status(HttpStatus.BAD_GATEWAY).build();
-        }
+        OffsetDateTime expiresAt = otpService.generateAndSend(user);
+        return ResponseEntity.ok(new OtpChallengeResponse(true, user.getMail(), expiresAt));
     }
 
     /**
@@ -99,21 +95,17 @@ public class AuthController {
 
     /**
      * Step 1 della registrazione: valida che l'email sia libera e avvia la verifica via OTP
-     * (email inviata). NON crea l'utente: l'account nasce solo dopo {@link #verifyRegistration}.
-     * 409 se l'email è già registrata, 502 se l'invio email fallisce.
+     * (email inviata in modo asincrono: vedi {@link RegistrationService#startChallenge}). NON crea
+     * l'utente: l'account nasce solo dopo {@link #verifyRegistration}. 409 se l'email è già
+     * registrata; la risposta torna appena il pending è persistito, senza attendere l'SMTP.
      */
     @PostMapping("/register")
     public ResponseEntity<OtpChallengeResponse> register(@RequestBody RegisterRequest request) {
         if (userService.findByMail(request.getEmail()).isPresent()) {
             return ResponseEntity.status(HttpStatus.CONFLICT).build();
         }
-        try {
-            OffsetDateTime expiresAt = registrationService.startChallenge(request);
-            return ResponseEntity.ok(new OtpChallengeResponse(true, request.getEmail(), expiresAt));
-        } catch (MailException e) {
-            // Email non inviabile: distinguibile dal 409 lato client.
-            return ResponseEntity.status(HttpStatus.BAD_GATEWAY).build();
-        }
+        OffsetDateTime expiresAt = registrationService.startChallenge(request);
+        return ResponseEntity.ok(new OtpChallengeResponse(true, request.getEmail(), expiresAt));
     }
 
     /**

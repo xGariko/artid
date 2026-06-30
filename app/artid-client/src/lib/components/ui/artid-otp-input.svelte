@@ -9,7 +9,8 @@
 		name,
 		error,
 		autofocus = false,
-		ariaLabel = 'Codice di verifica'
+		ariaLabel = 'Codice di verifica',
+		oncomplete
 	}: {
 		value?: string;
 		length?: number;
@@ -17,6 +18,9 @@
 		error?: string;
 		autofocus?: boolean;
 		ariaLabel?: string;
+		// Invocato quando tutte le caselle sono compilate (auto-submit senza pulsante). Rifà solo
+		// quando `value` cambia: dopo un errore il codice invariato non re-innesca la verifica.
+		oncomplete?: (value: string) => void;
 	} = $props();
 
 	let boxes: HTMLInputElement[] = [];
@@ -81,6 +85,22 @@
 
 	onMount(() => {
 		if (autofocus) focusAt(0);
+	});
+
+	// Auto-completamento: notifica il chiamante UNA sola volta per ogni codice completo. `lastFired`
+	// (non reattivo) evita che l'effetto, rieseguito ai re-render, reinneschi il submit dello stesso
+	// codice — causa del loop. Si azzera quando il codice torna incompleto, così una nuova
+	// compilazione (anche identica) torna a innescare la verifica.
+	let lastFired = '';
+	$effect(() => {
+		if (value.length === length) {
+			if (value !== lastFired) {
+				lastFired = value;
+				oncomplete?.(value);
+			}
+		} else {
+			lastFired = '';
+		}
 	});
 </script>
 

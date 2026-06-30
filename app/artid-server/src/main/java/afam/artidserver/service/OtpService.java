@@ -7,7 +7,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import java.security.SecureRandom;
 import java.time.OffsetDateTime;
@@ -35,6 +37,7 @@ public class OtpService {
     private final EmailService emailService;
     // Riusa il BCrypt encoder delle password: il codice non viene mai salvato in chiaro.
     private final PasswordEncoder passwordEncoder;
+    private final PlatformTransactionManager transactionManager;
 
     private final SecureRandom random = new SecureRandom();
 
@@ -49,25 +52,34 @@ public class OtpService {
     private int maxAttempts;
 
     /**
-     * Genera un nuovo OTP per l'utente, ne sostituisce l'eventuale precedente e lo invia via
-     * email. Restituisce l'istante di scadenza. Se l'invio email fallisce, la transazione
-     * viene annullata (nessun OTP "fantasma" resta nel DB).
+     * Genera un nuovo OTP per l'utente, ne sostituisce l'eventuale precedente e ne avvia l'invio via
+     * email. Restituisce l'istante di scadenza appena l'OTP è persistito, SENZA attendere l'SMTP:
+     * {@link EmailService#sendHtml} è {@code @Async}, così il chiamante (e quindi l'utente) non resta
+     * bloccato sull'I/O di rete dell'invio. L'OTP viene committato PRIMA del dispatch email: la
+     * transazione si chiude e restituisce la connessione al pool prima dell'invio (col pooler in
+     * transaction mode questo evita di tenere agganciato un backend Supabase), e la verifica funziona
+     * anche se la mail arriva con qualche secondo di ritardo. Se l'invio fallisce resta una riga OTP
+     * non recapitata: è innocua (la sostituisce il tentativo successivo e scade dopo {@code otp.ttl-seconds}).
      */
-    @Transactional
     public OffsetDateTime generateAndSend(User user) {
         String code = generateNumericCode();
+        // BCrypt è volutamente CPU-intensive: l'hashing sta fuori dalla transazione per tenerla breve.
+        String codeHash = passwordEncoder.encode(code);
         OffsetDateTime now = OffsetDateTime.now();
         OffsetDateTime expiresAt = now.plusSeconds(ttlSeconds);
 
-        loginOtpDAO.deleteByIdUser(user.getId());
-
-        LoginOtp otp = new LoginOtp();
-        otp.setIdUser(user.getId());
-        otp.setCodeHash(passwordEncoder.encode(code));
-        otp.setExpiresAt(expiresAt);
-        otp.setAttempts(0);
-        otp.setCreatedAt(now);
-        loginOtpDAO.save(otp);
+        // Delete + insert atomici (UNIQUE su id_user) ma senza l'invio email: la transazione si
+        // chiude e restituisce la connessione al pool prima dell'SMTP.
+        new TransactionTemplate(transactionManager).executeWithoutResult(status -> {
+            loginOtpDAO.deleteByIdUser(user.getId());
+            LoginOtp otp = new LoginOtp();
+            otp.setIdUser(user.getId());
+            otp.setCodeHash(codeHash);
+            otp.setExpiresAt(expiresAt);
+            otp.setAttempts(0);
+            otp.setCreatedAt(now);
+            loginOtpDAO.save(otp);
+        });
 
         emailService.sendHtml(user.getMail(), SUBJECT, buildBody(user.getName(), code, expiresAt));
         return expiresAt;
@@ -76,9 +88,9 @@ public class OtpService {
     /**
      * Rigenera e rinvia l'OTP ("Riprova") SOLO se esiste già una challenge attiva per l'utente:
      * il rinvio non deve poter essere innescato senza una prima validazione delle credenziali.
-     * {@code Optional.empty()} = nessuna challenge in corso.
+     * {@code Optional.empty()} = nessuna challenge in corso. Non transazionale: avvolgerlo terrebbe
+     * l'invio email di {@link #generateAndSend} dentro una transazione, agganciando la connessione.
      */
-    @Transactional
     public Optional<OffsetDateTime> resend(User user) {
         if (loginOtpDAO.findByIdUser(user.getId()).isEmpty()) {
             return Optional.empty();

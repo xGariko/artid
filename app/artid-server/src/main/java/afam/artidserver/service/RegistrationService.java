@@ -9,7 +9,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import java.security.SecureRandom;
 import java.time.OffsetDateTime;
@@ -38,6 +40,7 @@ public class RegistrationService {
     private final EmailService emailService;
     // Riusa il BCrypt encoder: né la password né il codice vengono mai salvati in chiaro.
     private final PasswordEncoder passwordEncoder;
+    private final PlatformTransactionManager transactionManager;
 
     private final SecureRandom random = new SecureRandom();
 
@@ -51,31 +54,41 @@ public class RegistrationService {
     private int maxAttempts;
 
     /**
-     * Avvia la registrazione: salva i dati del form come PENDING, genera e invia l'OTP. Sostituisce
-     * un eventuale pending precedente per la stessa email. Restituisce l'istante di scadenza. Se
-     * l'invio email fallisce la transazione viene annullata (nessun pending "fantasma" nel DB).
+     * Avvia la registrazione: salva i dati del form come PENDING, genera l'OTP e ne avvia l'invio.
+     * Sostituisce un eventuale pending precedente per la stessa email. Restituisce l'istante di
+     * scadenza appena il pending è persistito, SENZA attendere l'SMTP: {@link EmailService#sendText}
+     * è {@code @Async}, così l'utente passa subito alla schermata di verifica. Il pending viene
+     * committato PRIMA del dispatch email: la transazione si chiude e restituisce la connessione al
+     * pool prima dell'invio (col pooler in transaction mode questo evita di tenere agganciato un
+     * backend Supabase). Se l'invio fallisce resta un pending non recapitato: è innocuo (lo sostituisce
+     * il tentativo successivo e scade dopo {@code otp.ttl-seconds}).
      */
-    @Transactional
     public OffsetDateTime startChallenge(RegisterRequest request) {
         String code = generateNumericCode();
+        // BCrypt è volutamente CPU-intensive: i due hash stanno fuori dalla transazione per tenerla breve.
+        String codeHash = passwordEncoder.encode(code);
+        // La password viene salvata GIÀ hashata: non resta mai in chiaro, nemmeno nel pending.
+        String passwordHash = passwordEncoder.encode(request.getPassword());
         OffsetDateTime now = OffsetDateTime.now();
         OffsetDateTime expiresAt = now.plusSeconds(ttlSeconds);
 
-        registrationOtpDAO.deleteByEmail(request.getEmail());
-
-        RegistrationOtp pending = new RegistrationOtp();
-        pending.setEmail(request.getEmail());
-        pending.setName(request.getName());
-        pending.setSurname(request.getSurname());
-        // La password viene salvata GIÀ hashata: non resta mai in chiaro, nemmeno nel pending.
-        pending.setPasswordHash(passwordEncoder.encode(request.getPassword()));
-        pending.setBirthdate(request.getBirthdate());
-        pending.setBirthplace(request.getBirthplace());
-        pending.setCodeHash(passwordEncoder.encode(code));
-        pending.setExpiresAt(expiresAt);
-        pending.setAttempts(0);
-        pending.setCreatedAt(now);
-        registrationOtpDAO.save(pending);
+        // Delete + insert atomici ma senza l'invio email: la transazione si chiude e restituisce
+        // la connessione al pool prima dell'SMTP.
+        new TransactionTemplate(transactionManager).executeWithoutResult(status -> {
+            registrationOtpDAO.deleteByEmail(request.getEmail());
+            RegistrationOtp pending = new RegistrationOtp();
+            pending.setEmail(request.getEmail());
+            pending.setName(request.getName());
+            pending.setSurname(request.getSurname());
+            pending.setPasswordHash(passwordHash);
+            pending.setBirthdate(request.getBirthdate());
+            pending.setBirthplace(request.getBirthplace());
+            pending.setCodeHash(codeHash);
+            pending.setExpiresAt(expiresAt);
+            pending.setAttempts(0);
+            pending.setCreatedAt(now);
+            registrationOtpDAO.save(pending);
+        });
 
         emailService.sendText(request.getEmail(), SUBJECT, buildBody(request.getName(), code, expiresAt));
         return expiresAt;
@@ -128,9 +141,10 @@ public class RegistrationService {
 
     /**
      * Rigenera e rinvia l'OTP di registrazione ("Riprova") SOLO se esiste un pending per quell'email.
-     * {@code Optional.empty()} = nessuna registrazione in corso (il chiamante non rivela nulla).
+     * {@code Optional.empty()} = nessuna registrazione in corso (il chiamante non rivela nulla). Non
+     * transazionale: l'unico {@code save} è già atomico di per sé e l'invio email avviene dopo, senza
+     * tenere agganciata una connessione del pool durante l'SMTP.
      */
-    @Transactional
     public Optional<OffsetDateTime> resend(String email) {
         Optional<RegistrationOtp> found = registrationOtpDAO.findByEmail(email);
         if (found.isEmpty()) {
@@ -139,8 +153,7 @@ public class RegistrationService {
 
         RegistrationOtp pending = found.get();
         String code = generateNumericCode();
-        OffsetDateTime now = OffsetDateTime.now();
-        OffsetDateTime expiresAt = now.plusSeconds(ttlSeconds);
+        OffsetDateTime expiresAt = OffsetDateTime.now().plusSeconds(ttlSeconds);
         pending.setCodeHash(passwordEncoder.encode(code));
         pending.setExpiresAt(expiresAt);
         pending.setAttempts(0);

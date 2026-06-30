@@ -22,6 +22,44 @@
 
 	let code = $state('');
 
+	// Form di verifica: lo inviamo via JS appena il codice è completo, senza pulsante.
+	let verifyForm: HTMLFormElement | undefined = $state();
+
+	// Forza il remount dell'input OTP: dopo un tentativo fallito svuota le caselle e riporta il
+	// focus sulla prima, così l'utente reinserisce il codice da capo.
+	let otpResetKey = $state(0);
+
+	// Evita verifiche concorrenti: una sola submit in volo per volta.
+	let verifying = false;
+
+	// Cifre complete: invia il form di verifica (auto-submit senza pulsante).
+	function onOtpComplete() {
+		if (verifying) return;
+		verifying = true;
+		verifyForm?.requestSubmit();
+	}
+
+	// Verifica OTP: overlay durante la submit; se il codice è errato svuota le caselle e aspetta che
+	// l'utente lo reinserisca — evita il re-invio in loop dello stesso codice già fallito.
+	const onVerify = () => {
+		$loading = true;
+		return async ({
+			result,
+			update
+		}: {
+			result: { type: string };
+			update: () => Promise<void>;
+		}) => {
+			$loading = false;
+			await update();
+			verifying = false;
+			if (result.type === 'failure') {
+				code = '';
+				otpResetKey++;
+			}
+		};
+	};
+
 	// Pattern condiviso: attiva l'overlay di caricamento durante la submit.
 	const withLoading = () => {
 		$loading = true;
@@ -39,11 +77,25 @@
 		<strong>{form?.email}</strong>
 	</p>
 
-	<form method="POST" action="?/verify" class="auth-form" use:enhance={withLoading}>
+	<form
+		method="POST"
+		action="?/verify"
+		class="auth-form"
+		use:enhance={onVerify}
+		bind:this={verifyForm}
+	>
 		<input type="hidden" name="email" value={form?.email ?? ''} />
 
 		<div class="p-1 mt-1">
-			<ArtidOtpInput name="code" bind:value={code} error={form?.codeError} autofocus />
+			{#key otpResetKey}
+				<ArtidOtpInput
+					name="code"
+					bind:value={code}
+					error={form?.codeError}
+					oncomplete={onOtpComplete}
+					autofocus
+				/>
+			{/key}
 		</div>
 
 		{#if form?.codeError}
@@ -55,16 +107,15 @@
 		{#if form?.formError}
 			<div class="text-danger small text-center mt-2">{form.formError}</div>
 		{/if}
+	</form>
 
-		<div class="row p-1 mt-2">
-			<ArtidButton label="Verifica e accedi" type="submit" />
-		</div>
-
-		<p class="text-center mt-3 mb-0">
+	<!-- Rinvio in un form separato: il form di verifica non ha pulsanti di submit, così l'invio
+		automatico via requestSubmit() usa sempre l'azione ?/verify senza ambiguità. -->
+	<form method="POST" action="?/resend" class="text-center mt-3" use:enhance={withLoading}>
+		<input type="hidden" name="email" value={form?.email ?? ''} />
+		<p class="mb-0">
 			Non hai ricevuto il codice?
-			<button type="submit" formaction="?/resend" class="btn btn-link p-0 align-baseline auth-link">
-				Invia di nuovo
-			</button>
+			<button type="submit" class="btn btn-link p-0 align-baseline auth-link">Invia di nuovo</button>
 		</p>
 	</form>
 
