@@ -40,14 +40,32 @@
 			<ExploreProfileHeader {profile} />
 
 			{#if certifications.length > 0}
-				<div class="d-flex flex-wrap gap-2 mt-4">
+				<div class="d-flex align-items-center gap-2 mt-4 mb-2 text-artid-text-muted small fw-semibold text-uppercase">
+					<i class="bi bi-patch-check"></i>
+					<span>Certificati</span>
+				</div>
+				<div class="d-flex flex-wrap gap-2">
 					{#each certifications as certification (certification.id)}
-						<span
-							class="border border-artid-border rounded-2 px-3 py-2 d-flex align-items-center gap-2 text-artid-text small"
-						>
-							<i class="bi bi-file-earmark-text text-primary"></i>
-							{certification.title}
-						</span>
+						{#if certification.url}
+							<a
+								href={certification.url}
+								target="_blank"
+								rel="noopener"
+								class="certification-chip border border-artid-border rounded-2 px-3 py-2 d-flex align-items-center gap-2 text-artid-text small text-decoration-none"
+								title={`Scarica ${certification.title}`}
+							>
+								<i class="bi bi-file-earmark-text text-primary"></i>
+								<span>{certification.title}</span>
+								<i class="bi bi-download text-artid-text-muted"></i>
+							</a>
+						{:else}
+							<span
+								class="border border-artid-border rounded-2 px-3 py-2 d-flex align-items-center gap-2 text-artid-text small"
+							>
+								<i class="bi bi-file-earmark-text text-primary"></i>
+								{certification.title}
+							</span>
+						{/if}
 					{/each}
 				</div>
 			{/if}
@@ -83,5 +101,22 @@
 	/* Larghezza leggibile del riquadro, centrato: nessuna utility Bootstrap per un max-width in px. */
 	.explore-detail-card {
 		max-width: 960px;
+	}
+
+	/* Chip attestato scaricabile: feedback piatto (bordo/sfondo brand), nessuna ombra. */
+	.certification-chip {
+		transition:
+			border-color 0.15s ease,
+			background-color 0.15s ease;
+	}
+
+	.certification-chip:hover {
+		border-color: var(--artid-primary) !important;
+		background-color: var(--artid-primary-subtle);
+	}
+
+	.certification-chip:focus-visible {
+		outline: 2px solid var(--artid-primary);
+		outline-offset: 2px;
 	}
 </style>

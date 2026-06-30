@@ -100,10 +100,8 @@
 </script>
 
 <div class="card p-4 shadow-sm border-0 bg-white main-certification-card">
-	<div class="d-flex align-items-center gap-2 mb-4">
-		<div class="check-badge-container d-flex align-items-center justify-content-center">
-			<i class="bi bi-patch-check-fill text-white fs-5"></i>
-		</div>
+	<div class="d-flex align-items-center mb-4 gap-3">
+		<i class="bi bi-patch-check-fill text-artid-dark fs-3"></i>
 		<h3 class="fs-5 fw-bold text-artid-dark m-0">I tuoi attestati</h3>
 	</div>
 
@@ -203,6 +201,6 @@
     .resource-row { transition: 0.15s ease all; cursor: pointer; }
     .resource-row:hover { background-color: #f1f5f9; }
     .resource-row.selected { box-shadow: inset 6px 0px 0px -3px var(--artid-primary, #0d6efd); background-color: #f8fafc; }
-    .badge-type { display: inline-flex; align-items: center; justify-content: center; width: 2.5rem; height: 1.8rem; flex-shrink: 0; border-radius: 4px; font-size: 0.75rem; letter-spacing: 0.02em; background-color: #4de2d6 !important; color: #0f172a !important; }
+    .badge-type { display: inline-flex; align-items: center; justify-content: center; width: 2.25rem; height: 2.25rem; flex-shrink: 0; border-radius: 0.4rem; font-size: 0.7rem; letter-spacing: 0.02em; background-color: #4de2d6 !important; color: #0f172a !important; }
     .fs-xs { font-size: 0.7rem; }
 </style>

@@ -45,12 +45,10 @@
 		if (!isOpen) return;
 		title = certification?.title ?? '';
 		description = certification?.description ?? '';
-		// Mappa in modo sicuro sia isPublic che public provenienti dal backend
 		isPublic = certification?.isPublic ?? certification?.public ?? false;
 		selectedFile = null;
 	});
 
-	// Inizializzazione asincrona sicura di Quill Editor per Svelte 5
 	$effect(() => {
 		if (!quillContainer) {
 			quill = null;

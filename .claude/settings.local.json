@@ -189,7 +189,8 @@
       "PowerShell(Set-Location C:\\\\progetti\\\\artid\\\\app\\\\artid-client; npx svelte-kit sync; \"sync EXIT=$LASTEXITCODE\"; $out = npx svelte-check --output machine 2>&1 | Out-String; \\($out -split \"`n\" | Select-String -Pattern \"ERROR\" | Select-Object -First 25\\))",
       "Bash(curl -s -o /dev/null -w \"HTTP %{http_code}\\\\n\" \"http://localhost:5173/explore/30/artid/9\")",
       "Bash(curl -s \"http://localhost:5173/explore/30/artid/9\")",
-      "PowerShell(Set-Location C:\\\\progetti\\\\artid\\\\app\\\\artid-client; $out = npm run check 2>&1 | Out-String; \\($out -split \"`n\" | Select-String -Pattern \"public-artid-detail-view\"\\); \"--- component problems above \\(none = clean\\) ---\"; \\($out -split \"`n\" | Select-String -Pattern \"COMPLETED\"\\))"
+      "PowerShell(Set-Location C:\\\\progetti\\\\artid\\\\app\\\\artid-client; $out = npm run check 2>&1 | Out-String; \\($out -split \"`n\" | Select-String -Pattern \"public-artid-detail-view\"\\); \"--- component problems above \\(none = clean\\) ---\"; \\($out -split \"`n\" | Select-String -Pattern \"COMPLETED\"\\))",
+      "Bash(./mvnw -o -q compile)"
     ]
   }
 }

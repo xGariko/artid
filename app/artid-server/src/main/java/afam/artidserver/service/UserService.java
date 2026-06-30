@@ -39,6 +39,9 @@ public class UserService {
     @Value("${supabase.s3.propics-bucket}")
     private String propicsBucket;
 
+    @Value("${supabase.s3.certifications-bucket}")
+    private String certificationsBucket;
+
     @Value("${supabase.s3.presign-ttl-seconds}")
     private long presignTtlSeconds;
 
@@ -89,12 +92,14 @@ public class UserService {
                     rs.getLong("public_artid_count")
             );
 
-    // Attestati pubblici dell'utente (solo is_public = TRUE).
+    // Attestati pubblici dell'utente (solo is_public = TRUE) con i metadati del file collegato
+    // (LEFT JOIN: id_file può essere NULL), così possiamo firmare l'URL di download.
     private static final String PUBLIC_CERTIFICATIONS_SQL = """
-            SELECT id, title
-              FROM certifications
-             WHERE id_user = :userId AND is_public = TRUE
-             ORDER BY id
+            SELECT c.id, c.title, f.extension, f.file_path
+              FROM certifications c
+              LEFT JOIN file f ON f.id = c.id_file
+             WHERE c.id_user = :userId AND c.is_public = TRUE
+             ORDER BY c.id
             """;
 
     // ArtID pubblici dell'utente col conteggio delle risorse collegate (non eliminate) e la
@@ -309,8 +314,20 @@ public class UserService {
         return namedJdbcTemplate.query(
                 PUBLIC_CERTIFICATIONS_SQL,
                 new MapSqlParameterSource("userId", userId),
-                (rs, rowNum) -> new PublicCertificationResponse(rs.getLong("id"), rs.getString("title"))
+                (rs, rowNum) -> new PublicCertificationResponse(
+                        rs.getLong("id"),
+                        rs.getString("title"),
+                        rs.getString("extension"),
+                        presignCertificationKey(rs.getString("file_path"))
+                )
         );
+    }
+
+    // Gli attestati vivono nel bucket privato dedicato: li serviamo via presigned GET URL (come i
+    // materiali, ma su bucket diverso). Object key assente → nessuna URL (attestato senza file).
+    private String presignCertificationKey(String objectKey) {
+        if (objectKey == null || objectKey.isBlank()) return null;
+        return storageService.presignGet(certificationsBucket, objectKey, Duration.ofSeconds(presignTtlSeconds));
     }
 
     private List<PublicArtidSummaryResponse> findPublicArtids(Long userId) {

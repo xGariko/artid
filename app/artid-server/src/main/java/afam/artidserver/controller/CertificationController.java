@@ -1,11 +1,13 @@
 package afam.artidserver.controller;
 
 import afam.artidserver.model.dto.CertificationResponse;
+import afam.artidserver.security.AuthenticatedUser;
 import afam.artidserver.service.CertificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -20,10 +22,22 @@ public class CertificationController {
     private final CertificationService certificationService;
 
     @GetMapping
-    public ResponseEntity<List<CertificationResponse>> getAll() {
-        // Sostituisci l'ID utente mockato (1L) con il recupero dell'utente autenticato dal tuo pacchetto security
-        Long currentUserId = 1L;
-        return ResponseEntity.ok(certificationService.findAllCertifications(currentUserId));
+    public ResponseEntity<List<CertificationResponse>> getAll(@AuthenticationPrincipal AuthenticatedUser principal) {
+        return ResponseEntity.ok(certificationService.findAllCertifications(principal.getId()));
+    }
+
+    @GetMapping("/{id}/file")
+    public ResponseEntity<byte[]> downloadFile(@PathVariable Long id,
+            @AuthenticationPrincipal AuthenticatedUser principal) {
+        return certificationService.findDownloadable(id, principal.getId())
+                .map(file -> ResponseEntity.ok()
+                        .contentType(file.mimeType() != null
+                                ? MediaType.parseMediaType(file.mimeType())
+                                : MediaType.APPLICATION_OCTET_STREAM)
+                        .header("Content-Disposition",
+                                "inline; filename=\"" + (file.fileName() != null ? file.fileName() : "file") + "\"")
+                        .body(file.content()))
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -31,10 +45,11 @@ public class CertificationController {
             @RequestParam("title") String title,
             @RequestParam(value = "description", required = false) String description,
             @RequestParam("isPublic") boolean isPublic,
-            @RequestParam("file") MultipartFile file) throws IOException {
+            @RequestParam("file") MultipartFile file,
+            @AuthenticationPrincipal AuthenticatedUser principal) throws IOException {
 
-        Long currentUserId = 1L;
-        CertificationResponse created = certificationService.saveCertification(title, description, isPublic, file, currentUserId);
+        CertificationResponse created = certificationService.saveCertification(
+                title, description, isPublic, file, principal.getId());
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
@@ -44,14 +59,19 @@ public class CertificationController {
             @RequestParam("title") String title,
             @RequestParam(value = "description", required = false) String description,
             @RequestParam("isPublic") boolean isPublic,
-            @RequestParam(value = "file", required = false) MultipartFile file) throws IOException {
+            @RequestParam(value = "file", required = false) MultipartFile file,
+            @AuthenticationPrincipal AuthenticatedUser principal) throws IOException {
 
-        return ResponseEntity.ok(certificationService.updateCertification(id, title, description, isPublic, file));
+        return certificationService.updateCertification(id, title, description, isPublic, file, principal.getId())
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable("id") Long id) {
-        certificationService.deleteCertification(id);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<Void> delete(@PathVariable("id") Long id,
+            @AuthenticationPrincipal AuthenticatedUser principal) {
+        return certificationService.deleteCertification(id, principal.getId())
+                ? ResponseEntity.noContent().build()
+                : ResponseEntity.notFound().build();
     }
 }
