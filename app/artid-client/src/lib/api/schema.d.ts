@@ -532,6 +532,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/certifications/{id}/file": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["downloadFile_1"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/auth/me": {
         parameters: {
             query?: never;
@@ -854,6 +870,8 @@ export interface components {
             /** Format: int64 */
             id?: number;
             title?: string;
+            extension?: string;
+            url?: string;
         };
         PublicProfileDetailResponse: {
             /** Format: int64 */
@@ -1958,6 +1976,28 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["DashboardSummaryResponse"];
+                };
+            };
+        };
+    };
+    downloadFile_1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": string;
                 };
             };
         };
