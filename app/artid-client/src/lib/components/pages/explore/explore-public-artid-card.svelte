@@ -7,8 +7,11 @@
 	let { artid, userId }: { artid: PublicArtidSummary; userId: number } = $props();
 
 	const resourceCount = $derived(artid.resourceCount ?? 0);
-	// thumbnailUrl è un presigned URL (null se l'ArtID non ha thumbnail): fallback al logo.
-	const thumbnailSrc = $derived(artid.thumbnailUrl ?? artidPlaceholder);
+	// thumbnailUrl è un presigned URL: può essere null (nessuna copertina) o fallire il caricamento
+	// (URL scaduto/404). In entrambi i casi ripieghiamo sul logo come segnaposto.
+	let thumbnailFailed = $state(false);
+	const hasThumbnail = $derived(!!artid.thumbnailUrl && !thumbnailFailed);
+	const thumbnailSrc = $derived(hasThumbnail ? artid.thumbnailUrl! : artidPlaceholder);
 	// Dettaglio ArtID pubblico: /explore/{userId}/artid/{artidId}.
 	const detailHref = $derived(
 		resolve('/explore/[id]/artid/[artidId]', { id: String(userId), artidId: String(artid.id) })
@@ -25,6 +28,8 @@
 				src={thumbnailSrc}
 				alt={artid.title}
 				class="rounded-2 bg-artid-surface public-artid-card__thumb"
+				class:public-artid-card__thumb--placeholder={!hasThumbnail}
+				onerror={() => (thumbnailFailed = true)}
 			/>
 		</div>
 		<div class="d-flex flex-column overflow-hidden">
@@ -61,5 +66,11 @@
         width: 3.5rem;
         height: 3.5rem;
         object-fit: cover;
+    }
+
+    /* Segnaposto (nessuna copertina o URL non valido): logo contenuto, non ritagliato come una foto. */
+    .public-artid-card__thumb--placeholder {
+        object-fit: contain;
+        padding: 0.4rem;
     }
 </style>

@@ -14,9 +14,11 @@
 	const authorFullName = $derived(`${artid.authorName ?? ''} ${artid.authorSurname ?? ''}`.trim());
 	const authorInitials = $derived(initialsFor(artid.authorName, artid.authorSurname));
 	const authorColor = $derived(avatarColorFor(authorFullName));
-	// Senza thumbnail mostriamo il logo come segnaposto: va "contenuto" (non ritagliato come una foto).
-	const hasThumbnail = $derived(!!artid.thumbnailUrl);
-	const thumbnailSrc = $derived(artid.thumbnailUrl ?? artidPlaceholder);
+	// Senza thumbnail (o con URL presigned scaduto/404) mostriamo il logo come segnaposto:
+	// va "contenuto" (non ritagliato come una foto).
+	let thumbnailFailed = $state(false);
+	const hasThumbnail = $derived(!!artid.thumbnailUrl && !thumbnailFailed);
+	const thumbnailSrc = $derived(hasThumbnail ? artid.thumbnailUrl! : artidPlaceholder);
 
 	const profileHref = $derived(resolve('/explore/[id]', { id: String(artid.authorId) }));
 
@@ -114,6 +116,7 @@
 					alt={artid.title}
 					class="w-100 rounded-3 border border-artid-border artid-detail__thumb"
 					class:artid-detail__thumb--placeholder={!hasThumbnail}
+					onerror={() => (thumbnailFailed = true)}
 				/>
 			</div>
 			<div class="col-12 col-lg-7">
