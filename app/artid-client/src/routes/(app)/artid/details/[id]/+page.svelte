@@ -65,7 +65,7 @@
 			if (cancelled) return;
 			const instance = new QuillCtor(node, {
 				theme: 'snow',
-				placeholder: 'Scrivi qualcosa su di te…',
+				placeholder: 'Descrivi il contenuto di questo ArtID…',
 				modules: {
 					toolbar: [
 						[{ header: [1, 2, 3, false] }],
@@ -116,6 +116,7 @@
 	let isOpen = $state(false);
 
 	let isDeleting = $state(false);
+
 	// Funzione per rimuovere il materiale dall'artid
 	async function handleDeleteMaterial(materialId: number) {
 		if (isDeleting) return;
@@ -123,13 +124,20 @@
 		isDeleting = true;
 
 		try {
-			const response = await api.DELETE('/api/artids/{id}/resources/{resourceId}', {params:{path:{id: Number(id), resourceId: materialId}}})
+			const response = await api.DELETE('/api/artids/{id}/resources/{resourceId}', {
+				params: {
+					path: {
+						id: Number(id),
+						resourceId: materialId
+					}
+				}
+			});
 
-			if(!response.error){
+			if (!response.error) {
 				draggableMaterials = draggableMaterials.filter((m) => m.id !== materialId);
-				toast.success("Materiale rimosso con successo")
+				toast.success('Materiale rimosso con successo');
 
-			}else{
+			} else {
 				toast.error('Errore durante la rimozione del materiale');
 			}
 		} catch {
@@ -139,18 +147,18 @@
 		}
 	}
 
-	async function handleDelete(){
+	async function handleDelete() {
 		try {
-			const response = await api.DELETE('/api/artids/{id}', {params: {path: {id: Number(id)}}})
+			const response = await api.DELETE('/api/artids/{id}', { params: { path: { id: Number(id) } } });
 
-			if(!response.error){
-				toast.success("ArtId cancellato con successo");
-				await goto(resolve("/(app)/artid"));
-			}else{
+			if (!response.error) {
+				toast.success('ArtId cancellato con successo');
+				await goto(resolve('/(app)/artid'));
+			} else {
 				toast.error('Errore durante la cancellazione dell\'artid');
 			}
-		} catch  {
-			toast.error("Errore di rete")
+		} catch {
+			toast.error('Errore di rete');
 		}
 	}
 
@@ -177,12 +185,12 @@
 						{/each}
 					</ul>
 					<span class="text-artid text-decoration-underline" style="cursor: pointer;"
-						>Aggiungi Tag +</span
+					>Aggiungi Tag +</span
 					>
 				</div>
 			</div>
 			<div class="col-6 d-flex align-items-center justify-content-between">
-				<ArtidButton icon="trash" fullWidth={false} btnStyle="danger" outline={true} onclick={handleDelete}/>
+				<ArtidButton icon="trash" fullWidth={false} btnStyle="danger" outline={true} onclick={handleDelete} />
 				<div style="padding-right: calc(var(--bs-gutter-x)*0.5);">
 					<ArtidButton
 						label="Anteprima"
@@ -207,11 +215,12 @@
 		</div>
 	</div>
 
+
 	<div
 		class="bg-artid-section h-100 overflow-hidden w-75 rounded-3 border border-artid-border d-flex justify-content-between"
 		style="min-height: 0;"
 	>
-		<div class="w-50 h-100 overflow-y-auto border-end border-artid-border">
+		<div class="w-50 h-100 overflow-y-auto border-end border-artid-border d-flex flex-column">
 			<div
 				class="bg-artid-surface border-0 border-bottom border-artid-border px-3 py-2 text-artid-text fw-semibold fs-5"
 			>
@@ -229,21 +238,28 @@
 					</div>
 				</div>
 			</div>
-			<div class="description-editor p-2">
-				<div id="desciption" bind:this={descriptionContainer}></div>
-			</div>
-			<div class="d-flex gap-4 p-2">
-				<ArtidButton
-					label="Salva"
-					icon="floppy-fill"
-					btnStyle="success"
-					fullWidth={false}
-					disabled={!isDirty}
-				/>
-				<span class="artid-description text-artid-text-muted">
-					La descrizione dell'ArtID viene mostrata all'inizio della pagina di presentazione e
-					contiene le informazioni essenziali sul contenuto
-				</span>
+			<div class="rounded-3 border border-artid-border m-2 p-2 d-flex flex-column gap-2">
+				<div class="d-flex align-items-center gap-2 text-artid-text fw-semibold">
+					<i class="bi bi-card-text text-artid"></i>
+					Descrizione
+				</div>
+				<div class="description-editor">
+					<div id="description" bind:this={descriptionContainer}></div>
+				</div>
+				<div class="d-flex align-items-center gap-3">
+					<span class="artid-description text-artid-text-muted small flex-grow-1">
+						La descrizione dell'ArtID viene mostrata all'inizio della pagina di presentazione e contiene le informazioni essenziali sul contenuto.
+					</span>
+					<div class="flex-shrink-0">
+						<ArtidButton
+							label="Salva"
+							icon="floppy-fill"
+							btnStyle="success"
+							fullWidth={false}
+							disabled={!isDirty}
+						/>
+					</div>
+				</div>
 			</div>
 		</div>
 
@@ -325,93 +341,67 @@
 <ArtidAddMaterialsModal bind:isOpen bind:artidMaterials={draggableMaterials} artidId={Number(id)} />
 
 <style lang="scss">
-	.artid-preferite {
-		border-right: 1px solid;
-	}
+  .artid-preferite {
+    border-right: 1px solid;
+  }
 
-	.tag-container {
-		width: 100%;
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-	}
+  .tag-container {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
 
-	.tag {
-		position: relative;
-		/* display: flex;
+  .tag {
+    position: relative;
+    /* display: flex;
 		align-items: center; */
-		/* gap: 1rem; */
-		background-color: rgb(0, 255, 170);
-		/* padding-left: 1rem; */
-		i {
-			color: red;
-		}
+    /* gap: 1rem; */
+    background-color: rgb(0, 255, 170);
+    /* padding-left: 1rem; */
+    i {
+      color: red;
+    }
 
-		.tag-color {
-			width: 8px;
-			height: 8px;
-			background-color: blue;
-			border-radius: 100%;
-		}
+    .tag-color {
+      width: 8px;
+      height: 8px;
+      background-color: blue;
+      border-radius: 100%;
+    }
 
-		.tag-name {
-			font-size: 12px;
-			font-weight: bold;
-		}
-	}
+    .tag-name {
+      font-size: 12px;
+      font-weight: bold;
+    }
+  }
+  .a {
+    border-right: 1px solid;
+  }
+  .badge-type {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    flex-shrink: 0;
+    border-radius: 0.4rem;
+    font-size: 0.7rem;
+    letter-spacing: 0.02em;
+  }
 
-	/* .tag::before {
-		content: '';
-		position: absolute;
-		width: 8px;
-		height: 8px;
-		background-color: blue;
-		left: 0;
-		top: 50%;
-		transform: translateY(-50%);
+  .description-editor {
+    :global(.ql-toolbar.ql-snow) {
+      border-color: var(--artid-border);
+      border-top-left-radius: 0.5rem;
+      border-top-right-radius: 0.5rem;
+    }
 
-		border-radius: 100%;
-	} */
-
-	.a {
-		border-right: 1px solid;
-	}
-
-	// Allinea Quill (snow theme) al brand artid. :global perché il DOM lo crea Quill.
-	.description-editor :global(.ql-toolbar.ql-snow) {
-		border: 1px solid var(--artid-border);
-		border-top-left-radius: 0.5rem;
-		border-top-right-radius: 0.5rem;
-		background-color: var(--artid-section);
-	}
-
-	.description-editor :global(.ql-container.ql-snow) {
-		border: 1px solid var(--artid-border);
-		border-top: 0;
-		border-bottom-left-radius: 0.5rem;
-		border-bottom-right-radius: 0.5rem;
-		background-color: var(--artid-section);
-		font-family: var(--artid-font-sans);
-		font-size: 1rem;
-	}
-
-	.description-editor :global(.ql-editor) {
-		min-height: 10rem;
-	}
-
-	.artid-description {
-		font-size: 13px;
-	}
-
-	.badge-type {
-		display: inline-flex;
-		align-items: center;
-		justify-content: center;
-		width: 2.25rem;
-		height: 2.25rem;
-		flex-shrink: 0;
-		border-radius: 0.4rem;
-		font-size: 0.7rem;
-		letter-spacing: 0.02em;
-	}
+    :global(.ql-container.ql-snow) {
+      height: 10rem;
+      border-color: var(--artid-border);
+      border-bottom-left-radius: 0.5rem;
+      border-bottom-right-radius: 0.5rem;
+    }
+  }
 </style>
