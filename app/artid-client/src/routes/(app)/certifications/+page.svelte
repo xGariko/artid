@@ -31,7 +31,7 @@
 	}
 </script>
 
-<div class="w-100 h-100 d-flex align-items-center justify-content-center p-5 page-background">
+<div class="w-100 h-100 d-flex align-items-center justify-content-center p-5">
 	<CertificationList
 		certifications={data.certifications || []}
 		onEditRequest={handleEditRequest}
@@ -40,10 +40,3 @@
 </div>
 
 <CertificationEditor bind:isOpen={editorOpen} certification={editingCertification} />
-
-<style>
-    .page-background {
-        background-color: #f8fafc;
-        min-height: calc(100vh - 120px);
-    }
-</style>

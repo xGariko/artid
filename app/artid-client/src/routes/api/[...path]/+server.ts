@@ -5,7 +5,10 @@ const API_BASE = env.API_BASE ?? "http://localhost:8080";
 
 // Header in entrata da NON re-inoltrare: host/connection sono per il hop browser→SvelteKit,
 // content-length lo ricalcola fetch sullo stream, il cookie di sessione non serve a Spring.
-const STRIP_REQUEST = ["host", "connection", "content-length", "cookie"];
+// origin/referer: questa è una chiamata server→server, NON una richiesta cross-origin del browser;
+// inoltrarli farebbe scattare il filtro CORS di Spring ("Invalid CORS request") quando l'origine di
+// deploy (es. https://artid.space) non è tra quelle consentite.
+const STRIP_REQUEST = ["host", "connection", "content-length", "cookie", "origin", "referer"];
 
 // Proxy generico verso Spring: vale per QUALSIASI /api/* non coperto da una rotta più specifica
 // (le rotte con validazione/ownership hanno priorità su questa). Sostituisce il proxy-per-endpoint:

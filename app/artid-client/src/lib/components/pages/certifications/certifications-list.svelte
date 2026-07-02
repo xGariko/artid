@@ -99,14 +99,14 @@
 	}
 </script>
 
-<div class="card p-4 shadow-sm border-0 bg-white main-certification-card">
-	<div class="d-flex align-items-center mb-4 gap-3">
+<div class="bg-artid-section rounded-3 border border-artid-border p-3 d-flex flex-column gap-3 artid-list">
+	<div class="d-flex align-items-center gap-3">
 		<i class="bi bi-patch-check-fill text-artid-dark fs-3"></i>
 		<h3 class="fs-5 fw-bold text-artid-dark m-0">I tuoi attestati</h3>
 	</div>
 
 	<div class="flex-grow-1 overflow-y-auto rounded-3 border border-artid-border table-scroll-container">
-		<div class="row g-0 align-items-center px-3 py-2 sticky-header bg-artid-muted border-bottom border-artid-border text-artid-text small fw-semibold text-nowrap text-muted">
+		<div class="row g-0 align-items-center px-3 py-2 sticky-header bg-artid-muted border-bottom border-artid-border text-artid-text small fw-semibold text-nowrap">
 			<div class="col-1 d-flex align-items-center">
 				<input
 					type="checkbox"
@@ -117,73 +117,68 @@
 				/>
 			</div>
 			<div class="col-4">Nome</div>
-			<div class="col-2 text-center">Dimensioni</div>
-			<div class="col-2 text-center">Creato</div>
-			<div class="col-2 text-center">Modificato</div>
+			<div class="col-2">Dimensioni</div>
+			<div class="col-2">Creato</div>
+			<div class="col-2">Modificato</div>
 			<div class="col-1 text-center">Visibilità</div>
 		</div>
 
 		{#each certifications as cert (cert.id)}
 			{@const isSelected = cert.id != null && selectedIds.has(cert.id)}
 			<div
-				class="row g-0 align-items-center px-3 py-3 border-bottom border-artid-border resource-row"
+				class="row g-0 align-items-center px-3 py-2 border-bottom border-artid-border resource-row"
 				class:selected={isSelected}
 				role="button"
 				tabindex="0"
 				onclick={() => toggleSelection(cert.id)}
 				onkeydown={(e) => (e.key === ' ' || e.key === 'Enter') && toggleSelection(cert.id)}
 			>
-				<div class="col-1 d-flex align-items-center gap-2" onclick={(e) => e.stopPropagation()} role="presentation">
+				<div class="col-1 d-flex align-items-center gap-2">
 					<input
 						type="checkbox"
 						class="form-check-input flex-shrink-0"
 						checked={isSelected}
 						onchange={() => toggleSelection(cert.id)}
+						onclick={(e) => e.stopPropagation()}
 						aria-label={`Seleziona ${cert.title}`}
 					/>
 					<span
-						class="badge-type fw-bold text-dark text-uppercase fs-xs"
+						class="badge-type fw-bold text-white"
 						style:background-color={badgeColorForExtension(cert.extension || 'pdf')}
 					>
-            {badgeLabelForExtension(cert.extension || 'pdf')}
-          </span>
+						{badgeLabelForExtension(cert.extension || 'pdf')}
+					</span>
 				</div>
 
-				<div class="col-4 pe-3 text-truncate fw-medium text-artid-text" title={cert.title}>
+				<div class="col-4 pe-3 text-truncate fw-medium text-artid-text certification-title" title={cert.title}>
 					{cert.title ?? ''}
 				</div>
 
-				<div class="col-2 text-center text-secondary small">
-					{cert.fileSize ? formatFileSize(cert.fileSize) : '781 kb'}
-				</div>
+				<div class="col-2 text-artid-text">{formatFileSize(cert.fileSize)}</div>
 
-				<div class="col-2 text-center text-secondary small">
-					{cert.createdAt ? formatItalianDate(cert.createdAt) : '7 Mag 2026'}
-				</div>
+				<div class="col-2 text-artid-text text-nowrap">{formatItalianDate(cert.createdAt)}</div>
 
-				<div class="col-2 text-center text-secondary small">
-					{cert.lastModified ? formatItalianDate(cert.lastModified) : '7 Mag 2026'}
-				</div>
+				<div class="col-2 text-artid-text text-nowrap">{formatItalianDate(cert.lastModified)}</div>
 
 				<div class="col-1 text-center">
 					{#if cert.isPublic || cert.public}
-						<i class="bi bi-globe fs-5 text-secondary" title="Pubblico"></i>
+						<i class="bi bi-globe fs-5 text-artid-text-muted" title="Pubblico"></i>
 					{:else}
-						<i class="bi bi-lock-fill fs-5 text-secondary" title="Privato"></i>
+						<i class="bi bi-lock-fill fs-5 text-artid-text-muted" title="Privato"></i>
 					{/if}
 				</div>
 			</div>
 		{/each}
 
 		{#if certifications.length === 0}
-			<div class="text-center text-muted py-5">
-				<i class="bi bi-patch-check fs-2 d-block mb-2 text-secondary"></i>
+			<div class="text-center text-artid-text-muted py-5">
+				<i class="bi bi-patch-check fs-2 d-block mb-2"></i>
 				Nessun attestato caricato
 			</div>
 		{/if}
 	</div>
 
-	<div class="d-flex align-items-center gap-2 mt-4">
+	<div class="d-flex align-items-center gap-2">
 		<ArtidButton label="Nuovo" icon="plus-lg" fullWidth={false} onclick={onNewRequest} />
 		<ArtidButton label="Scarica" icon="download" disabled={!hasSelection} fullWidth={false} onclick={downloadSelected} />
 		<ArtidButton label="Modifica" icon="pencil-square" outline={true} disabled={selectedIds.size !== 1} fullWidth={false} onclick={editSelected} />
@@ -194,13 +189,52 @@
 <ArtidModal bind:isOpen={showDeleteModal} title="Conferma eliminazione" onConfirm={deleteSelected} message="Una volta eliminata la certificazione non sarà recuperabile." btnStyle="danger" />
 
 <style>
-    .main-certification-card { width: 100%; max-width: 75rem; border-radius: 12px; }
-    .check-badge-container { background-color: #0d4b83; width: 2rem; height: 2rem; border-radius: 50%; }
-    .table-scroll-container { max-height: 450px; }
-    .sticky-header { position: sticky; top: 0; z-index: 2; }
-    .resource-row { transition: 0.15s ease all; cursor: pointer; }
-    .resource-row:hover { background-color: #f1f5f9; }
-    .resource-row.selected { box-shadow: inset 6px 0px 0px -3px var(--artid-primary, #0d6efd); background-color: #f8fafc; }
-    .badge-type { display: inline-flex; align-items: center; justify-content: center; width: 2.25rem; height: 2.25rem; flex-shrink: 0; border-radius: 0.4rem; font-size: 0.7rem; letter-spacing: 0.02em; background-color: #4de2d6 !important; color: #0f172a !important; }
-    .fs-xs { font-size: 0.7rem; }
+    .artid-list {
+        min-width: 60rem;
+    }
+
+    .table-scroll-container {
+        height: 450px;
+    }
+
+    /* Header sticky: resta sopra le righe ma sotto le modali (z-index basso). */
+    .sticky-header {
+        position: sticky;
+        top: 0;
+        z-index: 1;
+    }
+
+    /* Righe cliccabili con feedback hover (sostituisce .table-hover). */
+    .resource-row {
+        transition: 0.2s ease all;
+        cursor: pointer;
+    }
+
+    .resource-row:hover {
+        transition: 0.2s ease all;
+        background-color: var(--artid-surface);
+    }
+
+    /* Riga selezionata: tinta brand. */
+    .resource-row.selected {
+        transition: 0.2s ease all;
+        box-shadow: inset 6px 0px 0px -3px var(--artid-primary);
+    }
+
+    /* Consente al titolo di troncare con ellissi dentro la colonna flex. */
+    .certification-title {
+        min-width: 0;
+    }
+
+    .badge-type {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 2.25rem;
+        height: 2.25rem;
+        flex-shrink: 0;
+        border-radius: 0.4rem;
+        font-size: 0.7rem;
+        letter-spacing: 0.02em;
+    }
 </style>
