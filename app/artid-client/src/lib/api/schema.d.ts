@@ -900,7 +900,13 @@ export interface components {
             /** Format: int64 */
             id?: number;
             /** Format: int64 */
-            idUser?: number;
+            idUserFrom?: number;
+            /** Format: int64 */
+            idUserTo?: number;
+            /** Format: int64 */
+            idArtid?: number;
+            recipientMail?: string;
+            isAccepted?: boolean;
         };
         CountResponse: {
             /** Format: int64 */
@@ -911,6 +917,8 @@ export interface components {
             id?: number;
             /** Format: int64 */
             idArtid?: number;
+            /** Format: int64 */
+            idUser?: number;
             /** Format: int32 */
             clickCounter?: number;
             isActive?: boolean;
@@ -920,9 +928,11 @@ export interface components {
             lastOpened?: string;
             /** Format: date-time */
             createdAt?: string;
+            /** Format: date-time */
+            firstOpened?: string;
+            description?: string;
             title?: string;
-            /** Format: int64 */
-            idThumbnail?: number;
+            file_path?: string;
         };
         ProfileCompletionResponse: {
             /** Format: int32 */

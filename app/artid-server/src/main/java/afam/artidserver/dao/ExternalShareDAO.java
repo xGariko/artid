@@ -10,21 +10,15 @@ import java.util.List;
 
 public interface ExternalShareDAO extends ListCrudRepository<ExternalShare, Long> {
 
-    @Query("""
-            SELECT COUNT(*)
-            FROM external_share es
-            JOIN artid a ON es.id_artid = a.id
-            WHERE a.id_user = :userId AND a.deleted_at IS NULL
-            """)
-    long countByArtidOwner(@Param("userId") Long userId);
+    long countByIdUser(Long idUser);
 
     @Query("""
-            SELECT es.*, a.title, a.id_thumbnail
-            FROM external_share es
-            JOIN artid a ON es.id_artid = a.id
-            WHERE a.id_user = :userId AND a.deleted_at IS NULL
+            SELECT s.*, a.title, f.file_path
+            FROM external_share s
+            LEFT JOIN artid a ON s.id_artid = a.id
+            LEFT JOIN file f ON f.id = a.id_thumbnail
+            WHERE s.id_user = :userId
             """)
     List<ExternalShareArtIDResponse> getExternalSharesByUserID(@Param("userId") Long userId);
 
-//    List<ExternalShare> findByUserId(Long userId); //non si può fare per ora perchè non ha userID
 }

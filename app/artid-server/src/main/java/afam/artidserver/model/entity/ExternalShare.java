@@ -17,6 +17,9 @@ public class ExternalShare {
     @Column("id_artid")
     private Long idArtid;
 
+    @Column("id_user")
+    private Long idUser;
+
     @Column("click_counter")
     private Integer clickCounter;
 
@@ -29,6 +32,12 @@ public class ExternalShare {
     @Column("last_opened")
     private OffsetDateTime lastOpened;
 
+    @Column("first_opened")
+    private OffsetDateTime firstOpened;
+
     @Column("created_at")
     private OffsetDateTime createdAt;
+
+    @Column("description")
+    private String description;
 }

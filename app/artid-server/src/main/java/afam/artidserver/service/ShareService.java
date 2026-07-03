@@ -21,15 +21,15 @@ public class ShareService {
     private final InternalShareDAO internalShareDAO;
 
     public long countByUser(Long userId) {
-        return externalShareDAO.countByArtidOwner(userId) + internalShareDAO.countByArtidOwner(userId);
+        return externalShareDAO.countByIdUser(userId) + internalShareDAO.countByIdUserFrom(userId);
     }
 
     public long countInternalByUser(Long userId) {
-        return internalShareDAO.countByArtidOwner(userId);
+        return internalShareDAO.countByIdUserFrom(userId);
     }
 
     public long countExternalByUser(Long userId) {
-        return externalShareDAO.countByArtidOwner(userId);
+        return externalShareDAO.countByIdUser(userId);
     }
 
     public List<InternalShareResponse> getInternalByUser(Long userId) {
@@ -43,7 +43,11 @@ public class ShareService {
     public InternalShareResponse toResponse(InternalShare share) {
         return new InternalShareResponse(
             share.getId(),
-            share.getIdArtid()
+            share.getIdUserFrom(),
+            share.getIdUserTo(),
+            share.getIdArtid(),
+            share.getRecipientMail(),
+            share.getIsAccepted()
         );
     }
 
@@ -51,10 +55,14 @@ public class ShareService {
         return new ExternalShareResponse(
                 share.getId(),
                 share.getIdArtid(),
+                share.getIdUser(),
                 share.getClickCounter(),
                 share.getIsActive(),
                 share.getExpirationDate(),
-                share.getLastOpened()
+                share.getLastOpened(),
+                share.getCreatedAt(),
+                share.getFirstOpened(),
+                share.getDescription()
         );
     }
 

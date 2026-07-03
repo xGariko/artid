@@ -25,19 +25,12 @@ public interface InternalShareDAO extends ListCrudRepository<InternalShare, Long
 //        return count != null ? count : 0L;
 //    }
 
-    @Query("""
-            SELECT COUNT(*)
-            FROM internal_share s
-            JOIN artid a ON s.id_artid = a.id
-            WHERE a.id_user = :userId AND a.deleted_at IS NULL
-            """)
-    long countByArtidOwner(@Param("userId") Long userId);
+    long countByIdUserFrom(Long idUser);
 
     @Query("""
             SELECT *
             FROM internal_share s
-            JOIN artid a ON s.id = a.id
-            WHERE a.id_user = :userId AND a.deleted_at IS NULL
+            WHERE s.id_user_from = :userId
             """)
     List<InternalShare> getInternalSharesByUserID(@Param("userId") Long userId);
 }

@@ -5,13 +5,16 @@ import java.time.OffsetDateTime;
 public record ExternalShareArtIDResponse(
         Long id,
         Long idArtid,
+        Long idUser,
         Integer clickCounter,
         Boolean isActive,
         OffsetDateTime expirationDate,
         OffsetDateTime lastOpened,
         OffsetDateTime createdAt,
+        OffsetDateTime firstOpened,
+        String description,
         String title,
-        Long idThumbnail
+        String file_path
 ) {
 
 }

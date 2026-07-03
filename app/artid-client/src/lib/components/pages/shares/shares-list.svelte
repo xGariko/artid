@@ -2,6 +2,7 @@
 	import { invalidateAll } from '$app/navigation';
 	import { api } from '$lib/api/browser-client';
 	import ArtidButton from '$lib/components/ui/artid-button.svelte';
+	import ArtidLogoIconWhite from '$lib/assets/artid_logo_Icon_white.svg';
 	import ArtidModal from '$lib/components/ui/artid-modal.svelte';
 
 	import { badgeColorForExtension, badgeLabelForExtension, formatFileSize, formatItalianDate } from '$lib/utilities';
@@ -39,6 +40,25 @@
 	);
 
 	const hasSelection = $derived(selectedSharesIds.size > 0);
+	const hasSingleSelection = $derived(selectedSharesIds.size == 1);
+
+	const hasNonActiveSelection = $derived(
+		shares.some((share) =>
+			share.id != null &&
+			selectedSharesIds.has(share.id) &&
+			'isActive' in share &&
+			!share.isActive
+		)
+	);
+
+	const hasActiveSelection = $derived(
+		shares.some((share) =>
+			share.id != null &&
+			selectedSharesIds.has(share.id) &&
+			'isActive' in share &&
+			share.isActive === true
+		)
+	);
 
 	function toggleShareSelection(shareId: number | undefined): void {
 		if (shareId == null) return;
@@ -90,9 +110,9 @@
 			{#if filter === 'externals' || filter === 'expired'}
 				<div class="col-1">Creazione</div>
 				<div class="col-1">Scadenza</div>
-				<div class="col-1">Numero Vis.</div>
-				<div class="col-1">Prima Vis.</div>
-				<div class="col-1">Ultima Vis.</div>
+				<div class="col-1" title="Numero Visualizzazioni">Numero Vis.</div>
+				<div class="col-1" title="Prima Visione">Prima Vis.</div>
+				<div class="col-1" title="Ultima Visione">Ultima Vis.</div>
 				<div class="col-1">Stato</div>
 				<div class="col-3">Descrizione</div>
 				<div class="col-1 text-center">Azioni</div>
@@ -123,24 +143,36 @@
 							onclick={(event) => event.stopPropagation()}
 							aria-label={`Seleziona ${extShare.title}`}
 						/>
-						<span
-							class="badge-type fw-bold text-white"
-							style:background-color={badgeColorForExtension("png")}
-						>
-							{badgeLabelForExtension("png")}
-						</span>
+						{#if !extShare.file_path}
+							<div
+								class="badge-type fw-bold text-white"
+								style:background-color="grey"
+							> <img src="{ArtidLogoIconWhite}" class="h-60 w-60"> </div>
+						{:else}
+							<img class="badge-type" src="{extShare.file_path}">
+						{/if}
 					</div>
-					<div class="col-1">Img</div>
-					<div class="col-2 pe-2 text-truncate fw-medium text-artid-text share-title" title={extShare.title}>
-						{extShare.title}
+					<div class="col-1 pe-1 text-truncate fw-medium text-artid-text share-title" title={extShare.title}>
+						{#if extShare.title}
+							<a href="">{extShare.title}</a>
+						{:else}
+							<a href="" class="text-artid-text-muted ms-1">Non trovato</a>
+						{/if}
 					</div>
 					<div class="col-1 text-artid-text text-nowrap">{formatItalianDate(extShare.createdAt)}</div>
 					<div class="col-1 text-artid-text text-nowrap">{formatItalianDate(extShare.expirationDate)}</div>
-					<div class="col-1 text-artid-text">Oggi</div>
-					<div class="col-1 text-artid-text">Domani</div>
-					<div class="col-1 text-artid-text">In uso</div>
-					<div class="col-3 text-artid-text text-nowrap">
-						BLABLABLA super desc
+					<div class="col-1 text-artid-text text-nowrap">{extShare.clickCounter}</div>
+					<div class="col-1 text-artid-text text-nowrap">{formatItalianDate(extShare.firstOpened)}</div>
+					<div class="col-1 text-artid-text text-nowrap">{formatItalianDate(extShare.lastOpened)}</div>
+					<div class="col-1 text-artid-text text-nowrap d-flex align-items-center gap-2">
+						<span
+							class="rounded-circle {extShare.isActive ? 'bg-success' : 'bg-warning'}"
+							style="width: 10px; height: 10px; display: inline-block;">
+						</span>
+						{extShare.isActive ? "Attivo" : "Disattivo"}
+					</div>
+					<div class="col-3 text-artid-text">
+						{extShare.description}
 					</div>
 				<div class="col-1 d-flex align-items-center justify-content-center gap-3">
 					<button class="btn btn-link p-0 text-artid-text" title="Apri">
@@ -167,7 +199,7 @@
 			<ArtidButton
 				label="Prolunga scadenza"
 				icon="hourglass"
-				disabled={!hasSelection}
+				disabled={!hasSingleSelection}
 				fullWidth={false}
 				onclick={()=>{return;}}
 			/>
@@ -176,7 +208,7 @@
 				icon="arrow-clockwise"
 				outline={true}
 				btnStyle="success"
-				disabled={!hasSelection}
+				disabled={!hasNonActiveSelection}
 				fullWidth={false}
 				onclick={()=>{return;}}
 			/>
@@ -185,7 +217,7 @@
 				icon="ban"
 				btnStyle="warning"
 				outline={true}
-				disabled={!hasSelection}
+				disabled={!hasActiveSelection}
 				fullWidth={false}
 				onclick={()=>{return;}}
 			/>
@@ -193,7 +225,7 @@
 				label="Modifica descrizione"
 				icon="pencil-square"
 				btnStyle="secondary"
-				disabled={!hasSelection}
+				disabled={!hasSingleSelection}
 				fullWidth={false}
 				onclick={()=>{return;}}
 			/>

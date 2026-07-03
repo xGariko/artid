@@ -1,11 +1,13 @@
 package afam.artidserver.model.dto;
 
-public record InternalShareResponse(
+public record InternalShareArtIDResponse(
         Long id,
         Long idUserFrom,
         Long idUserTo,
         Long idArtid,
         String recipientMail,
-        Boolean isAccepted
+        Boolean isAccepted,
+        String title,
+        String file_path
 ) {
 }
