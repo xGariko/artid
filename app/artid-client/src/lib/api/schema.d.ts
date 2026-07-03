@@ -896,7 +896,7 @@ export interface components {
             /** Format: int64 */
             publicArtidCount?: number;
         };
-        InternalShareResponse: {
+        InternalShareArtIDResponse: {
             /** Format: int64 */
             id?: number;
             /** Format: int64 */
@@ -907,6 +907,8 @@ export interface components {
             idArtid?: number;
             recipientMail?: string;
             isAccepted?: boolean;
+            title?: string;
+            file_path?: string;
         };
         CountResponse: {
             /** Format: int64 */
@@ -1823,7 +1825,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["InternalShareResponse"][];
+                    "*/*": components["schemas"]["InternalShareArtIDResponse"][];
                 };
             };
         };

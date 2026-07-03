@@ -2,9 +2,7 @@ package afam.artidserver.service;
 
 import afam.artidserver.dao.ExternalShareDAO;
 import afam.artidserver.dao.InternalShareDAO;
-import afam.artidserver.model.dto.ExternalShareArtIDResponse;
-import afam.artidserver.model.dto.ExternalShareResponse;
-import afam.artidserver.model.dto.InternalShareResponse;
+import afam.artidserver.model.dto.*;
 import afam.artidserver.model.entity.ExternalShare;
 import afam.artidserver.model.entity.InternalShare;
 import lombok.RequiredArgsConstructor;
@@ -43,8 +41,18 @@ public class ShareService {
         return externalShareDAO.countByIdUser(userId);
     }
 
-    public List<InternalShareResponse> getInternalByUser(Long userId) {
-        return toResponsesInt(internalShareDAO.getInternalSharesByUserID(userId));
+    public List<InternalShareArtIDResponse> getInternalFromUser(Long userId) {
+        return internalShareDAO.getInternalSharesFromUserID(userId)
+                .stream()
+                .map(this::withPresignedPath)
+                .toList();
+    }
+
+    public List<InternalShareArtIDExtendedResponse> getInternalToUser(Long userId) {
+        return internalShareDAO.getInternalSharesToUserID(userId)
+                .stream()
+                .map(this::withPresignedPath)
+                .toList();
     }
 
     public List<ExternalShareArtIDResponse> getExternalByUser(Long userId) {
@@ -94,6 +102,33 @@ public class ShareService {
                 share.description(),
                 share.title(),
                 presignObjectKey(share.file_path()) // Nuovo valore aggiornato
+        );
+    }
+
+    private InternalShareArtIDResponse withPresignedPath(InternalShareArtIDResponse share) {
+        return new InternalShareArtIDResponse(
+                share.id(),
+                share.idUserFrom(),
+                share.idUserTo(),
+                share.idArtid(),
+                share.recipientMail(),
+                share.isAccepted(),
+                share.title(),
+                presignObjectKey(share.file_path()) // Nuovo valore aggiornato
+        );
+    }
+
+    private InternalShareArtIDExtendedResponse withPresignedPath(InternalShareArtIDExtendedResponse share) {
+        return new InternalShareArtIDExtendedResponse(
+                share.id(),
+                share.idUserFrom(),
+                share.idUserTo(),
+                share.idArtid(),
+                share.recipientMail(),
+                share.isAccepted(),
+                share.title(),
+                presignObjectKey(share.file_path()), // Nuovo valore aggiornato
+                share.name()
         );
     }
 

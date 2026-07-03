@@ -7,13 +7,13 @@
 
 	import { badgeColorForExtension, badgeLabelForExtension, formatFileSize, formatItalianDate } from '$lib/utilities';
 	import { toast } from 'svelte-sonner';
-	import type { InternalShareResponse, ExternalShareArtIDResponse } from '$lib/api/types';
+	import type { InternalShareArtIDResponse, ExternalShareArtIDResponse } from '$lib/api/types';
 
 	let {
 		shares,
 		filter
 	}: {
-		shares: InternalShareResponse[] | ExternalShareArtIDResponse[];
+		shares: InternalShareArtIDResponse[] | ExternalShareArtIDResponse[];
 		filter: "externals" | "internals" | "expired";
 	} = $props();
 

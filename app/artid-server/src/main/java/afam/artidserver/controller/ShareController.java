@@ -1,11 +1,6 @@
 package afam.artidserver.controller;
 
-import afam.artidserver.model.dto.CountResponse;
-import afam.artidserver.model.dto.ExternalShareArtIDResponse;
-import afam.artidserver.model.dto.ExternalShareResponse;
-import afam.artidserver.model.dto.InternalShareResponse;
-import afam.artidserver.model.entity.ExternalShare;
-import afam.artidserver.model.entity.InternalShare;
+import afam.artidserver.model.dto.*;
 import afam.artidserver.security.AuthenticatedUser;
 import afam.artidserver.service.ShareService;
 import lombok.RequiredArgsConstructor;
@@ -35,8 +30,8 @@ public class ShareController {
     }
 
     @GetMapping("/internal")
-    public ResponseEntity<List<InternalShareResponse>> getInternalByAuthor(@AuthenticationPrincipal AuthenticatedUser principal) {
-        return ResponseEntity.ok(shareService.getInternalByUser(principal.getId()));
+    public ResponseEntity<List<InternalShareArtIDResponse>> getInternalByAuthor(@AuthenticationPrincipal AuthenticatedUser principal) {
+        return ResponseEntity.ok(shareService.getInternalFromUser(principal.getId()));
     }
 
     @GetMapping("/external/count") //Non so se serve ma ho messo per coerenza

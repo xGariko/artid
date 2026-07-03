@@ -29,6 +29,6 @@ export type PublicArtidSummary = Schemas["PublicArtidSummaryResponse"];
 export type PublicArtidDetail = Schemas["PublicArtidDetailResponse"];
 export type PublicMaterial = Schemas["PublicMaterialResponse"];
 export type PublicCertification = Schemas["PublicCertificationResponse"];
-export type InternalShareResponse = Schemas["InternalShareResponse"];
+export type InternalShareArtIDResponse = Schemas["InternalShareArtIDResponse"];
 export type ExternalShareArtIDResponse = Schemas["ExternalShareArtIDResponse"];
 export type CertificationResponse = Schemas["CertificationResponse"];
