@@ -8,8 +8,11 @@ import afam.artidserver.model.dto.InternalShareResponse;
 import afam.artidserver.model.entity.ExternalShare;
 import afam.artidserver.model.entity.InternalShare;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import afam.artidserver.storage.StorageService;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,6 +22,14 @@ public class ShareService {
 
     private final ExternalShareDAO externalShareDAO;
     private final InternalShareDAO internalShareDAO;
+
+    private final StorageService storageService;
+
+    @Value("${supabase.s3.bucket}")
+    private String thumbnailBucket;
+
+    @Value("${supabase.s3.presign-ttl-seconds}")
+    private long presignTtlSeconds;
 
     public long countByUser(Long userId) {
         return externalShareDAO.countByIdUser(userId) + internalShareDAO.countByIdUserFrom(userId);
@@ -37,7 +48,10 @@ public class ShareService {
     }
 
     public List<ExternalShareArtIDResponse> getExternalByUser(Long userId) {
-        return externalShareDAO.getExternalSharesByUserID(userId);
+        return externalShareDAO.getExternalSharesByUserID(userId)
+                .stream()
+                .map(this::withPresignedPath)
+                .toList();
     }
 
     public InternalShareResponse toResponse(InternalShare share) {
@@ -66,6 +80,24 @@ public class ShareService {
         );
     }
 
+    private ExternalShareArtIDResponse withPresignedPath(ExternalShareArtIDResponse share) {
+        return new ExternalShareArtIDResponse(
+                share.id(),
+                share.idArtid(),
+                share.idUser(),
+                share.clickCounter(),
+                share.isActive(),
+                share.expirationDate(),
+                share.lastOpened(),
+                share.createdAt(),
+                share.firstOpened(),
+                share.description(),
+                share.title(),
+                presignObjectKey(share.file_path()) // Nuovo valore aggiornato
+        );
+    }
+
+
     public List<ExternalShareResponse> toResponsesExt(List<ExternalShare> shares) {
         List<ExternalShareResponse> responses = new ArrayList<>();
         for (ExternalShare share : shares) {
@@ -80,5 +112,10 @@ public class ShareService {
             responses.add(toResponse(share));
         }
         return responses;
+    }
+
+    private String presignObjectKey(String objectKey) {
+        if (objectKey == null || objectKey.isBlank()) return null;
+        return storageService.presignGet(objectKey, Duration.ofSeconds(presignTtlSeconds));
     }
 }
