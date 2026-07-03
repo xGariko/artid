@@ -14,10 +14,14 @@
 	import { toast } from 'svelte-sonner';
 	import { api } from '$lib/api/browser-client';
 	import 'quill/dist/quill.snow.css';
+	import ArtidDropdown from '$lib/components/ui/artid-dropdown.svelte';
 
 	const id = $derived(page.params.id);
 
 	let { data }: { data: PageData } = $props();
+
+	// svelte-ignore state_referenced_locally
+	let artid = $state(data.artid);
 
 	let draggableMaterials: ResourceResponse[] = $state([]);
 	$effect(() => {
@@ -37,14 +41,30 @@
 		});
 	});
 
+	let selectedImage: File | null = $state(null);
+	let imagePreview = $state('');
+
+	// let srcImage = $derived(selectedImage ?? data.artid.idThumbnail);
+	let srcImage = $derived(selectedImage ? imagePreview : artidimage);
+
+	const modelArtIDTitle = data.artid.title ?? '';
+	let inputTitleValue = $state(modelArtIDTitle);
+
 	let modelDescription = $state(data.artid.description ?? '');
 
 	// Snapshot iniziale per il dirty-check. La description viene riallineata al
 	// valore "canonico" di Quill dopo il caricamento (vedi $effect sotto).
 	let baselineDescription = $state(data.artid.description ?? '');
 
+	let isTitleModified = $derived(inputTitleValue !== modelArtIDTitle);
+	let isDescriptionModified = $derived(modelDescription !== baselineDescription);
+	let isImageChanged = $derived(selectedImage !== null);
+
 	// "Salva" attivo se ha modificato la description
-	let isDirty = $derived(modelDescription !== baselineDescription);
+	let isDirty = $derived(
+		isDescriptionModified || (isTitleModified && inputTitleValue.length > 0) || isImageChanged
+	);
+	let isSaving = $state(false);
 
 	let descriptionContainer = $state<HTMLDivElement | undefined>(undefined);
 
@@ -136,7 +156,6 @@
 			if (!response.error) {
 				draggableMaterials = draggableMaterials.filter((m) => m.id !== materialId);
 				toast.success('Materiale rimosso con successo');
-
 			} else {
 				toast.error('Errore durante la rimozione del materiale');
 			}
@@ -149,19 +168,130 @@
 
 	async function handleDelete() {
 		try {
-			const response = await api.DELETE('/api/artids/{id}', { params: { path: { id: Number(id) } } });
+			const response = await api.DELETE('/api/artids/{id}', {
+				params: { path: { id: Number(id) } }
+			});
 
 			if (!response.error) {
 				toast.success('ArtId cancellato con successo');
 				await goto(resolve('/(app)/artid'));
 			} else {
-				toast.error('Errore durante la cancellazione dell\'artid');
+				toast.error("Errore durante la cancellazione dell'artid");
 			}
 		} catch {
 			toast.error('Errore di rete');
 		}
 	}
 
+	async function handleFavourite() {
+		const newFavouriteState = !artid.favourite;
+
+		try {
+			const response = await api.PUT('/api/artids/{id}/favourite', {
+				params: { path: { id: Number(id) } },
+				body: newFavouriteState
+			});
+
+			if (!response.error) {
+				artid.favourite = newFavouriteState;
+
+				const successMessage = newFavouriteState
+					? 'ArtID aggiunto ai preferiti'
+					: 'ArtID rimosso dai preferiti';
+
+				toast.success(successMessage);
+			} else {
+				const errorMessage = newFavouriteState
+					? 'Impossibile aggiungere ArtID ai preferiti'
+					: 'Impossibile rimuovere ArtID dai preferiti';
+				toast.error(errorMessage);
+			}
+		} catch {
+			toast.error('Errore di rete');
+		}
+	}
+
+	function handleImageSelect(event: Event) {
+		const target = event.target as HTMLInputElement;
+		if (target.files && target.files.length > 0) {
+			selectedImage = target.files[0];
+			imagePreview = URL.createObjectURL(selectedImage);
+			toast.warning("Ricordati di cliccare il tasto SALVA per aggiornare l'immagine");
+		}
+	}
+
+	async function handleUpdateDetails() {
+		isSaving = true;
+
+		const formData = new FormData();
+
+		if (isTitleModified && inputTitleValue.length > 0) {
+			formData.append('title', inputTitleValue);
+		}
+
+		if (isDescriptionModified && descriptionForSave() !== undefined) {
+			formData.append('description', descriptionForSave()!);
+		}
+
+		if (isImageChanged && selectedImage) {
+			formData.append('image', selectedImage);
+		}
+
+		try {
+			const response = await api.PUT('/api/artids/{id}/details', {
+				params: { path: { id: Number(id) } },
+				body: formData
+			});
+
+			if (!response.error) {
+				toast.success('Dettagli aggiornati con successo');
+				selectedImage = null;
+				imagePreview = '';
+			} else {
+				toast.error('Errore durante la modifica dei dettagli');
+			}
+		} catch {
+			toast.error('Errore di rete');
+		} finally {
+			isSaving = false;
+		}
+	}
+
+	//TODO da qualche parte c'è sicuramente un ENUM con i 3 valori
+	type VisibilityType = 'public' | 'private' | 'unlisted';
+	const visibilityValues = [
+		{ label: 'Pubblico', value: 'public' as VisibilityType },
+		{ label: 'Privato', value: 'private' as VisibilityType },
+		{ label: 'Unlisted', value: 'unlisted' as VisibilityType }
+	];
+
+	let selectedVisibility: VisibilityType | null = $state(
+		(data.artid.visibilityState as VisibilityType) ?? null
+	);
+
+	$effect(() => {
+		if (selectedVisibility && selectedVisibility !== data.artid.visibilityState) {
+			console.log(`L'utente ha scelto l'azione: ${selectedVisibility}`);
+			handleUpdateVisibility(selectedVisibility);
+		}
+	});
+
+	async function handleUpdateVisibility(selectedVisibility: VisibilityType) {
+		try {
+			const response = await api.PUT('/api/artids/{id}/visibility', {
+				params: { path: { id: Number(id) } },
+				body: { visibility: selectedVisibility }
+			});
+
+			if (!response.error) {
+				toast.success('Visibilità aggiornata con successo');
+			} else {
+				toast.error('Errore durante la modifica della visibilità');
+			}
+		} catch {
+			toast.error('Errore di rete');
+		}
+	}
 </script>
 
 <div class="w-100 h-100 d-flex flex-column align-items-center gap-4 p-5">
@@ -169,10 +299,15 @@
 		<div class="row">
 			<div class="col-6 a d-flex flex-row border-artid-border">
 				<button
-					class="rounded-3 border-0 bg-transparent border-end border-artid-border outline-0 py-3 px-4 me-2 artid-preferite"
-					aria-label="preferite"
+					class="rounded-3 border-0 bg-transparent border-end border-artid-border outline-0 py-3 px-4 me-2 artid-favourite"
+					aria-label="favourite"
+					onclick={() => handleFavourite()}
 				>
-					<i class="bi bi-star text-artid-muted fs-4"></i>
+					{#if artid.favourite}
+						<i class="bi bi-star-fill text-warning fs-4"></i>
+					{:else}
+						<i class="bi bi-star text-artid-muted fs-4"></i>
+					{/if}
 				</button>
 				<div class="tag-container">
 					<ul class="list-unstyled mb-0 d-flex gap-2 flex-wrap">
@@ -185,12 +320,18 @@
 						{/each}
 					</ul>
 					<span class="text-artid text-decoration-underline" style="cursor: pointer;"
-					>Aggiungi Tag +</span
+						>Aggiungi Tag +</span
 					>
 				</div>
 			</div>
 			<div class="col-6 d-flex align-items-center justify-content-between">
-				<ArtidButton icon="trash" fullWidth={false} btnStyle="danger" outline={true} onclick={handleDelete} />
+				<ArtidButton
+					icon="trash"
+					fullWidth={false}
+					btnStyle="danger"
+					outline={true}
+					onclick={handleDelete}
+				/>
 				<div style="padding-right: calc(var(--bs-gutter-x)*0.5);">
 					<ArtidButton
 						label="Anteprima"
@@ -215,7 +356,6 @@
 		</div>
 	</div>
 
-
 	<div
 		class="bg-artid-section h-100 overflow-hidden w-75 rounded-3 border border-artid-border d-flex justify-content-between"
 		style="min-height: 0;"
@@ -227,13 +367,28 @@
 				Informazioni
 			</div>
 			<div class="rounded-3 border border-artid-border m-2 p-2 d-flex gap-4">
-				<img src={artidimage} alt="" />
+				<input
+					type="file"
+					accept="image/*"
+					id="image-input"
+					style="display: none;"
+					onchange={handleImageSelect}
+				/>
+				<label for="image-input" style="cursor: pointer">
+					<img src={srcImage} alt="" class="artid-image" />
+				</label>
 				<div class="flex-grow-1 d-flex flex-column justify-content-between">
-					<ArtidInput name="artid" label="Titolo" />
+					<ArtidInput name="artid" label="Titolo" bind:value={inputTitleValue} />
 					<div>
 						<span class="fw-semibold" style="color: #565759;">Visibilità artid</span>
 						<div>
-							<ArtidButton label="test" fullWidth={false} />
+							<ArtidDropdown
+								btnLabel="Visibilità"
+								btnStyle="secondary"
+								outline={true}
+								items={visibilityValues}
+								bind:value={selectedVisibility}
+							/>
 						</div>
 					</div>
 				</div>
@@ -248,7 +403,8 @@
 				</div>
 				<div class="d-flex align-items-center gap-3">
 					<span class="artid-description text-artid-text-muted small flex-grow-1">
-						La descrizione dell'ArtID viene mostrata all'inizio della pagina di presentazione e contiene le informazioni essenziali sul contenuto.
+						La descrizione dell'ArtID viene mostrata all'inizio della pagina di presentazione e
+						contiene le informazioni essenziali sul contenuto.
 					</span>
 					<div class="flex-shrink-0">
 						<ArtidButton
@@ -256,7 +412,8 @@
 							icon="floppy-fill"
 							btnStyle="success"
 							fullWidth={false}
-							disabled={!isDirty}
+							disabled={!isDirty || isSaving}
+							onclick={handleUpdateDetails}
 						/>
 					</div>
 				</div>
@@ -341,67 +498,74 @@
 <ArtidAddMaterialsModal bind:isOpen bind:artidMaterials={draggableMaterials} artidId={Number(id)} />
 
 <style lang="scss">
-  .artid-preferite {
-    border-right: 1px solid;
-  }
+	.artid-favourite {
+		border-right: 1px solid;
+	}
 
-  .tag-container {
-    width: 100%;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
+	.tag-container {
+		width: 100%;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+	}
 
-  .tag {
-    position: relative;
-    /* display: flex;
+	.tag {
+		position: relative;
+		/* display: flex;
 		align-items: center; */
-    /* gap: 1rem; */
-    background-color: rgb(0, 255, 170);
-    /* padding-left: 1rem; */
-    i {
-      color: red;
-    }
+		/* gap: 1rem; */
+		background-color: rgb(0, 255, 170);
+		/* padding-left: 1rem; */
+		i {
+			color: red;
+		}
 
-    .tag-color {
-      width: 8px;
-      height: 8px;
-      background-color: blue;
-      border-radius: 100%;
-    }
+		.tag-color {
+			width: 8px;
+			height: 8px;
+			background-color: blue;
+			border-radius: 100%;
+		}
 
-    .tag-name {
-      font-size: 12px;
-      font-weight: bold;
-    }
-  }
-  .a {
-    border-right: 1px solid;
-  }
-  .badge-type {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 2.25rem;
-    height: 2.25rem;
-    flex-shrink: 0;
-    border-radius: 0.4rem;
-    font-size: 0.7rem;
-    letter-spacing: 0.02em;
-  }
+		.tag-name {
+			font-size: 12px;
+			font-weight: bold;
+		}
+	}
+	.a {
+		border-right: 1px solid;
+	}
 
-  .description-editor {
-    :global(.ql-toolbar.ql-snow) {
-      border-color: var(--artid-border);
-      border-top-left-radius: 0.5rem;
-      border-top-right-radius: 0.5rem;
-    }
+	.artid-image {
+		width: 150px;
+		object-fit: contain;
+		aspect-ratio: 1 / 1;
+	}
 
-    :global(.ql-container.ql-snow) {
-      height: 10rem;
-      border-color: var(--artid-border);
-      border-bottom-left-radius: 0.5rem;
-      border-bottom-right-radius: 0.5rem;
-    }
-  }
+	.badge-type {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: 2.25rem;
+		height: 2.25rem;
+		flex-shrink: 0;
+		border-radius: 0.4rem;
+		font-size: 0.7rem;
+		letter-spacing: 0.02em;
+	}
+
+	.description-editor {
+		:global(.ql-toolbar.ql-snow) {
+			border-color: var(--artid-border);
+			border-top-left-radius: 0.5rem;
+			border-top-right-radius: 0.5rem;
+		}
+
+		:global(.ql-container.ql-snow) {
+			height: 10rem;
+			border-color: var(--artid-border);
+			border-bottom-left-radius: 0.5rem;
+			border-bottom-right-radius: 0.5rem;
+		}
+	}
 </style>
