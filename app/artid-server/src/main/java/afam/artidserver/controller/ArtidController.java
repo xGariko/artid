@@ -1,24 +1,33 @@
 package afam.artidserver.controller;
 
+import afam.artidserver.model.VISIBILITY_STATE;
 import afam.artidserver.model.dto.ArtidCreateRequest;
+import afam.artidserver.model.dto.ArtidDetailsUpdateRequest;
 import afam.artidserver.model.dto.ArtidResponse;
 import afam.artidserver.model.dto.CountResponse;
 import afam.artidserver.model.dto.PublicArtidDetailResponse;
 import afam.artidserver.model.dto.ResourceResponse;
+import afam.artidserver.model.dto.VisibilityUpdateRequest;
 import afam.artidserver.security.AuthenticatedUser;
 import afam.artidserver.service.ArtidService;
 import afam.artidserver.service.ResourceService;
 import afam.artidserver.service.UserService;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -53,9 +62,12 @@ public class ArtidController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    // Anteprima dell'ArtID per il proprietario: stesso contenuto della pagina Explore (autore,
-    // thumbnail, materiali con presigned URL), ma visibile anche se l'ArtID non è pubblico. La
-    // proprietà è verificata nel service (filtro per id_user del principal) → 404 se non è suo.
+    // Anteprima dell'ArtID per il proprietario: stesso contenuto della pagina
+    // Explore (autore,
+    // thumbnail, materiali con presigned URL), ma visibile anche se l'ArtID non è
+    // pubblico. La
+    // proprietà è verificata nel service (filtro per id_user del principal) → 404
+    // se non è suo.
     @GetMapping("/{id}/preview")
     public ResponseEntity<PublicArtidDetailResponse> preview(@PathVariable Long id,
             @AuthenticationPrincipal AuthenticatedUser principal) {
@@ -117,6 +129,44 @@ public class ArtidController {
             // 404 Not Found: la risorsa o l'associazione non esisteva
             return ResponseEntity.notFound().build();
         }
+    }
+
+    @PutMapping("/{id}/favourite")
+    public ResponseEntity<Void> updateFavourite(@PathVariable Long id,
+            @AuthenticationPrincipal AuthenticatedUser principal,
+            @RequestBody boolean isFavourite) {
+
+        boolean updated = artidService.updateFavourite(id, isFavourite, principal.getId());
+
+        return updated
+                ? ResponseEntity.noContent().build()
+                : ResponseEntity.notFound().build();
+    }
+
+    @PutMapping(value = "/{id}/details", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<Void> updateDetails(
+            @PathVariable Long id,
+            @ModelAttribute ArtidDetailsUpdateRequest request,
+            @RequestPart(value = "image", required = false) MultipartFile image,
+            @AuthenticationPrincipal AuthenticatedUser principal) {
+
+        boolean updated = artidService.updateDetails(id, principal.getId(), request, image);
+
+        return updated
+                ? ResponseEntity.noContent().build()
+                : ResponseEntity.notFound().build();
+    }
+
+    @PutMapping("/{id}/visibility")
+    public ResponseEntity<Void> updateVisibility(@PathVariable Long id,
+            @RequestBody VisibilityUpdateRequest request,
+            @AuthenticationPrincipal AuthenticatedUser principal) {
+
+        boolean updated = artidService.updateVisibility(id, request.visibility(), principal.getId());
+
+        return updated
+                ? ResponseEntity.noContent().build()
+                : ResponseEntity.notFound().build();
     }
 
 }
