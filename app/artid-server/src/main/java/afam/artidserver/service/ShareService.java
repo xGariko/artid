@@ -20,7 +20,6 @@ import org.springframework.web.server.ResponseStatusException;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -91,12 +90,19 @@ public class ShareService {
     }
 
     @Transactional
-    public void deleteAll(Long userId, List<Long> shareIds) {
+    public void deleteExternalShares(Long userId, List<Long> shareIds) {
         if (shareIds == null || shareIds.isEmpty())
             return;
 
-        // Esegue una singola query di update bulk
         externalShareDAO.deleteSharesByIds(userId, shareIds);
+    }
+
+    @Transactional
+    public void deleteInternalShares(Long userId, List<Long> shareIds) {
+        if (shareIds == null || shareIds.isEmpty())
+            return;
+
+        internalShareDAO.deleteSharesByIds(userId, shareIds);
     }
 
     @Transactional
@@ -181,7 +187,7 @@ public class ShareService {
                 share.firstOpened(),
                 share.description(),
                 share.title(),
-                presignObjectKey(share.file_path()) // Nuovo valore aggiornato
+                presignObjectKey(share.filePath()) // Nuovo valore aggiornato
         );
     }
 
@@ -189,12 +195,13 @@ public class ShareService {
         return new InternalShareArtIDResponse(
                 share.id(),
                 share.idUserFrom(),
-                share.idUserTo(),
+//                share.idUserTo(),
                 share.idArtid(),
                 share.recipientMail(),
-                share.isAccepted(),
+//                share.isAccepted(),
+                share.createdAt(),
                 share.title(),
-                presignObjectKey(share.file_path()) // Nuovo valore aggiornato
+                presignObjectKey(share.filePath()) // Nuovo valore aggiornato
         );
     }
 
@@ -206,8 +213,9 @@ public class ShareService {
                 share.idArtid(),
                 share.recipientMail(),
                 share.isAccepted(),
+                share.createdAt(),
                 share.title(),
-                presignObjectKey(share.file_path()), // Nuovo valore aggiornato
+                presignObjectKey(share.filePath()), // Nuovo valore aggiornato
                 share.name());
     }
 

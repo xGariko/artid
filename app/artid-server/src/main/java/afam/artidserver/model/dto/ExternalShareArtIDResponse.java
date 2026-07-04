@@ -14,7 +14,7 @@ public record ExternalShareArtIDResponse(
         OffsetDateTime firstOpened,
         String description,
         String title,
-        String file_path
+        String filePath
 ) {
 
 }

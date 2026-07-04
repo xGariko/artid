@@ -5,6 +5,8 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
+import java.time.OffsetDateTime;
+
 @Data
 @Table("internal_share")
 public class InternalShare {
@@ -26,4 +28,7 @@ public class InternalShare {
 
     @Column("is_accepted")
     private Boolean isAccepted;
+
+    @Column("created_at")
+    private OffsetDateTime createdAt;
 }

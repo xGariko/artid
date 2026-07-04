@@ -146,38 +146,43 @@
 
 	let deleteLinkMessage = $derived.by(() => {
 		if (selectedSharesIds.size === 0) return '';
-		if (selectedSharesIds.size === 1) {
-			let share = singleSelectedShare as ExternalShareArtIDResponse;
-			if (!isExpired(share!.expirationDate)) {
-				if (share.clickCounter == 0) {
-					return 'Il contenuto non è stato visualizzato ma il link è ancora valido. Eliminare?';
+		if (filter == "externals" || filter == "expired") {
+			if (selectedSharesIds.size === 1) {
+				let share = singleSelectedShare as ExternalShareArtIDResponse;
+				if (!isExpired(share!.expirationDate)) {
+					if (share.clickCounter == 0) {
+						return 'Il contenuto non è stato visualizzato ma il link è ancora valido. Eliminare?';
+					} else {
+						return 'Il link è ancora valido. Eliminare?';
+					}
 				} else {
-					return 'Il link è ancora valido. Eliminare?';
+					if (share.clickCounter == 0) {
+						return (
+							'Il link è scaduto ma il' +
+							'contenuto non + stato ancora visualizzato. Puoi annullare la ' +
+							'cellazione e rimandare la scadenza del link con l’apposito pulsante. ' +
+							'Eliminare comunque?'
+						);
+					} else {
+						return 'Il link è scaduto. Eliminare?';
+					}
 				}
 			} else {
-				if (share.clickCounter == 0) {
-					return (
-						'Il link è scaduto ma il' +
-						'contenuto non + stato ancora visualizzato. Puoi annullare la ' +
-						'cellazione e rimandare la scadenza del link con l’apposito pulsante. ' +
-						'Eliminare comunque?'
-					);
-				} else {
-					return 'Il link è scaduto. Eliminare?';
-				}
+				return `Eliminare i ${selectedSharesIds.size} link selezionati?`;
 			}
 		} else {
-			return `Eliminare i ${selectedSharesIds.size} link selezionati?`;
+			return 'Sei sicuro di voler cancellare le condivisioni selezionate?'
 		}
 	});
 
-	async function handleExternalDelete(): Promise<void> {
+	async function handleDelete(): Promise<void> {
 		if (isSaving) return;
 		if (selectedSharesIds.size === 0) return; //anche se non serve
 
 		isSaving = true;
+		let type = (filter == "externals" || filter == "expired") ? "external" : "internal"
 		try {
-			const response = await fetch('/api/shares/' + 'external', {
+			const response = await fetch('/api/shares/' + type, {
 				method: 'DELETE',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify(Array.from(selectedSharesIds))
@@ -188,12 +193,14 @@
 				return;
 			}
 
-			toast.success('I link selezionati sono stati eliminati correttamente.');
+			toast.success(type == "external" ? 'I link selezionati sono stati eliminati correttamente.' :
+				'Le condivisioni selezionate sono state eliminate correttamente');
 			selectedSharesIds = new Set();
 			invalidateAll();
 		} catch (e) {
 			toast.error(e instanceof Error ? e.message : 'Errore di rete');
 		} finally {
+			showDeleteModal = false;
 			isSaving = false;
 		}
 	}
@@ -226,14 +233,15 @@
 				<div class="col-3">Descrizione</div>
 				<div class="col-1 text-center">Azioni</div>
 			{:else}
-				<div class="col-3">ArtID</div>
+				<div class="col-2">ArtID</div>
+				<div class="col-1">Creazione</div>
 				<div class="col-2">Condiviso con</div>
 			{/if}
 		</div>
 
 		{#each filteredShares as share (share.id)}
 			{@const isShareSelected = share.id != null && selectedSharesIds.has(share.id)}
-			{@const titleSize = filter === 'externals' || filter === 'expired' ? '1' : '3'}
+			{@const titleSize = filter === 'externals' || filter === 'expired' ? '1' : '2'}
 			<div
 				class="row g-0 align-items-center px-3 py-2 border-bottom border-artid-border share-row"
 				class:selected={isShareSelected}
@@ -251,12 +259,12 @@
 						onclick={(event) => event.stopPropagation()}
 						aria-label={`Seleziona ${share.title}`}
 					/>
-					{#if !share.file_path}
+					{#if !share.filePath}
 						<div class="badge-type fw-bold text-white" style:background-color="grey">
 							<img src={ArtidLogoIconWhite} class="h-60 w-60" />
 						</div>
 					{:else}
-						<img class="badge-type preview-small" src={share.file_path} />
+						<img class="badge-type preview-small" src={share.filePath} />
 					{/if}
 				</div>
 				<div
@@ -270,11 +278,11 @@
 					{/if}
 				</div>
 
+				<div class="col-1 text-artid-text text-nowrap">
+					{formatItalianDate(share.createdAt)}
+				</div>
 				{#if filter === 'externals' || filter === 'expired'}
 					{@const extShare = share as ExternalShareArtIDResponse}
-					<div class="col-1 text-artid-text text-nowrap">
-						{formatItalianDate(extShare.createdAt)}
-					</div>
 					<div class="col-1 text-artid-text text-nowrap">
 						{formatItalianDate(extShare.expirationDate)}
 					</div>
@@ -389,7 +397,7 @@
 <ArtidModal
 	bind:isOpen={showDeleteModal}
 	title="Conferma eliminazione"
-	onConfirm={handleExternalDelete}
+	onConfirm={handleDelete}
 	message={deleteLinkMessage}
 	btnStyle="danger"
 />

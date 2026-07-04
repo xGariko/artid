@@ -1039,13 +1039,12 @@ export interface components {
             /** Format: int64 */
             idUserFrom?: number;
             /** Format: int64 */
-            idUserTo?: number;
-            /** Format: int64 */
             idArtid?: number;
             recipientMail?: string;
-            isAccepted?: boolean;
+            /** Format: date-time */
+            createdAt?: string;
             title?: string;
-            file_path?: string;
+            filePath?: string;
         };
         CountResponse: {
             /** Format: int64 */
@@ -1071,7 +1070,7 @@ export interface components {
             firstOpened?: string;
             description?: string;
             title?: string;
-            file_path?: string;
+            filePath?: string;
         };
         ProfileCompletionResponse: {
             /** Format: int32 */

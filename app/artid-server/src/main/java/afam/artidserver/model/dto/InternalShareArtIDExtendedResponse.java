@@ -1,5 +1,7 @@
 package afam.artidserver.model.dto;
 
+import java.time.OffsetDateTime;
+
 public record InternalShareArtIDExtendedResponse(
         Long id,
         Long idUserFrom,
@@ -7,8 +9,9 @@ public record InternalShareArtIDExtendedResponse(
         Long idArtid,
         String recipientMail,
         Boolean isAccepted,
+        OffsetDateTime createdAt,
         String title,
-        String file_path,
+        String filePath,
         String name
 ) {
 }
