@@ -201,7 +201,6 @@
 				</div>
 			{/each}
 		</div>
-		<a href={resolve('/(app)/artid/details/[id]', { id: '1' })}>Vai a dettagli</a>
 	</div>
 </div>
 

@@ -181,7 +181,7 @@
 				toast.success('ArtId cancellato con successo');
 				await goto(resolve('/(app)/artid'));
 			} else {
-				toast.error("Errore durante la cancellazione dell'artid");
+				toast.error('Errore durante la cancellazione dell\'artid');
 			}
 		} catch {
 			toast.error('Errore di rete');
@@ -221,7 +221,7 @@
 		if (target.files && target.files.length > 0) {
 			selectedImage = target.files[0];
 			imagePreview = URL.createObjectURL(selectedImage);
-			toast.warning("Ricordati di cliccare il tasto SALVA per aggiornare l'immagine");
+			toast.warning('Ricordati di cliccare il tasto SALVA per aggiornare l\'immagine');
 		}
 	}
 
@@ -497,35 +497,44 @@
 					</div>
 
 					<div class="p-2 flex-grow-1" style="overflow-y: auto; min-height: 0;">
-						<ul
-							class="list-group list-unstyled"
-							use:dndzone={{ items: filteredMaterials, flipDurationMs }}
-							onconsider={handleDndConsider}
-							onfinalize={handleDndFinalize}
-						>
-							{#each filteredMaterials as material (material.id)}
-								<li class="list-group-item d-flex justify-content-between align-items-center gap-3">
-									<i class="bi bi-grip-horizontal fs-4 text-artid-text-muted" style="cursor: grab;"
-									></i>
-									<span
-										class="badge-type fw-bold text-white"
-										style:background-color={badgeColorForExtension(material.extension)}
-									>
+						{#if filteredMaterials.length === 0}
+							<div class="w-100 h-100 d-flex align-items-center justify-content-center">
+								<span class="fw-bold fst-italic text-secondary">
+									Aggiungi un materiale per iniziare.
+								</span>
+							</div>
+						{:else}
+							<ul
+								class="list-group list-unstyled"
+								use:dndzone={{ items: filteredMaterials, flipDurationMs }}
+								onconsider={handleDndConsider}
+								onfinalize={handleDndFinalize}
+							>
+
+								{#each filteredMaterials as material (material.id)}
+									<li class="list-group-item d-flex justify-content-between align-items-center gap-3">
+										<i class="bi bi-grip-horizontal fs-4 text-artid-text-muted" style="cursor: grab;"
+										></i>
+										<span
+											class="badge-type fw-bold text-white"
+											style:background-color={badgeColorForExtension(material.extension)}
+										>
 										{badgeLabelForExtension(material.extension)}
 									</span>
-									<span class="flex-grow-1 text-truncate">
+										<span class="flex-grow-1 text-truncate">
 										{material.title}
 									</span>
-									<button
-										class="border-0 bg-transparent"
-										onclick={() => handleDeleteMaterial(material.id!)}
-										aria-label="remove material"
-									>
-										<i class="bi bi-x fs-4" style="color: red;"></i>
-									</button>
-								</li>
-							{/each}
-						</ul>
+										<button
+											class="border-0 bg-transparent"
+											onclick={() => handleDeleteMaterial(material.id!)}
+											aria-label="remove material"
+										>
+											<i class="bi bi-x fs-4" style="color: red;"></i>
+										</button>
+									</li>
+								{/each}
+							</ul>
+						{/if}
 					</div>
 				</div>
 
@@ -546,74 +555,75 @@
 <ArtidAddTagsModal bind:isOpen={isTagOpen} bind:artidTags artidId={Number(id)} />
 
 <style lang="scss">
-	.artid-favourite {
-		border-right: 1px solid;
-	}
+  .artid-favourite {
+    border-right: 1px solid;
+  }
 
-	.tag-container {
-		width: 100%;
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-	}
+  .tag-container {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
 
-	.tag {
-		position: relative;
-		/* display: flex;
+  .tag {
+    position: relative;
+    /* display: flex;
 		align-items: center; */
-		/* gap: 1rem; */
-		/* padding-left: 1rem; */
+    /* gap: 1rem; */
+    /* padding-left: 1rem; */
 
-		.tag-color {
-			width: 8px;
-			height: 8px;
-			border-radius: 100%;
-		}
+    .tag-color {
+      width: 8px;
+      height: 8px;
+      border-radius: 100%;
+    }
 
-		.tag-name {
-			font-size: 12px;
-			font-weight: bold;
-		}
-	}
+    .tag-name {
+      font-size: 12px;
+      font-weight: bold;
+    }
+  }
 
-	button:disabled {
-		color: var(--artid-text-muted) !important;
-		cursor: not-allowed;
-	}
-	.a {
-		border-right: 1px solid;
-	}
+  button:disabled {
+    color: var(--artid-text-muted) !important;
+    cursor: not-allowed;
+  }
 
-	.artid-image {
-		width: 150px;
-		object-fit: contain;
-		aspect-ratio: 1 / 1;
-	}
+  .a {
+    border-right: 1px solid;
+  }
 
-	.badge-type {
-		display: inline-flex;
-		align-items: center;
-		justify-content: center;
-		width: 2.25rem;
-		height: 2.25rem;
-		flex-shrink: 0;
-		border-radius: 0.4rem;
-		font-size: 0.7rem;
-		letter-spacing: 0.02em;
-	}
+  .artid-image {
+    width: 150px;
+    object-fit: contain;
+    aspect-ratio: 1 / 1;
+  }
 
-	.description-editor {
-		:global(.ql-toolbar.ql-snow) {
-			border-color: var(--artid-border);
-			border-top-left-radius: 0.5rem;
-			border-top-right-radius: 0.5rem;
-		}
+  .badge-type {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    flex-shrink: 0;
+    border-radius: 0.4rem;
+    font-size: 0.7rem;
+    letter-spacing: 0.02em;
+  }
 
-		:global(.ql-container.ql-snow) {
-			height: 10rem;
-			border-color: var(--artid-border);
-			border-bottom-left-radius: 0.5rem;
-			border-bottom-right-radius: 0.5rem;
-		}
-	}
+  .description-editor {
+    :global(.ql-toolbar.ql-snow) {
+      border-color: var(--artid-border);
+      border-top-left-radius: 0.5rem;
+      border-top-right-radius: 0.5rem;
+    }
+
+    :global(.ql-container.ql-snow) {
+      height: 10rem;
+      border-color: var(--artid-border);
+      border-bottom-left-radius: 0.5rem;
+      border-bottom-right-radius: 0.5rem;
+    }
+  }
 </style>
