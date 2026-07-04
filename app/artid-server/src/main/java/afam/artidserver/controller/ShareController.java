@@ -55,8 +55,14 @@ public class ShareController {
     }
 
     @DeleteMapping("/external")
+    public ResponseEntity<Void> deleteExternalShares(@AuthenticationPrincipal AuthenticatedUser principal, @RequestBody List<Long> shareIds) {
+        shareService.deleteExternalShares(principal.getId(), shareIds);
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/internal")
     public ResponseEntity<Void> deleteShares(@AuthenticationPrincipal AuthenticatedUser principal, @RequestBody List<Long> shareIds) {
-        shareService.deleteAll(principal.getId(), shareIds);
+        shareService.deleteInternalShares(principal.getId(), shareIds);
         return ResponseEntity.noContent().build();
     }
 

@@ -16,6 +16,7 @@
 	import 'quill/dist/quill.snow.css';
 	import ArtidDropdown from '$lib/components/ui/artid-dropdown.svelte';
 	import ArtidAddTagsModal from '$lib/components/pages/artid/artid-add-tags-modal.svelte';
+	import ArtidAddInternalShareModal from '$lib/components/pages/artid/artid-add-internal-share-modal.svelte';
 
 	const id = $derived(page.params.id);
 
@@ -139,6 +140,7 @@
 
 	let isOpen = $state(false);
 	let isTagOpen = $state(false);
+	let isInternalShareOpen = $state(false);
 
 	let isDeleting = $state(false);
 
@@ -275,7 +277,7 @@
 	);
 
 	$effect(() => {
-		if (selectedVisibility && selectedVisibility !== data.artid.visibilityState) {
+		if (selectedVisibility && selectedVisibility !== artid.visibilityState) {
 			console.log(`L'utente ha scelto l'azione: ${selectedVisibility}`);
 			handleUpdateVisibility(selectedVisibility);
 		}
@@ -290,6 +292,7 @@
 
 			if (!response.error) {
 				toast.success('Visibilità aggiornata con successo');
+				artid.visibilityState = selectedVisibility;
 			} else {
 				toast.error('Errore durante la modifica della visibilità');
 			}
@@ -396,6 +399,8 @@
 						fullWidth={false}
 						btnStyle="primary"
 						outline={true}
+						disabled={(artid.visibilityState as VisibilityType) === 'private'}
+						onclick={() => (isInternalShareOpen = !isInternalShareOpen)}
 					/>
 					<ArtidButton label="Crea link" icon="link-45deg" fullWidth={false} btnStyle="primary" />
 				</div>
@@ -553,6 +558,7 @@
 
 <ArtidAddMaterialsModal bind:isOpen bind:artidMaterials={draggableMaterials} artidId={Number(id)} />
 <ArtidAddTagsModal bind:isOpen={isTagOpen} bind:artidTags artidId={Number(id)} />
+<ArtidAddInternalShareModal bind:isOpen={isInternalShareOpen} artidId={Number(id)} />
 
 <style lang="scss">
   .artid-favourite {

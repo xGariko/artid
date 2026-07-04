@@ -3,6 +3,7 @@ package afam.artidserver.dao;
 import afam.artidserver.model.dto.InternalShareArtIDExtendedResponse;
 import afam.artidserver.model.dto.InternalShareArtIDResponse;
 import afam.artidserver.model.entity.InternalShare;
+import org.springframework.data.jdbc.repository.query.Modifying;
 import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.ListCrudRepository;
 import org.springframework.data.repository.query.Param;
@@ -36,6 +37,7 @@ public interface InternalShareDAO extends ListCrudRepository<InternalShare, Long
             JOIN artid a ON s.id_artid = a.id
             LEFT JOIN file f ON a.id_thumbnail = f.id
             WHERE s.id_user_from = :userId
+            ORDER BY s.created_at
             """)
     List<InternalShareArtIDResponse> getInternalSharesFromUserID(@Param("userId") Long userId);
 
@@ -45,7 +47,15 @@ public interface InternalShareDAO extends ListCrudRepository<InternalShare, Long
             JOIN artid a ON s.id_artid = a.id
             JOIN user u ON u.id = s.id_user_from
             LEFT JOIN file f ON a.id_thumbnail = f.id
-            WHERE s.id_user_ti = :userId
+            WHERE s.id_user_to = :userId
+            ORDER BY s.created_at
             """)
     List<InternalShareArtIDExtendedResponse> getInternalSharesToUserID(@Param("userId") Long userId);
+
+    @Modifying
+    @Query(value = """
+        DELETE FROM internal_share s
+        WHERE s.id IN (:shareIds) AND s.id_user_from = :userId
+        """)
+    void deleteSharesByIds(@Param("userId") Long userId, @Param("shareIds") List<Long> shareIds);
 }

@@ -11,6 +11,7 @@ import afam.artidserver.model.dto.VisibilityUpdateRequest;
 import afam.artidserver.security.AuthenticatedUser;
 import afam.artidserver.service.ArtidService;
 import afam.artidserver.service.ResourceService;
+import afam.artidserver.service.ShareService;
 import afam.artidserver.service.TagService;
 import afam.artidserver.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -37,6 +38,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ArtidController {
 
+    private final ShareService shareService;
     private final TagService tagService;
     private final ArtidService artidService;
     private final ResourceService resourceService;
@@ -201,6 +203,24 @@ public class ArtidController {
             // oppure il tag non era associato
             return ResponseEntity.notFound().build();
         }
+    }
+
+    @PostMapping("/{id}/share/internal")
+    public ResponseEntity<Void> addInternalShared(@PathVariable Long id, @RequestBody String email,
+            @AuthenticationPrincipal AuthenticatedUser principal) {
+
+        try {
+            // Esegue il servizio (controlla se esiste, se è tuo, se accetta e salva)
+            shareService.addInternalShare(id, email, principal.getId());
+        } catch (Exception e) {
+            // Cattura QUALSIASI errore (utente non trovato, condivisione con se stessi,
+            // ecc.)
+            // e fa finta di nulla stampando solo un log sul server per debug
+            System.out.println("Condivisione silenziata per privacy/sicurezza: " + e.getMessage());
+        }
+
+        // Risponde SEMPRE 200 OK se la mail era scritta bene
+        return ResponseEntity.ok().build();
     }
 
 }
