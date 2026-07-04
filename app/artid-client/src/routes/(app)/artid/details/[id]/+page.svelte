@@ -10,11 +10,12 @@
 	import ArtidInput from '$lib/components/ui/artid-input.svelte';
 	import { badgeColorForExtension, badgeLabelForExtension } from '$lib/utilities';
 	import ArtidAddMaterialsModal from '$lib/components/pages/artid/artid-add-materials-modal.svelte';
-	import type { ResourceResponse } from '$lib/api/types';
+	import type { ResourceResponse, TagResponse } from '$lib/api/types';
 	import { toast } from 'svelte-sonner';
 	import { api } from '$lib/api/browser-client';
 	import 'quill/dist/quill.snow.css';
 	import ArtidDropdown from '$lib/components/ui/artid-dropdown.svelte';
+	import ArtidAddTagsModal from '$lib/components/pages/artid/artid-add-tags-modal.svelte';
 
 	const id = $derived(page.params.id);
 
@@ -24,8 +25,11 @@
 	let artid = $state(data.artid);
 
 	let draggableMaterials: ResourceResponse[] = $state([]);
+	let artidTags: TagResponse[] = $state([]);
+
 	$effect(() => {
 		draggableMaterials = data.materials ?? [];
+		artidTags = data.tags ?? [];
 	});
 
 	let searchQuery = $state('');
@@ -134,6 +138,7 @@
 	}
 
 	let isOpen = $state(false);
+	let isTagOpen = $state(false);
 
 	let isDeleting = $state(false);
 
@@ -292,6 +297,36 @@
 			toast.error('Errore di rete');
 		}
 	}
+
+	async function handleDeleteTag(tagId: number) {
+		if (isDeleting) return;
+
+		isDeleting = true;
+
+		try {
+			const response = await api.DELETE('/api/artids/{id}/tags/{tagId}', {
+				params: {
+					path: {
+						id: Number(id),
+						tagId: tagId
+					}
+				}
+			});
+
+			console.log(response);
+
+			if (!response.error) {
+				artidTags = artidTags.filter((t) => t.id !== tagId);
+				toast.success('Tag rimosso con successo');
+			} else {
+				toast.error('Errore durante la rimozione del tag');
+			}
+		} catch {
+			toast.error('Errore di rete');
+		} finally {
+			isDeleting = false;
+		}
+	}
 </script>
 
 <div class="w-100 h-100 d-flex flex-column align-items-center gap-4 p-5">
@@ -301,7 +336,7 @@
 				<button
 					class="rounded-3 border-0 bg-transparent border-end border-artid-border outline-0 py-3 px-4 me-2 artid-favourite"
 					aria-label="favourite"
-					onclick={() => handleFavourite()}
+					onclick={handleFavourite}
 				>
 					{#if artid.favourite}
 						<i class="bi bi-star-fill text-warning fs-4"></i>
@@ -311,17 +346,29 @@
 				</button>
 				<div class="tag-container">
 					<ul class="list-unstyled mb-0 d-flex gap-2 flex-wrap">
-						{#each Array(10) as _, i (i)}
-							<li class="tag d-flex align-items-center px-1 rounded-4">
-								<span class="tag-color me-1"></span>
-								<span class="tag-name"> Tag{i}</span>
-								<i class="bi bi-x fs-6"></i>
+						{#each artidTags as tag (tag.id)}
+							<li
+								class="tag d-flex align-items-center px-1 rounded-4 bg-artid-surface border border-artid-border"
+							>
+								<span class="tag-color me-1" style="background-color: #{tag.color};"></span>
+								<span class="tag-name">{tag.title}</span>
+								<button
+									class="p-0 m-0 border-0 bg-transparent"
+									onclick={() => handleDeleteTag(tag.id!)}
+									aria-label="button"
+								>
+									<i class="bi bi-x fs-6 text-danger"></i>
+								</button>
 							</li>
 						{/each}
 					</ul>
-					<span class="text-artid text-decoration-underline" style="cursor: pointer;"
-						>Aggiungi Tag +</span
+					<button
+						class="text-artid text-decoration-underline bg-transparent border-0 p-0"
+						onclick={() => (isTagOpen = !isTagOpen)}
+						disabled={artidTags.length >= 5}
 					>
+						<span>Aggiungi Tag +</span>
+					</button>
 				</div>
 			</div>
 			<div class="col-6 d-flex align-items-center justify-content-between">
@@ -496,6 +543,7 @@
 </div>
 
 <ArtidAddMaterialsModal bind:isOpen bind:artidMaterials={draggableMaterials} artidId={Number(id)} />
+<ArtidAddTagsModal bind:isOpen={isTagOpen} bind:artidTags artidId={Number(id)} />
 
 <style lang="scss">
 	.artid-favourite {
@@ -514,16 +562,11 @@
 		/* display: flex;
 		align-items: center; */
 		/* gap: 1rem; */
-		background-color: rgb(0, 255, 170);
 		/* padding-left: 1rem; */
-		i {
-			color: red;
-		}
 
 		.tag-color {
 			width: 8px;
 			height: 8px;
-			background-color: blue;
 			border-radius: 100%;
 		}
 
@@ -531,6 +574,11 @@
 			font-size: 12px;
 			font-weight: bold;
 		}
+	}
+
+	button:disabled {
+		color: var(--artid-text-muted) !important;
+		cursor: not-allowed;
 	}
 	.a {
 		border-right: 1px solid;

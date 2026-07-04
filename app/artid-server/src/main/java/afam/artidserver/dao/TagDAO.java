@@ -1,17 +1,28 @@
-// package afam.artidserver.dao;
+package afam.artidserver.dao;
 
-// import afam.artidserver.model.dto.TagResponse;
-// import afam.artidserver.model.entity.Tag;
-// import org.springframework.data.repository.ListCrudRepository;
+import afam.artidserver.model.entity.Tag;
 
-// import java.util.Collection;
-// import java.util.List;
-// import java.util.Optional;
+import org.springframework.data.jdbc.repository.query.Query;
+import org.springframework.data.repository.ListCrudRepository;
+import org.springframework.data.repository.query.Param;
 
-// public interface TagDAO extends ListCrudRepository<Tag, Long> {
+import java.util.List;
 
-// List<Tag> findByUserId(Long userId);
+public interface TagDAO extends ListCrudRepository<Tag, Long> {
 
-// boolean existsByTitleAndUserId(String title, Long userId);
+    List<Tag> findByIdUser(Long userId);
 
-// }
+    boolean existsByTitleAndIdUser(String title, Long userId);
+
+    @Query("""
+            SELECT t.* FROM tag t
+            JOIN artid_tag at ON at.id_tag = t.id
+            JOIN artid a ON a.id = at.id_artid
+            WHERE at.id_artid = :artidId
+              AND a.id_user = :userId
+              AND t.id_user = :userId
+              AND a.deleted_at IS NULL
+            ORDER BY t.title ASC
+            """)
+    List<Tag> findByArtidForUser(@Param("artidId") Long artidId, @Param("userId") Long userId);
+}

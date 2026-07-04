@@ -1,16 +1,17 @@
 package afam.artidserver.controller;
 
-import afam.artidserver.model.VISIBILITY_STATE;
 import afam.artidserver.model.dto.ArtidCreateRequest;
 import afam.artidserver.model.dto.ArtidDetailsUpdateRequest;
 import afam.artidserver.model.dto.ArtidResponse;
 import afam.artidserver.model.dto.CountResponse;
 import afam.artidserver.model.dto.PublicArtidDetailResponse;
 import afam.artidserver.model.dto.ResourceResponse;
+import afam.artidserver.model.dto.TagResponse;
 import afam.artidserver.model.dto.VisibilityUpdateRequest;
 import afam.artidserver.security.AuthenticatedUser;
 import afam.artidserver.service.ArtidService;
 import afam.artidserver.service.ResourceService;
+import afam.artidserver.service.TagService;
 import afam.artidserver.service.UserService;
 import lombok.RequiredArgsConstructor;
 
@@ -36,6 +37,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ArtidController {
 
+    private final TagService tagService;
     private final ArtidService artidService;
     private final ResourceService resourceService;
     private final UserService userService;
@@ -120,7 +122,7 @@ public class ArtidController {
             @PathVariable Long resourceId, @AuthenticationPrincipal AuthenticatedUser principal) {
 
         // Chiamata al servizio per gestire la logica di cancellazione
-        boolean removed = artidService.removeResourceFromArtid(id, resourceId);
+        boolean removed = artidService.removeResourceFromArtid(id, resourceId, principal.getId());
 
         if (removed) {
             // 204 No Content: l'operazione è riuscita e non c'è nulla da ritornare nel body
@@ -167,6 +169,38 @@ public class ArtidController {
         return updated
                 ? ResponseEntity.noContent().build()
                 : ResponseEntity.notFound().build();
+    }
+
+    @GetMapping("/{id}/tags")
+    public ResponseEntity<List<TagResponse>> findTags(@PathVariable Long id,
+            @AuthenticationPrincipal AuthenticatedUser principal) {
+
+        return ResponseEntity.ok(tagService.findByArtid(id, principal.getId()));
+    }
+
+    @PostMapping("/{id}/tags")
+    public ResponseEntity<Void> addTags(@PathVariable Long id,
+            @AuthenticationPrincipal AuthenticatedUser principal, @RequestBody Long tagId) {
+        artidService.linkArtidTag(id, tagId);
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/{id}/tags/{tagId}")
+    public ResponseEntity<Void> removeTagFromArtid(
+            @PathVariable Long id,
+            @PathVariable Long tagId, @AuthenticationPrincipal AuthenticatedUser principal) {
+
+        // Chiamata al servizio per gestire la logica di cancellazione
+        boolean removed = artidService.removeTagFromArtid(id, tagId, principal.getId());
+
+        if (removed) {
+            // 204 No Content: l'operazione è riuscita e non c'è nulla da ritornare nel body
+            return ResponseEntity.noContent().build();
+        } else {
+            // 404 Not Found: l'artid non esiste, non è di questo utente,
+            // oppure il tag non era associato
+            return ResponseEntity.notFound().build();
+        }
     }
 
 }

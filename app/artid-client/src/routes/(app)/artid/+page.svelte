@@ -25,6 +25,8 @@
 	let title = $state('');
 	let tag = $state('');
 
+	let tagList = $state(data.tags ?? []);
+
 	function handleNewArtid(): void {
 		isOpen = true;
 		console.log('New artid');
@@ -34,7 +36,7 @@
 		isTagOpen = true;
 	}
 
-	async function createNewArtid(): Promise<void> {
+	async function createNewArtid() {
 		if (isSaving) return;
 
 		const trimmed = title.trim();
@@ -67,7 +69,7 @@
 		}
 	}
 
-	async function createNewTag(): Promise<void> {
+	async function createNewTag() {
 		if (isSaving) return;
 
 		const trimmed = tag.trim();
@@ -77,19 +79,34 @@
 		}
 
 		isSaving = true;
+
+		console.log(trimmed);
+
 		try {
 			const { data, error: err } = await api.POST('/api/tags', {
-				body: { tag: trimmed }
+				body: { title: trimmed }
 			});
 
-			if (err || !data?.id) {
-				console.log(err);
-				toast.error('Errore nella creazione del tag');
+			if (err) {
+				// eslint-disable-next-line @typescript-eslint/no-explicit-any
+				const serverError = err as any;
+
+				if (serverError.status === 409 || serverError.message?.includes('già creato')) {
+					toast.error(`Il tag "${trimmed}" esiste già!`);
+				} else if (serverError.status === 400) {
+					toast.error('Il nome contiene termini non consentiti.');
+				} else {
+					toast.error('Errore nella creazione del tag');
+				}
 				return;
 			}
 
-			isOpen = false;
+			tagList?.push(data);
+
+			isTagOpen = false;
 			tag = '';
+
+			toast.success('Tag creato con successo');
 		} catch (e) {
 			toast.error(e instanceof Error ? e.message : 'Errore di rete');
 		} finally {
@@ -155,7 +172,7 @@
 		},
 		{
 			label: 'Tag',
-			tags: (data.tags ?? []).map((tag) => {
+			tags: tagList.map((tag) => {
 				return { id: tag.id!, title: tag.title!, color: tag.color! };
 			})
 		}
@@ -243,4 +260,3 @@
 		</div>
 	</div>
 </ArtidEditorModal>
-
