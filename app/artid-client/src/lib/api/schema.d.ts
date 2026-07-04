@@ -388,6 +388,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/artids/{id}/share/internal": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["addInternalShared"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/artids/{id}/resources": {
         parameters: {
             query?: never;
@@ -526,7 +542,7 @@ export interface paths {
         get: operations["getExternalByAuthor"];
         put?: never;
         post?: never;
-        delete?: never;
+        delete: operations["deleteShares"];
         options?: never;
         head?: never;
         patch?: never;
@@ -1940,6 +1956,30 @@ export interface operations {
             };
         };
     };
+    addInternalShared: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": string;
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
     findResources: {
         parameters: {
             query?: never;
@@ -2154,6 +2194,28 @@ export interface operations {
                 content: {
                     "*/*": components["schemas"]["ExternalShareArtIDResponse"][];
                 };
+            };
+        };
+    };
+    deleteShares: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": number[];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };
