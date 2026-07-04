@@ -20,7 +20,7 @@
 
 	async function handleLogout() {
 		await fetch(resolve('/logout'), { method: 'POST' });
-		await goto(resolve('/login'));
+		await goto(resolve('/welcome'));
 	}
 
 	// Stesso match per prefisso usato da ArtidLink, replicato per i dropdown-item.

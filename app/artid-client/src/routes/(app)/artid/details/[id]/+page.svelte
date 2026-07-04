@@ -1,12 +1,11 @@
 <script lang="ts">
 	import ArtidButton from '$lib/components/ui/artid-button.svelte';
-	import { goto } from '$app/navigation';
+	import { goto, invalidateAll } from '$app/navigation';
 	import { resolve } from '$app/paths';
 	import { page } from '$app/state';
 	import { dndzone } from 'svelte-dnd-action';
 	import type { PageData } from './$types';
 
-	import artidimage from '$lib/assets/artid_logo_outline_primary.svg';
 	import ArtidInput from '$lib/components/ui/artid-input.svelte';
 	import { badgeColorForExtension, badgeLabelForExtension } from '$lib/utilities';
 	import ArtidAddMaterialsModal from '$lib/components/pages/artid/artid-add-materials-modal.svelte';
@@ -17,6 +16,8 @@
 	import ArtidDropdown from '$lib/components/ui/artid-dropdown.svelte';
 	import ArtidAddTagsModal from '$lib/components/pages/artid/artid-add-tags-modal.svelte';
 	import ArtidAddInternalShareModal from '$lib/components/pages/artid/artid-add-internal-share-modal.svelte';
+	import ArtidCreateLinkModal from '$lib/components/pages/artid/artid-create-link-modal.svelte';
+	import ArtidModal from '$lib/components/ui/artid-modal.svelte';
 
 	const id = $derived(page.params.id);
 
@@ -49,8 +50,9 @@
 	let selectedImage: File | null = $state(null);
 	let imagePreview = $state('');
 
-	// let srcImage = $derived(selectedImage ?? data.artid.idThumbnail);
-	let srcImage = $derived(selectedImage ? imagePreview : artidimage);
+	// Preview locale durante la selezione, altrimenti la thumbnail salvata (presigned URL da data,
+	// rinfrescata via invalidateAll dopo il salvataggio). Se assente, il template mostra il placeholder.
+	let srcImage = $derived(selectedImage ? imagePreview : data.artid.thumbnailUrl);
 
 	const modelArtIDTitle = data.artid.title ?? '';
 	let inputTitleValue = $state(modelArtIDTitle);
@@ -141,6 +143,7 @@
 	let isOpen = $state(false);
 	let isTagOpen = $state(false);
 	let isInternalShareOpen = $state(false);
+	let isCreateLinkOpen = $state(false);
 
 	let isDeleting = $state(false);
 
@@ -173,6 +176,12 @@
 		}
 	}
 
+	let showDeleteModal = $state(false);
+
+	function askDelete(){
+		showDeleteModal = true;
+	}
+
 	async function handleDelete() {
 		try {
 			const response = await api.DELETE('/api/artids/{id}', {
@@ -188,6 +197,7 @@
 		} catch {
 			toast.error('Errore di rete');
 		}
+		showDeleteModal = false;
 	}
 
 	async function handleFavourite() {
@@ -223,7 +233,7 @@
 		if (target.files && target.files.length > 0) {
 			selectedImage = target.files[0];
 			imagePreview = URL.createObjectURL(selectedImage);
-			toast.warning('Ricordati di cliccare il tasto SALVA per aggiornare l\'immagine');
+			toast.warning('Ricordati di cliccare il tasto "Salva" per aggiornare l\'immagine');
 		}
 	}
 
@@ -251,6 +261,9 @@
 			});
 
 			if (!response.error) {
+				// La PUT risponde 204 senza body: ricarico la load per ottenere il thumbnailUrl
+				// (presigned) aggiornato dal server prima di azzerare il preview locale.
+				await invalidateAll();
 				toast.success('Dettagli aggiornati con successo');
 				selectedImage = null;
 				imagePreview = '';
@@ -380,7 +393,7 @@
 					fullWidth={false}
 					btnStyle="danger"
 					outline={true}
-					onclick={handleDelete}
+					onclick={askDelete}
 				/>
 				<div style="padding-right: calc(var(--bs-gutter-x)*0.5);">
 					<ArtidButton
@@ -402,7 +415,13 @@
 						disabled={(artid.visibilityState as VisibilityType) === 'private'}
 						onclick={() => (isInternalShareOpen = !isInternalShareOpen)}
 					/>
-					<ArtidButton label="Crea link" icon="link-45deg" fullWidth={false} btnStyle="primary" />
+					<ArtidButton
+							label="Crea link"
+							icon="link-45deg"
+							fullWidth={false}
+							btnStyle="primary"
+							onclick={() => (isCreateLinkOpen = true)}
+						/>
 				</div>
 			</div>
 		</div>
@@ -427,7 +446,13 @@
 					onchange={handleImageSelect}
 				/>
 				<label for="image-input" style="cursor: pointer">
-					<img src={srcImage} alt="" class="artid-image" />
+					{#if srcImage}
+						<img src={srcImage} alt="" class="artid-image" />
+					{:else}
+						<div class="artid-image-placeholder" title="Carica un'immagine">
+							<i class="bi bi-image-fill"></i>
+						</div>
+					{/if}
 				</label>
 				<div class="flex-grow-1 d-flex flex-column justify-content-between">
 					<ArtidInput name="artid" label="Titolo" bind:value={inputTitleValue} />
@@ -496,6 +521,7 @@
 								type="text"
 								class="form-control rounded-3 ps-5 py-2 search-input"
 								placeholder="Cerca materiali"
+								disabled="{filteredMaterials.length === 0}"
 								bind:value={searchQuery}
 							/>
 						</div>
@@ -504,7 +530,7 @@
 					<div class="p-2 flex-grow-1" style="overflow-y: auto; min-height: 0;">
 						{#if filteredMaterials.length === 0}
 							<div class="w-100 h-100 d-flex align-items-center justify-content-center">
-								<span class="fw-bold fst-italic text-secondary">
+								<span class="fw-bold fst-italic text-artid-text-muted">
 									Aggiungi un materiale per iniziare.
 								</span>
 							</div>
@@ -556,9 +582,19 @@
 	</div>
 </div>
 
+
+<ArtidModal
+	bind:isOpen={showDeleteModal}
+	title="Conferma eliminazione"
+	onConfirm={handleDelete}
+	message="Sei sicuro di voler cancellare '{artid.title}' ?"
+	btnStyle="danger"
+/>
+
 <ArtidAddMaterialsModal bind:isOpen bind:artidMaterials={draggableMaterials} artidId={Number(id)} />
 <ArtidAddTagsModal bind:isOpen={isTagOpen} bind:artidTags artidId={Number(id)} />
 <ArtidAddInternalShareModal bind:isOpen={isInternalShareOpen} artidId={Number(id)} />
+<ArtidCreateLinkModal bind:isOpen={isCreateLinkOpen} artidId={Number(id)} />
 
 <style lang="scss">
   .artid-favourite {
@@ -604,6 +640,34 @@
     width: 150px;
     object-fit: contain;
     aspect-ratio: 1 / 1;
+  }
+
+  // Placeholder mostrato quando l'ArtID non ha ancora una thumbnail: stesso
+  // ingombro dell'immagine, tile flat con bordo tratteggiato = "slot vuoto".
+  .artid-image-placeholder {
+    width: 150px;
+    aspect-ratio: 1 / 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px dashed var(--artid-border);
+    border-radius: 0.75rem;
+    background-color: var(--artid-surface);
+    color: var(--artid-primary);
+    transition:
+      border-color 0.15s ease,
+      background-color 0.15s ease,
+      color 0.15s ease;
+
+    i {
+      font-size: 3rem;
+      line-height: 1;
+    }
+
+    &:hover {
+      border-color: var(--artid-primary);
+      background-color: var(--artid-muted);
+    }
   }
 
   .badge-type {

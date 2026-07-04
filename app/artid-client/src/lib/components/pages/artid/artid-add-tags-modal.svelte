@@ -16,7 +16,6 @@
 		artidId: number;
 	} = $props();
 
-	let loading = $state(true);
 	let userTags: TagResponse[] = $state([]);
 	let isSaving = $state(false);
 
@@ -26,7 +25,6 @@
 	const canAddTag = $derived(tagsNumber <= 5);
 
 	async function fetchAllTags() {
-		loading = true;
 
 		try {
 			const result = await api.GET('/api/tags', { credentials: 'include' });
@@ -41,7 +39,6 @@
 		} catch {
 			toast.error('Errore nel caricamento dei tag');
 		} finally {
-			loading = false;
 			selectedTagsIds = new Set();
 		}
 	}

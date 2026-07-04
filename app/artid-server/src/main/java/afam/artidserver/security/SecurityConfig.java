@@ -49,6 +49,8 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/users/*/public").permitAll()
                         // Dettaglio ArtID pubblico (Explore → /explore/[id]/artid/[artidId]): senza login.
                         .requestMatchers(HttpMethod.GET, "/api/users/*/public/artids/*").permitAll()
+                        // Anteprima ArtID via link di condivisione (/s/[token]): aperta senza login.
+                        .requestMatchers(HttpMethod.GET, "/api/shares/public/*").permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);

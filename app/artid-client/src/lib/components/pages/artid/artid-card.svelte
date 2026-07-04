@@ -57,7 +57,7 @@
 	class="rounded-3 border border-artid-border w-100 d-block text-decoration-none artid-card z-2"
 >
 	<div class="card-image p-4">
-		<img src={artidImage} alt={`${artid.title} image`} />
+		<img src={artid.thumbnailUrl ?? artidImage} alt={`${artid.title} image`} />
 		{#if filter === 'mine'}
 				<button class="position-absolute w-10 h-10 border-1 border-artid-border rounded-pill p-3 border bg-artid-section z-3"
 				      style="right: 0px; top: 0px; transform: translate(25%, -25%);"

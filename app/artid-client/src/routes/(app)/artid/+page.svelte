@@ -41,7 +41,7 @@
 
 		const trimmed = title.trim();
 		if (trimmed.length <= 0) {
-			toast.error("Inserisci il nome dell'artid");
+			toast.error('Inserisci il nome dell\'artid');
 			return;
 		}
 
@@ -53,7 +53,7 @@
 			});
 
 			if (err || !data?.id) {
-				toast.error("Errore nella creazione dell'ArtID");
+				toast.error('Errore nella creazione dell\'ArtID');
 				return;
 			}
 
@@ -204,12 +204,19 @@
 	</div>
 </div>
 
-<ArtidEditorModal bind:isOpen>
-	<div class="text-artid-primary fw-semibold new-artid-modal">
-		<i class="bi bi-folder2-open fs-5 text-primary"></i>
-		<span>Nuovo ArtID</span>
+<ArtidEditorModal bind:isOpen customHeight="25">
+	<div class="text-artid-primary fw-semibold new-artid-modal h-100 d-flex justify-content-between flex-column">
+		<div class="d-flex align-items-center gap-2">
+			<i class="bi bi-folder2-open fs-5 text-primary"></i>
+			<span>Nuovo ArtID</span>
+		</div>
 		<div class="my-2">
-			<ArtidInput name="artid-title" label="Titolo" bind:value={title} />
+			<ArtidInput
+				name="artid-title"
+				label="Titolo"
+				bind:value={title}
+				onkeydown={(e) => e.key === 'Enter' && createNewArtid()}
+			/>
 		</div>
 		<div class="d-flex justify-content-end gap-2">
 			<ArtidButton
@@ -232,30 +239,35 @@
 	</div>
 </ArtidEditorModal>
 
-<ArtidEditorModal bind:isOpen={isTagOpen}>
+<ArtidEditorModal bind:isOpen={isTagOpen} customHeight="25">
 	<div class="text-artid-primary fw-semibold new-artid-modal">
-		<i class="bi bi-folder2-open fs-5 text-primary"></i>
-		<span>Nuovo Tag</span>
-		<div class="my-2">
-			<ArtidInput name="tag" label="Tag" bind:value={tag} />
+		<div class="d-flex align-items-center gap-2">
+			<i class="bi bi-tags-fill fs-5 text-primary"></i>
+			<span>Nuovo Tag</span>
 		</div>
-		<div class="d-flex justify-content-end gap-2">
-			<ArtidButton
-				label="Chiudi"
-				fullWidth={false}
-				btnStyle="secondary"
-				outline={true}
-				disabled={isSaving}
-				onclick={() => (isTagOpen = false)}
-			/>
-			<ArtidButton
-				label="Crea"
-				fullWidth={false}
-				btnStyle="success"
-				icon="check2"
-				disabled={isSaving}
-				onclick={createNewTag}
-			/>
+		<div class="d-flex justify-content-between flex-column h-100">
+			<div class="my-2">
+				<ArtidInput name="tag" label="Tag" bind:value={tag} />
+			</div>
+			<div class="d-flex justify-content-end h-auto gap-2">
+				<ArtidButton
+					label="Chiudi"
+					fullWidth={false}
+					btnStyle="secondary"
+					outline={true}
+					disabled={isSaving}
+					onclick={() => (isTagOpen = false)}
+				/>
+				<ArtidButton
+					label="Crea"
+					fullWidth={false}
+					btnStyle="success"
+					icon="check2"
+					disabled={isSaving}
+					onclick={createNewTag}
+				/>
+			</div>
 		</div>
+
 	</div>
 </ArtidEditorModal>

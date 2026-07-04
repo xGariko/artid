@@ -26,7 +26,7 @@
 	} = $props();
 </script>
 
-<Modal {isOpen} class="border border-artid-border rounded-3 bg-artid-section">
+<Modal {isOpen} class="border border-artid-border rounded-3 bg-artid-section z-3">
 	<ModalHeader>{title}</ModalHeader>
 	<ModalBody>
 		{message}

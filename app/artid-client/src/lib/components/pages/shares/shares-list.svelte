@@ -1,5 +1,6 @@
 <script lang="ts">
-	import { invalidateAll } from '$app/navigation';
+	import { invalidateAll, goto } from '$app/navigation';
+	import { resolve } from '$app/paths';
 	import { api } from '$lib/api/browser-client';
 	import ArtidButton from '$lib/components/ui/artid-button.svelte';
 	import ArtidLogoIconWhite from '$lib/assets/artid_logo_icon_white.svg';
@@ -29,8 +30,15 @@
 
 	let showDeleteModal = $state(false);
 	let showModifyDescriptionModal = $state(false);
+	let showExtendModal = $state(false);
 
 	let isSaving = $state(false);
+
+	// Data (yyyy-MM-dd) scelta nella modale "Prolunga scadenza".
+	let newExpirationDate = $state('');
+
+	// Bozza descrizione modificata nella modale "Modifica descrizione".
+	let descriptionDraft = $state('');
 
 	const singleSelectedShare = $derived(
 		selectedSharesIds.size === 1
@@ -51,7 +59,7 @@
 
 	const areAllFilteredSelected = $derived(
 		filteredShares.length > 0 &&
-			filteredShares.every((share) => share.id != null && selectedSharesIds.has(share.id))
+		filteredShares.every((share) => share.id != null && selectedSharesIds.has(share.id))
 	);
 
 	const hasSelection = $derived(selectedSharesIds.size > 0);
@@ -76,6 +84,47 @@
 				share.isActive === true
 		)
 	);
+
+	// Share esterno singolo selezionato: "Prolunga scadenza" è attivo solo su externals/expired.
+	const selectedExternalShare = $derived(
+		filter === 'externals' || filter === 'expired'
+			? (singleSelectedShare as ExternalShareArtIDResponse | undefined)
+			: undefined
+	);
+
+	// Converte una Date in stringa yyyy-MM-dd (ora locale) per l'input type=date.
+	function toDateInputValue(date: Date): string {
+		const year = date.getFullYear();
+		const month = String(date.getMonth() + 1).padStart(2, '0');
+		const day = String(date.getDate()).padStart(2, '0');
+		return `${year}-${month}-${day}`;
+	}
+
+	// Data minima selezionabile: il giorno dopo la scadenza attuale, mai prima di domani
+	// (la proroga deve spostare la scadenza in avanti e nel futuro).
+	const minExpirationDate = $derived.by(() => {
+		const now = new Date();
+		let min = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+		const current = selectedExternalShare?.expirationDate;
+		if (current) {
+			const currentDate = new Date(current);
+			const dayAfterCurrent = new Date(
+				currentDate.getFullYear(),
+				currentDate.getMonth(),
+				currentDate.getDate() + 1
+			);
+			if (dayAfterCurrent > min) min = dayAfterCurrent;
+		}
+		return toDateInputValue(min);
+	});
+
+	// Le stringhe yyyy-MM-dd si confrontano lessicograficamente come date.
+	const extendError = $derived(
+		newExpirationDate && newExpirationDate < minExpirationDate
+			? 'La nuova scadenza deve essere successiva a quella attuale.'
+			: ''
+	);
+	const isExtendValid = $derived(!!newExpirationDate && !extendError);
 
 	function toggleShareSelection(shareId: number | undefined): void {
 		if (shareId == null) return;
@@ -121,7 +170,7 @@
 			});
 
 			if (!response.ok) {
-				toast.error("Errore nell'aggiornamento dello stato delle condivisioni");
+				toast.error('Errore nell\'aggiornamento dello stato delle condivisioni');
 				return;
 			}
 
@@ -144,9 +193,94 @@
 		}
 	}
 
+	async function handleExtend(): Promise<void> {
+		if (isSaving) return;
+		if (!selectedExternalShare?.id || !isExtendValid) return;
+
+		isSaving = true;
+		try {
+			// Scadenza a fine giornata: il link resta valido per tutto il giorno scelto.
+			const expirationDate = new Date(`${newExpirationDate}T23:59:59`).toISOString();
+			const response = await fetch('/api/shares/external/' + selectedExternalShare.id + '/expiration', {
+				method: 'PATCH',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ expirationDate })
+			});
+
+			if (!response.ok) {
+				toast.error('Errore nella proroga della scadenza.');
+				return;
+			}
+
+			toast.success('Scadenza prorogata con successo.');
+			selectedSharesIds = new Set();
+			invalidateAll();
+		} catch (e) {
+			toast.error(e instanceof Error ? e.message : 'Errore di rete');
+		} finally {
+			showExtendModal = false;
+			isSaving = false;
+		}
+	}
+
+	async function handleUpdateDescription(): Promise<void> {
+		if (isSaving) return;
+		if (!selectedExternalShare?.id) return;
+
+		isSaving = true;
+		try {
+			const response = await fetch('/api/shares/external/' + selectedExternalShare.id + '/description', {
+				method: 'PATCH',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ description: descriptionDraft })
+			});
+
+			if (!response.ok) {
+				toast.error('Errore nella modifica della descrizione.');
+				return;
+			}
+
+			toast.success('Descrizione aggiornata con successo.');
+			selectedSharesIds = new Set();
+			invalidateAll();
+		} catch (e) {
+			toast.error(e instanceof Error ? e.message : 'Errore di rete');
+		} finally {
+			showModifyDescriptionModal = false;
+			isSaving = false;
+		}
+	}
+
+	// Pulsante "Apri": anteprima in-app dell'ArtID collegato alla condivisione.
+	function openPreview(artidId: number | undefined): void {
+		if (artidId == null) {
+			toast.error('ArtID non collegato alla condivisione.');
+			return;
+		}
+		goto(resolve('/(app)/artid/details/[id]/preview', { id: String(artidId) }));
+	}
+
+	// Pulsante "Copia": genera il link pubblico della condivisione e lo copia negli appunti.
+	async function copyShareLink(shareId: number | undefined): Promise<void> {
+		if (shareId == null) return;
+		try {
+			const response = await fetch('/api/shares/external/' + shareId + '/link');
+			if (!response.ok) {
+				toast.error('Errore nella generazione del link.');
+				return;
+			}
+			const { token } = await response.json();
+			const url = `${window.location.origin}/s/${token}`;
+			await navigator.clipboard.writeText(url);
+			toast.success('Link di condivisione copiato negli appunti.');
+		} catch (e) {
+			toast.error(e instanceof Error ? e.message : 'Errore di rete');
+		}
+	}
+
 	let deleteLinkMessage = $derived.by(() => {
 		if (selectedSharesIds.size === 0) return '';
-		if (filter == "externals" || filter == "expired") {
+		if (filter == 'externals' || filter == 'expired') {
 			if (selectedSharesIds.size === 1) {
 				let share = singleSelectedShare as ExternalShareArtIDResponse;
 				if (!isExpired(share!.expirationDate)) {
@@ -171,7 +305,7 @@
 				return `Eliminare i ${selectedSharesIds.size} link selezionati?`;
 			}
 		} else {
-			return 'Sei sicuro di voler cancellare le condivisioni selezionate?'
+			return 'Sei sicuro di voler cancellare le condivisioni selezionate?';
 		}
 	});
 
@@ -180,7 +314,7 @@
 		if (selectedSharesIds.size === 0) return; //anche se non serve
 
 		isSaving = true;
-		let type = (filter == "externals" || filter == "expired") ? "external" : "internal"
+		let type = (filter == 'externals' || filter == 'expired') ? 'external' : 'internal';
 		try {
 			const response = await fetch('/api/shares/' + type, {
 				method: 'DELETE',
@@ -189,11 +323,11 @@
 			});
 
 			if (!response.ok) {
-				toast.error("Errore nell'eliminazione delle condivisioni.");
+				toast.error('Errore nell\'eliminazione delle condivisioni.');
 				return;
 			}
 
-			toast.success(type == "external" ? 'I link selezionati sono stati eliminati correttamente.' :
+			toast.success(type == 'external' ? 'I link selezionati sono stati eliminati correttamente.' :
 				'Le condivisioni selezionate sono state eliminate correttamente');
 			selectedSharesIds = new Set();
 			invalidateAll();
@@ -314,10 +448,24 @@
 						{extShare.description}
 					</div>
 					<div class="col-1 d-flex align-items-center justify-content-center gap-3">
-						<button class="btn btn-link p-0 text-artid-text" title="Apri">
+						<button
+							class="btn btn-link p-0 text-artid-text"
+							title="Apri anteprima"
+							onclick={(event) => {
+								event.stopPropagation();
+								openPreview(extShare.idArtid);
+							}}
+						>
 							<i class="bi bi-box-arrow-up-right fs-6"></i>
 						</button>
-						<button class="btn btn-link p-0 text-artid-text" title="Copia">
+						<button
+							class="btn btn-link p-0 text-artid-text"
+							title="Copia link"
+							onclick={(event) => {
+								event.stopPropagation();
+								copyShareLink(extShare.id);
+							}}
+						>
 							<i class="bi bi-copy fs-6"></i>
 						</button>
 					</div>
@@ -344,7 +492,8 @@
 				disabled={!hasSingleSelection}
 				fullWidth={false}
 				onclick={() => {
-					return;
+					newExpirationDate = '';
+					showExtendModal = true;
 				}}
 			/>
 			<ArtidButton
@@ -376,6 +525,7 @@
 				disabled={!hasSingleSelection}
 				fullWidth={false}
 				onclick={() => {
+					descriptionDraft = selectedExternalShare?.description ?? '';
 					showModifyDescriptionModal = true;
 				}}
 			/>
@@ -402,20 +552,69 @@
 	btnStyle="danger"
 />
 
+<ArtidEditorModal bind:isOpen={showExtendModal} customHeight="35">
+	<div class="d-flex flex-column align-items-start justify-content-between w-100 h-100 flex-fill">
+		<div class="text-artid-primary fw-semibold w-100 d-flex align-items-center gap-2">
+			<i class="bi bi-hourglass-split text-primary"></i>
+			<span>Prolunga scadenza</span>
+		</div>
+
+		<div class="w-100 d-flex flex-column gap-3">
+			{#if selectedExternalShare}
+				<span class="text-artid-text-muted">
+					Scadenza attuale:
+					<span class="fw-semibold">{formatItalianDate(selectedExternalShare.expirationDate)}</span>
+				</span>
+			{/if}
+
+			<ArtidInput
+				type="date"
+				name="newExpirationDate"
+				label="Nuova scadenza"
+				bind:value={newExpirationDate}
+				min={minExpirationDate}
+				error={extendError}
+			/>
+		</div>
+
+		<div class="w-100">
+			<div class="d-flex justify-content-end gap-2">
+				<ArtidButton
+					label="Chiudi"
+					fullWidth={false}
+					btnStyle="secondary"
+					outline={true}
+					disabled={false}
+					onclick={() => (showExtendModal = false)}
+				/>
+				<ArtidButton
+					label="Prolunga"
+					fullWidth={false}
+					btnStyle="success"
+					icon="check2"
+					disabled={!isExtendValid || isSaving}
+					onclick={handleExtend}
+				/>
+			</div>
+		</div>
+	</div>
+</ArtidEditorModal>
+
 <ArtidEditorModal bind:isOpen={showModifyDescriptionModal} customHeight="40">
-	<div class="d-flex flex-column align-items-start justify-content-around w-100 h-100 flex-fill">
-		<div class="text-artid-primary fw-semibold w-100">
-			<i class="bi bi-pencil fs-6 text-success"></i>
+	<div class="d-flex flex-column align-items-start justify-content-between w-100 h-100 flex-fill">
+		<div class="text-artid-primary fw-semibold w-100 d-flex align-items-center gap-2">
+			<i class="bi bi-pencil text-primary"></i>
 			<span>Inserisci la descrizione</span>
 		</div>
 
-		<div class="w-100 mb-5">
+		<div class="w-100 mb-5 d-flex flex-column justify-content-between">
 			<div class="my-2">
-				<textarea name="description" placeholder="Descrizione" class="w-100 artid-textarea" rows="8"
+				<textarea name="description" placeholder="Descrizione" class="w-100 form-control" style="resize: none;" rows="8"
+					bind:value={descriptionDraft}
 				></textarea>
 			</div>
 
-			<div class="w-100">
+			<div class="w-100 bottom-0">
 				<div class="d-flex justify-content-end gap-2">
 					<ArtidButton
 						label="Chiudi"
@@ -430,93 +629,78 @@
 						fullWidth={false}
 						btnStyle="success"
 						icon="check2"
-						disabled={false}
-						onclick={() => {
-							return;
-						}}
+						disabled={isSaving}
+						onclick={handleUpdateDescription}
 					/>
 				</div>
 			</div>
 		</div>
-	</div></ArtidEditorModal
->
+	</div>
+</ArtidEditorModal>
 
 <style>
-	.preview-small {
-		aspect-ratio: 1 !important;
-		object-fit: cover !important;
-	}
+    .preview-small {
+        aspect-ratio: 1 !important;
+        object-fit: cover !important;
+    }
 
-	.circle-small {
-		width: 10px;
-		height: 10px;
-		display: inline-block;
-	}
+    .circle-small {
+        width: 10px;
+        height: 10px;
+        display: inline-block;
+    }
 
-	.artid-textarea {
-		padding: 10px;
-		min-height: 200px;
-		resize: none;
-		border-radius: 5px;
-	}
+    .artid-list {
+        min-width: 60rem;
+    }
 
-	.artid-textarea:focus {
-		outline: none !important;
-		border: 1px solid #06c !important;
-		box-shadow: 0 0 3px #06c !important;
-	}
+    /*.search-input {*/
+    /*    border-color: var(--artid-border);*/
+    /*}*/
 
-	.artid-list {
-		min-width: 60rem;
-	}
+    /*.search-input:focus {*/
+    /*    border-color: var(--artid-primary);*/
+    /*    box-shadow: 0 0 0 0.2rem var(--artid-primary-subtle);*/
+    /*}*/
 
-	/*.search-input {*/
-	/*    border-color: var(--artid-border);*/
-	/*}*/
+    /* Header sticky: resta sopra le righe ma sotto le modali (z-index basso). */
+    .sticky-header {
+        position: sticky;
+        top: 0;
+        z-index: 1;
+    }
 
-	/*.search-input:focus {*/
-	/*    border-color: var(--artid-primary);*/
-	/*    box-shadow: 0 0 0 0.2rem var(--artid-primary-subtle);*/
-	/*}*/
+    /* Righe cliccabili con feedback hover (sostituisce .table-hover). */
+    .share-row {
+        transition: 0.2s ease all;
+        cursor: pointer;
+    }
 
-	/* Header sticky: resta sopra le righe ma sotto le modali (z-index basso). */
-	.sticky-header {
-		position: sticky;
-		top: 0;
-		z-index: 1;
-	}
+    .share-row:hover {
+        transition: 0.2s ease all;
+        background-color: var(--artid-surface);
+    }
 
-	/* Righe cliccabili con feedback hover (sostituisce .table-hover). */
-	.share-row {
-		transition: 0.2s ease all;
-		cursor: pointer;
-	}
+    /* Riga selezionata: tinta brand, evidenziata anche in hover. */
+    .share-row.selected {
+        transition: 0.2s ease all;
+        box-shadow: inset 6px 0px 0px -3px var(--artid-primary);
+    }
 
-	.share-row:hover {
-		transition: 0.2s ease all;
-		background-color: var(--artid-surface);
-	}
+    /* Consente al titolo di troncare con ellissi dentro la colonna flex. */
+    .share-title {
+        min-width: 0;
+    }
 
-	/* Riga selezionata: tinta brand, evidenziata anche in hover. */
-	.share-row.selected {
-		transition: 0.2s ease all;
-		box-shadow: inset 6px 0px 0px -3px var(--artid-primary);
-	}
-
-	/* Consente al titolo di troncare con ellissi dentro la colonna flex. */
-	.share-title {
-		min-width: 0;
-	}
-
-	.badge-type {
-		display: inline-flex;
-		align-items: center;
-		justify-content: center;
-		width: 2.25rem;
-		height: 2.25rem;
-		flex-shrink: 0;
-		border-radius: 0.4rem;
-		font-size: 0.7rem;
-		letter-spacing: 0.02em;
-	}
+    .badge-type {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 2.25rem;
+        height: 2.25rem;
+        flex-shrink: 0;
+        border-radius: 0.4rem;
+        font-size: 0.7rem;
+        letter-spacing: 0.02em;
+    }
 </style>

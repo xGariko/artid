@@ -11,5 +11,6 @@ public record ArtidResponse(
                 Boolean favourite,
                 String visibilityState,
                 OffsetDateTime createdAt,
-                OffsetDateTime lastModified) {
+                OffsetDateTime lastModified,
+                String thumbnailUrl) {
 }

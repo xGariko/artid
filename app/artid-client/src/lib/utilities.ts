@@ -27,6 +27,14 @@ export function formatItalianDateLong(isoDate: string | null | undefined): strin
 	return ITALIAN_DATE_FORMATTER_LONG.format(new Date(isoDate));
 }
 
+// Converte una Date in stringa yyyy-MM-dd (ora locale), formato richiesto dagli input type=date.
+export function toDateInputValue(date: Date): string {
+	const year = date.getFullYear();
+	const month = String(date.getMonth() + 1).padStart(2, '0');
+	const day = String(date.getDate()).padStart(2, '0');
+	return `${year}-${month}-${day}`;
+}
+
 // Formatta una dimensione in byte come stringa human-readable (kb/mb/gb).
 export function formatFileSize(bytes: number | null | undefined): string {
 	if (bytes == null) return '—';

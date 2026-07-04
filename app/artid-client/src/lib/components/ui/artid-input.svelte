@@ -9,8 +9,11 @@
 		error,
 		inputmode,
 		maxlength,
+		min,
+		max,
 		autocomplete,
-		onChange
+		onChange,
+		onkeydown
 	}: {
 		type?: 'text' | 'number' | 'password' | 'email' | 'tel' | 'date';
 		value?: string | number | Date;
@@ -21,8 +24,11 @@
 		error?: string;
 		inputmode?: 'text' | 'numeric' | 'tel' | 'email';
 		maxlength?: number;
+		min?: string | number;
+		max?: string | number;
 		autocomplete?: 'on' | 'off' | 'one-time-code';
 		onChange?: (value: string | number | Date) => void;
+		onkeydown?: (e: KeyboardEvent) => void;
 	} = $props();
 </script>
 
@@ -34,7 +40,10 @@
 		bind:value
 		{inputmode}
 		{maxlength}
+		{min}
+		{max}
 		{autocomplete}
+		onkeydown={onkeydown}
 		class="form-control {addClass ?? ''} bg-artid-section outline-none rounded-1 {error
 			? 'is-invalid'
 			: ''}"

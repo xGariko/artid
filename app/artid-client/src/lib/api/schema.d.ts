@@ -420,6 +420,38 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/shares/external/{id}/expiration": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: operations["extendExpiration"];
+        trace?: never;
+    };
+    "/api/shares/external/{id}/description": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: operations["updateDescription"];
+        trace?: never;
+    };
     "/api/shares/enable": {
         parameters: {
             query?: never;
@@ -500,6 +532,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/shares/public/{token}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["openSharedArtid"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/shares/internal": {
         parameters: {
             query?: never;
@@ -510,7 +558,7 @@ export interface paths {
         get: operations["getInternalByAuthor"];
         put?: never;
         post?: never;
-        delete?: never;
+        delete: operations["deleteShares"];
         options?: never;
         head?: never;
         patch?: never;
@@ -542,7 +590,23 @@ export interface paths {
         get: operations["getExternalByAuthor"];
         put?: never;
         post?: never;
-        delete: operations["deleteShares"];
+        delete: operations["deleteExternalShares"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/shares/external/{id}/link": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["generateLink"];
+        put?: never;
+        post?: never;
+        delete?: never;
         options?: never;
         head?: never;
         patch?: never;
@@ -962,6 +1026,14 @@ export interface components {
             createdAt?: string;
             /** Format: date-time */
             lastModified?: string;
+            thumbnailUrl?: string;
+        };
+        ExtendExpirationRequest: {
+            /** Format: date-time */
+            expirationDate?: string;
+        };
+        ShareDescriptionUpdateRequest: {
+            description?: string;
         };
         PublicArtidDetailResponse: {
             /** Format: int64 */
@@ -1071,6 +1143,9 @@ export interface components {
             description?: string;
             title?: string;
             filePath?: string;
+        };
+        ShareLinkResponse: {
+            token?: string;
         };
         ProfileCompletionResponse: {
             /** Format: int32 */
@@ -2025,6 +2100,54 @@ export interface operations {
             };
         };
     };
+    extendExpiration: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ExtendExpirationRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    updateDescription: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ShareDescriptionUpdateRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
     enableShares: {
         parameters: {
             query?: never;
@@ -2136,6 +2259,28 @@ export interface operations {
             };
         };
     };
+    openSharedArtid: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                token: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["PublicArtidDetailResponse"];
+                };
+            };
+        };
+    };
     getInternalByAuthor: {
         parameters: {
             query?: never;
@@ -2153,6 +2298,28 @@ export interface operations {
                 content: {
                     "*/*": components["schemas"]["InternalShareArtIDResponse"][];
                 };
+            };
+        };
+    };
+    deleteShares: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": number[];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };
@@ -2196,7 +2363,7 @@ export interface operations {
             };
         };
     };
-    deleteShares: {
+    deleteExternalShares: {
         parameters: {
             query?: never;
             header?: never;
@@ -2215,6 +2382,28 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+        };
+    };
+    generateLink: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ShareLinkResponse"];
+                };
             };
         };
     };
