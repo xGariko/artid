@@ -66,15 +66,20 @@
 
 			await invalidateAll();
 
-			toShareEmails.forEach((email) =>
-				toast.success(`Condivisione con ${email} completata con successo. Se questa mail esiste e se il destinatario accetta
-condivisioni, riceverà la tua condivisione.`)
-			);
+			if (results.some((r) => r.error)) {
+				toast.error('Errore durante la condivisione');
+			} else {
+				toShareEmails.forEach((email) =>
+					toast.success(`Condivisione con ${email} completata con successo. Se questa mail esiste e se il destinatario accetta
+				condivisioni, riceverà la tua condivisione.`)
+				);
+			}
 		} catch {
 			toast.error('Errore di rete');
 		} finally {
 			toShareEmails = [];
 			isSaving = false;
+			isOpen = false;
 		}
 	}
 </script>

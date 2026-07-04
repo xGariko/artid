@@ -6,17 +6,19 @@ export const load: PageServerLoad = async ({ locals }) => {
 		throw error(401, 'Non autenticato');
 	}
 
-	const [artids, tags] = await Promise.all([
+	const [artids, tags, sharedArtids] = await Promise.all([
 		locals.api.GET('/api/artids'),
-		locals.api.GET('/api/tags')
+		locals.api.GET('/api/tags'),
+		locals.api.GET('/api/shares/internal/to-me')
 	]);
 
-	if (!artids.data) {
+	if (!artids.data || !tags.data || !sharedArtids.data) {
 		throw error(500, 'Errore nel caricamento della pagina artid');
 	}
 
 	return {
 		artids: artids.data,
-		tags: tags.data
+		tags: tags.data,
+		sharedArtids: sharedArtids.data
 	};
 };

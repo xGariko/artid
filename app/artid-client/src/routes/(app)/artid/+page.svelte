@@ -120,7 +120,7 @@
 	const filterCounts = $derived.by(() => {
 		const counts = {
 			mine: data.artids.length,
-			sharedWithMe: 0,
+			sharedWithMe: data.sharedArtids.length,
 			recent: data.artids.length,
 			favourite: data.artids.filter((artid) => artid.favourite).length
 		};
@@ -135,8 +135,7 @@
 			case 'recent':
 				return data.artids.filter((artid) => isRecent(artid.lastModified));
 			case 'sharedWithMe':
-				// TODO: collegare alle condivisioni quando l'endpoint sarà disponibile.
-				return [];
+				return data.sharedArtids;
 			case 'favourite':
 				return data.artids.filter((artid) => artid.favourite);
 			default:

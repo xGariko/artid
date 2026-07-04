@@ -20,6 +20,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/shares/internal/decline": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: operations["declineInternalShare"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/resources/{id}": {
         parameters: {
             query?: never;
@@ -429,7 +445,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        post: operations["addInternalShared"];
+        post: operations["addInternalShare"];
         delete?: never;
         options?: never;
         head?: never;
@@ -591,6 +607,22 @@ export interface paths {
         put?: never;
         post?: never;
         delete: operations["deleteShares"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/shares/internal/to-me": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getInternalToMe"];
+        put?: never;
+        post?: never;
+        delete?: never;
         options?: never;
         head?: never;
         patch?: never;
@@ -1146,6 +1178,23 @@ export interface components {
             title?: string;
             filePath?: string;
         };
+        InternalShareArtIDExtendedResponse: {
+            /** Format: int64 */
+            id?: number;
+            /** Format: int64 */
+            idUserFrom?: number;
+            /** Format: int64 */
+            idUserTo?: number;
+            /** Format: int64 */
+            idArtid?: number;
+            recipientMail?: string;
+            isAccepted?: boolean;
+            /** Format: date-time */
+            createdAt?: string;
+            title?: string;
+            filePath?: string;
+            name?: string;
+        };
         CountResponse: {
             /** Format: int64 */
             count?: number;
@@ -1265,6 +1314,28 @@ export interface operations {
             cookie?: never;
         };
         requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    declineInternalShare: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": number;
+            };
+        };
         responses: {
             /** @description OK */
             200: {
@@ -2149,7 +2220,7 @@ export interface operations {
             };
         };
     };
-    addInternalShared: {
+    addInternalShare: {
         parameters: {
             query?: never;
             header?: never;
@@ -2439,6 +2510,26 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+        };
+    };
+    getInternalToMe: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["InternalShareArtIDExtendedResponse"][];
+                };
             };
         };
     };
