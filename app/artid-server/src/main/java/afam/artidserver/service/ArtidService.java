@@ -125,6 +125,13 @@ public class ArtidService {
                 resourceId, id);
     }
 
+    @Transactional
+    public void linkArtidTag(Long id, Long tagId) {
+        jdbcTemplate.update(
+                "INSERT INTO artid_tag (id_tag, id_artid) VALUES (?, ?)",
+                tagId, id);
+    }
+
     private static ArtidResponse toResponse(Artid a) {
         return new ArtidResponse(
                 a.getId(),
@@ -145,10 +152,14 @@ public class ArtidService {
      *         esisteva.
      */
     @Transactional
-    public boolean removeResourceFromArtid(Long artidId, Long resourceId) {
-        // Esegue la DELETE e controlla se il numero di righe eliminate è maggiore di 0
-        int rowsAffected = artidDAO.removeResourceByResourceId(artidId, resourceId);
-        return rowsAffected > 0;
+    public boolean removeResourceFromArtid(Long artidId, Long resourceId, Long userId) {
+        return artidDAO.findByIdAndIdUserAndDeletedAtIsNull(artidId, userId)
+                .map(artid -> {
+                    int rowsAffected = artidDAO.removeResourceByResourceId(artidId, resourceId);
+                    return rowsAffected > 0;
+                })
+                .orElse(false);
+
     }
 
     /**
@@ -231,6 +242,17 @@ public class ArtidService {
                             now,
                             id);
                     return true;
+                })
+                .orElse(false);
+    }
+
+    @Transactional
+    public boolean removeTagFromArtid(Long artidId, Long tagId, Long userId) {
+
+        return artidDAO.findByIdAndIdUserAndDeletedAtIsNull(artidId, userId)
+                .map(artid -> {
+                    int rowsAffected = artidDAO.removeTagByTagId(artidId, tagId);
+                    return rowsAffected > 0;
                 })
                 .orElse(false);
     }

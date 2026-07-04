@@ -29,11 +29,11 @@ public interface ArtidDAO extends ListCrudRepository<Artid, Long> {
             """)
     int removeResourceByResourceId(@Param("artidId") Long id, @Param("resourceId") Long resourceId);
 
-    // @Query("""
-    // INSERT INTO artid_resource
-    // (id, id_resource) VALUES (:id, :resourceId)
-    // """)
-    // void addResourceToArtid(@Param("id") Long id, @Param("resourceId") Long
-    // resourceId);
+    @Modifying
+    @Query("""
+            DELETE FROM artid_tag
+            WHERE id_artid = :artidId AND id_tag = :tagId
+            """)
+    int removeTagByTagId(@Param("artidId") Long id, @Param("tagId") Long tagId);
 
 }
