@@ -4,6 +4,9 @@
 	import { isExpired } from '$lib/utilities';
 	import type { SidebarAction, SidebarButtonGroup } from "$lib/models/sidebar-buttons";
 	import type { PageData } from "./$types";
+	import ArtidButton from '$lib/components/ui/artid-button.svelte';
+	import ArtidInput from '$lib/components/ui/artid-input.svelte';
+	import ArtidEditorModal from '$lib/components/ui/artid-editor-modal.svelte';
 
 	let { data }: { data: PageData } = $props();
 
@@ -29,7 +32,7 @@
 		const counts = {
 			externals: data.externals.length,
 			internals: data.internals.length,
-			expired: 0,
+			expired: data.externals.filter((externalShare) => isExpired(externalShare.expirationDate)).length,
 		};
 		return counts;
 	});

@@ -4,6 +4,9 @@
 	import ArtidButton from '$lib/components/ui/artid-button.svelte';
 	import ArtidLogoIconWhite from '$lib/assets/artid_logo_Icon_white.svg';
 	import ArtidModal from '$lib/components/ui/artid-modal.svelte';
+	import ArtidEditorModal from '$lib/components/ui/artid-editor-modal.svelte';
+	import ArtidInput from '$lib/components/ui/artid-input.svelte';
+	import { isExpired } from '$lib/utilities';
 
 	import { badgeColorForExtension, badgeLabelForExtension, formatFileSize, formatItalianDate } from '$lib/utilities';
 	import { toast } from 'svelte-sonner';
@@ -20,6 +23,15 @@
 	let selectedSharesIds = $state<Set<number>>(new Set());
 
 	let showDeleteModal = $state(false);
+	let showModifyDescriptionModal = $state(false);
+
+	let isSaving = $state(false);
+
+	const singleSelectedShare = $derived(
+		selectedSharesIds.size === 1
+			? shares.find(share => share.id === [...selectedSharesIds][0])
+			: undefined
+	);
 
 	// Cambiando filtro sidebar il parent passa un nuovo array `shares`:
 	// resettiamo la selezione per evitare di trattenere id non più visibili.
@@ -90,6 +102,95 @@
 				.filter((shareId): shareId is number => shareId != null)
 		);
 	}
+
+	async function handleStatus(action: 'enable' | 'disable'): Promise<void> {
+		if (isSaving) return;
+		if (selectedSharesIds.size === 0) return; //anche se non serve
+
+		isSaving = true;
+		try {
+			const response = await fetch('/api/shares/' + action, {
+				method:'PATCH',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify(Array.from(selectedSharesIds))
+			});
+
+			if (!response.ok) {
+				toast.error('Errore nell\'aggiornamento dello stato delle condivisioni');
+				return;
+			}
+
+			let msg;
+			switch (action) {
+				case 'enable':
+					msg = "Link attivati con successo. Puoi disattivarli in qualsiasi momento.";
+					break;
+				case 'disable':
+					msg = "Link attivati con successo. Puoi disattivarli in qualsiasi momento.";
+					break;
+			}
+			toast.success(msg);
+			selectedSharesIds = new Set();
+			invalidateAll();
+		} catch (e) {
+			toast.error(e instanceof Error ? e.message : 'Errore di rete');
+		} finally {
+			isSaving = false;
+		}
+	}
+
+	let deleteLinkMessage = $derived.by(() => {
+		if (selectedSharesIds.size === 0) return '';
+		if (selectedSharesIds.size === 1) {
+			let share = singleSelectedShare as ExternalShareArtIDResponse;
+			if (!isExpired(share!.expirationDate)) {
+				if (share.clickCounter == 0) {
+					return 'Il contenuto non è stato visualizzato ma il link è ancora valido. Eliminare?'
+				} else {
+					return 'Il link è ancora valido. Eliminare?'
+				}
+			} else {
+				if (share.clickCounter == 0) {
+					return 'Il link è scaduto ma il' +
+						'contenuto non + stato ancora visualizzato. Puoi annullare la ' +
+						'cellazione e rimandare la scadenza del link con l’apposito pulsante. ' +
+						'Eliminare comunque?'
+				} else {
+					return 'Il link è scaduto. Eliminare?'
+				}
+			}
+		} else {
+			return `Eliminare i ${selectedSharesIds.size} link selezionati?`;
+		}
+
+	});
+
+	async function handleExternalDelete(): Promise<void> {
+		if (isSaving) return;
+		if (selectedSharesIds.size === 0) return; //anche se non serve
+
+		isSaving = true;
+		try {
+			const response = await fetch('/api/shares/' + "external", {
+				method:'DELETE',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify(Array.from(selectedSharesIds))
+			});
+
+			if (!response.ok) {
+				toast.error('Errore nell\'eliminazione delle condivisioni.');
+				return;
+			}
+
+			toast.success('I link selezionati sono stati eliminati correttamente.');
+			selectedSharesIds = new Set();
+			invalidateAll();
+		} catch (e) {
+			toast.error(e instanceof Error ? e.message : 'Errore di rete');
+		} finally {
+			isSaving = false;
+		}
+	}
 	</script>
 
 <div class="bg-artid-section h-100 w-80 rounded-3 border border-artid-border p-3 d-flex flex-column gap-3 artid-list">
@@ -106,8 +207,8 @@
 					aria-label="Seleziona tutto"
 				/>
 			</div>
-			<div class="col-1">ArtID</div>
 			{#if filter === 'externals' || filter === 'expired'}
+				<div class="col-1">ArtID</div>
 				<div class="col-1">Creazione</div>
 				<div class="col-1">Scadenza</div>
 				<div class="col-1" title="Numero Visualizzazioni">Numero Vis.</div>
@@ -117,15 +218,14 @@
 				<div class="col-3">Descrizione</div>
 				<div class="col-1 text-center">Azioni</div>
 			{:else}
+				<div class="col-3">ArtID</div>
 				<div class="col-2">Condiviso con</div>
 			{/if}
 		</div>
 
 		{#each filteredShares as share (share.id)}
 			{@const isShareSelected = share.id != null && selectedSharesIds.has(share.id)}
-
-			{#if filter === 'externals' || filter === 'expired'}
-				{@const extShare = share as ExternalShareArtIDResponse}
+			{@const titleSize = (filter === 'externals' || filter === 'expired') ? "1" : "3"}
 			<div
 				class="row g-0 align-items-center px-3 py-2 border-bottom border-artid-border share-row"
 				class:selected={isShareSelected}
@@ -141,35 +241,47 @@
 							checked={isShareSelected}
 							onchange={() => toggleShareSelection(share.id)}
 							onclick={(event) => event.stopPropagation()}
-							aria-label={`Seleziona ${extShare.title}`}
+							aria-label={`Seleziona ${share.title}`}
 						/>
-						{#if !extShare.file_path}
+						{#if !share.file_path}
 							<div
 								class="badge-type fw-bold text-white"
 								style:background-color="grey"
 							> <img src="{ArtidLogoIconWhite}" class="h-60 w-60"> </div>
 						{:else}
-							<img class="badge-type" src="{extShare.file_path}">
+							<img class="badge-type preview-small" src="{share.file_path}">
 						{/if}
 					</div>
-					<div class="col-1 pe-1 text-truncate fw-medium text-artid-text share-title" title={extShare.title}>
-						{#if extShare.title}
-							<a href="">{extShare.title}</a>
+					<div class="col-{titleSize} pe-{titleSize} text-truncate fw-medium text-artid-text share-title" title={share.title}>
+						{#if share.title}
+							<a href="">{share.title}</a>
 						{:else}
-							<a href="" class="text-artid-text-muted ms-1">Non trovato</a>
+							<a href="" class="text-artid-text-muted ms-{titleSize}">Non trovato</a>
 						{/if}
 					</div>
+
+				{#if filter === 'externals' || filter === 'expired'}
+					{@const extShare = share as ExternalShareArtIDResponse}
 					<div class="col-1 text-artid-text text-nowrap">{formatItalianDate(extShare.createdAt)}</div>
 					<div class="col-1 text-artid-text text-nowrap">{formatItalianDate(extShare.expirationDate)}</div>
 					<div class="col-1 text-artid-text text-nowrap">{extShare.clickCounter}</div>
 					<div class="col-1 text-artid-text text-nowrap">{formatItalianDate(extShare.firstOpened)}</div>
 					<div class="col-1 text-artid-text text-nowrap">{formatItalianDate(extShare.lastOpened)}</div>
-					<div class="col-1 text-artid-text text-nowrap d-flex align-items-center gap-2">
-						<span
-							class="rounded-circle {extShare.isActive ? 'bg-success' : 'bg-warning'}"
-							style="width: 10px; height: 10px; display: inline-block;">
-						</span>
-						{extShare.isActive ? "Attivo" : "Disattivo"}
+					<div class="col-1 text-artid-text text-nowrap d-flex gap-2 flex-column">
+						<div>
+							<span
+								class="rounded-circle {extShare.isActive ? 'bg-success' : 'bg-warning'} circle-small" >
+							</span>
+							{extShare.isActive ? "Attivo" : "Disattivo"}
+						</div>
+						{#if isExpired(extShare.expirationDate)}
+							<div>
+								<span
+									class="rounded-circle bg-danger circle-small" >
+								</span>
+								Scaduto
+							</div>
+						{/if}
 					</div>
 					<div class="col-3 text-artid-text">
 						{extShare.description}
@@ -182,9 +294,12 @@
 						<i class="bi bi-copy fs-6"></i>
 					</button>
 				</div>
-				</div>
-				{/if}
-			{/each}
+			{:else}
+				{@const intShare = share as InternalShareArtIDResponse}
+					<div class="col-2 text-artid-text text-nowrap">{intShare.recipientMail}</div>
+			{/if}
+			</div>
+		{/each}
 
 		{#if filteredShares.length === 0}
 			<div class="text-center text-artid-text-muted py-5">
@@ -210,7 +325,7 @@
 				btnStyle="success"
 				disabled={!hasNonActiveSelection}
 				fullWidth={false}
-				onclick={()=>{return;}}
+				onclick={() => {handleStatus("enable")}}
 			/>
 			<ArtidButton
 				label="Disattiva"
@@ -219,7 +334,7 @@
 				outline={true}
 				disabled={!hasActiveSelection}
 				fullWidth={false}
-				onclick={()=>{return;}}
+				onclick={() => {handleStatus("disable")}}
 			/>
 			<ArtidButton
 				label="Modifica descrizione"
@@ -227,7 +342,7 @@
 				btnStyle="secondary"
 				disabled={!hasSingleSelection}
 				fullWidth={false}
-				onclick={()=>{return;}}
+				onclick={()=>{showModifyDescriptionModal = true;}}
 			/>
 		{/if}
 		<ArtidButton
@@ -245,13 +360,76 @@
 <ArtidModal
 	bind:isOpen={showDeleteModal}
 	title="Conferma eliminazione"
-	onConfirm={()=>{return;}}
-	message="Una volta eliminata la risorsa non sarà recuperabile."
+	onConfirm={handleExternalDelete}
+	message={deleteLinkMessage}
 	btnStyle="danger"
 />
 
+<ArtidEditorModal bind:isOpen={showModifyDescriptionModal} customHeight="40">
+	<div class="d-flex flex-column align-items-start justify-content-around w-100 h-100 flex-fill">
+		<div class="text-artid-primary fw-semibold w-100">
+			<i class="bi bi-pencil fs-6 text-success"></i>
+			<span>Inserisci la descrizione</span>
+		</div>
+
+		<div class="w-100 mb-5">
+			<div class="my-2">
+				<textarea
+					name="description"
+					placeholder="Descrizione"
+					class="w-100 artid-textarea"
+					rows="8"
+				></textarea>
+		</div>
+
+		<div class="w-100">
+			<div class="d-flex justify-content-end gap-2">
+				<ArtidButton
+					label="Chiudi"
+					fullWidth={false}
+					btnStyle="secondary"
+					outline={true}
+					disabled={false}
+					onclick={() => (showModifyDescriptionModal = false)}
+				/>
+				<ArtidButton
+					label="Salva"
+					fullWidth={false}
+					btnStyle="success"
+					icon="check2"
+					disabled={false}
+					onclick={() => {return;}}
+				/>
+			</div>
+		</div>
+	</div>
+</ArtidEditorModal>
 
 <style>
+		.preview-small {
+				aspect-ratio: 1 !important;
+				object-fit: cover !important;
+		}
+
+		.circle-small {
+				width: 10px;
+				height: 10px;
+				display: inline-block;
+		}
+
+		.artid-textarea {
+				padding: 10px;
+				min-height: 200px;
+				resize: none;
+				border-radius: 5px;
+		}
+
+    .artid-textarea:focus {
+        outline: none !important;
+        border: 1px solid #06c !important;
+        box-shadow: 0 0 3px #06c !important;
+    }
+
     .artid-list {
         min-width: 60rem;
     }

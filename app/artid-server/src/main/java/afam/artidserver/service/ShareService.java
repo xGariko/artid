@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import afam.artidserver.storage.StorageService;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
 import java.util.ArrayList;
@@ -30,7 +31,7 @@ public class ShareService {
     private long presignTtlSeconds;
 
     public long countByUser(Long userId) {
-        return externalShareDAO.countByIdUser(userId) + internalShareDAO.countByIdUserFrom(userId);
+        return externalShareDAO.countByIdCreator(userId) + internalShareDAO.countByIdUserFrom(userId);
     }
 
     public long countInternalByUser(Long userId) {
@@ -38,7 +39,7 @@ public class ShareService {
     }
 
     public long countExternalByUser(Long userId) {
-        return externalShareDAO.countByIdUser(userId);
+        return externalShareDAO.countByIdCreator(userId);
     }
 
     public List<InternalShareArtIDResponse> getInternalFromUser(Long userId) {
@@ -62,6 +63,30 @@ public class ShareService {
                 .toList();
     }
 
+    @Transactional
+    public void disableAll(Long userId, List<Long> shareIds) {
+        if (shareIds == null || shareIds.isEmpty()) return;
+
+        // Esegue una singola query di update bulk
+        externalShareDAO.disableSharesByIds(userId, shareIds);
+    }
+
+    @Transactional
+    public void enableAll(Long userId, List<Long> shareIds) {
+        if (shareIds == null || shareIds.isEmpty()) return;
+
+        // Esegue una singola query di update bulk
+        externalShareDAO.enableSharesByIds(userId, shareIds);
+    }
+
+    @Transactional
+    public void deleteAll(Long userId, List<Long> shareIds) {
+        if (shareIds == null || shareIds.isEmpty()) return;
+
+        // Esegue una singola query di update bulk
+        externalShareDAO.deleteSharesByIds(userId, shareIds);
+    }
+
     public InternalShareResponse toResponse(InternalShare share) {
         return new InternalShareResponse(
             share.getId(),
@@ -77,7 +102,7 @@ public class ShareService {
         return new ExternalShareResponse(
                 share.getId(),
                 share.getIdArtid(),
-                share.getIdUser(),
+                share.getIdCreator(),
                 share.getClickCounter(),
                 share.getIsActive(),
                 share.getExpirationDate(),
@@ -92,7 +117,7 @@ public class ShareService {
         return new ExternalShareArtIDResponse(
                 share.id(),
                 share.idArtid(),
-                share.idUser(),
+                share.idCreator(),
                 share.clickCounter(),
                 share.isActive(),
                 share.expirationDate(),

@@ -17,8 +17,8 @@ public class ExternalShare {
     @Column("id_artid")
     private Long idArtid;
 
-    @Column("id_user")
-    private Long idUser;
+    @Column("id_creator")
+    private Long idCreator;
 
     @Column("click_counter")
     private Integer clickCounter;

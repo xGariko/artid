@@ -388,6 +388,38 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/shares/enable": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: operations["enableShares"];
+        trace?: never;
+    };
+    "/api/shares/disable": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: operations["disableShares"];
+        trace?: never;
+    };
     "/api/users/{userId}/public/artids/{artidId}": {
         parameters: {
             query?: never;
@@ -978,7 +1010,7 @@ export interface components {
             /** Format: int64 */
             idArtid?: number;
             /** Format: int64 */
-            idUser?: number;
+            idCreator?: number;
             /** Format: int32 */
             clickCounter?: number;
             isActive?: boolean;
@@ -1865,6 +1897,50 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": number;
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    enableShares: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": number[];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    disableShares: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": number[];
             };
         };
         responses: {
