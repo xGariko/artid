@@ -14,17 +14,15 @@
 </script>
 
 <div
-	class="bg-artid-section h-100 d-flex flex-column w-15 rounded-3 border border-artid-border sidebar p-3 overflow-y-auto">
+	class="bg-artid-section h-100 d-flex flex-column w-15 rounded-3 border border-artid-border sidebar p-3 overflow-y-auto"
+>
 	{#if sidebarActions.length > 0}
 		<div class="mb-4">
 			{#each sidebarActions as action, index (index)}
-			  {#if action.type !== 'tag'}
-				<ArtidButton
-					label={action.label}
-					icon={action.icon}
-					onclick={action.callback}
-				></ArtidButton>
-			  {/if}
+				{#if action.type !== 'tag'}
+					<ArtidButton label={action.label} icon={action.icon} onclick={action.callback}
+					></ArtidButton>
+				{/if}
 			{/each}
 		</div>
 	{/if}
@@ -102,7 +100,7 @@
 	}
 
 	.tag-container {
-		overflow-y: scroll;
+		overflow-y: auto;
 		max-height: 9rem;
 		display: flex;
 	}
@@ -111,6 +109,7 @@
 		background-color: transparent;
 		&.tag-active {
 			color: var(--artid-primary) !important;
+			text-decoration: underline;
 		}
 		.tag-color {
 			width: 8px;

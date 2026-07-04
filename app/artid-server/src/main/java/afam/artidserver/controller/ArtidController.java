@@ -114,7 +114,7 @@ public class ArtidController {
     @PostMapping("/{id}/resources")
     public ResponseEntity<Void> addResource(@PathVariable Long id,
             @AuthenticationPrincipal AuthenticatedUser principal, @RequestBody Long resourceId) {
-        artidService.linkArtidResource(id, resourceId);
+        artidService.linkArtidResource(id, resourceId, principal.getId());
         return ResponseEntity.ok().build();
     }
 
@@ -131,6 +131,22 @@ public class ArtidController {
             return ResponseEntity.noContent().build();
         } else {
             // 404 Not Found: la risorsa o l'associazione non esisteva
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @PutMapping("/{id}/resources/{resourceId}/reorder")
+    public ResponseEntity<Void> reorderResource(
+            @PathVariable Long id,
+            @PathVariable Long resourceId,
+            @RequestBody Integer newRank,
+            @AuthenticationPrincipal AuthenticatedUser principal) {
+
+        boolean success = artidService.reorderResource(id, resourceId, newRank, principal.getId());
+
+        if (success) {
+            return ResponseEntity.ok().build();
+        } else {
             return ResponseEntity.notFound().build();
         }
     }

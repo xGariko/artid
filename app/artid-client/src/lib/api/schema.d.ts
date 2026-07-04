@@ -100,6 +100,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/artids/{id}/resources/{resourceId}/reorder": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: operations["reorderResource"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/artids/{id}/favourite": {
         parameters: {
             query?: never;
@@ -159,6 +175,22 @@ export interface paths {
         put?: never;
         post: operations["create_1"];
         delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/shares/external": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getExternalByAuthor"];
+        put?: never;
+        post: operations["createExternalShare"];
+        delete: operations["deleteExternalShares"];
         options?: never;
         head?: never;
         patch?: never;
@@ -580,22 +612,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/shares/external": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["getExternalByAuthor"];
-        put?: never;
-        post?: never;
-        delete: operations["deleteExternalShares"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/api/shares/external/{id}/link": {
         parameters: {
             query?: never;
@@ -948,6 +964,18 @@ export interface components {
             id?: number;
             title?: string;
             color?: string;
+        };
+        CreateExternalShareRequest: {
+            /** Format: int64 */
+            artidId?: number;
+            /** Format: date-time */
+            expirationDate?: string;
+            description?: string;
+        };
+        CreateExternalShareResponse: {
+            /** Format: int64 */
+            id?: number;
+            token?: string;
         };
         SpidLoginRequest: {
             providerId?: string;
@@ -1463,6 +1491,31 @@ export interface operations {
             };
         };
     };
+    reorderResource: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+                resourceId: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": number;
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
     updateFavourite: {
         parameters: {
             query?: never;
@@ -1600,6 +1653,72 @@ export interface operations {
                 content: {
                     "*/*": components["schemas"]["TagResponse"];
                 };
+            };
+        };
+    };
+    getExternalByAuthor: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ExternalShareArtIDResponse"][];
+                };
+            };
+        };
+    };
+    createExternalShare: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateExternalShareRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["CreateExternalShareResponse"];
+                };
+            };
+        };
+    };
+    deleteExternalShares: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": number[];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };
@@ -2340,48 +2459,6 @@ export interface operations {
                 content: {
                     "*/*": components["schemas"]["CountResponse"];
                 };
-            };
-        };
-    };
-    getExternalByAuthor: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["ExternalShareArtIDResponse"][];
-                };
-            };
-        };
-    };
-    deleteExternalShares: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": number[];
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
             };
         };
     };

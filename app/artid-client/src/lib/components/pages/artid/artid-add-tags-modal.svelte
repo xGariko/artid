@@ -25,7 +25,6 @@
 	const canAddTag = $derived(tagsNumber <= 5);
 
 	async function fetchAllTags() {
-
 		try {
 			const result = await api.GET('/api/tags', { credentials: 'include' });
 			if (result.error) {
@@ -93,7 +92,7 @@
 </script>
 
 <ArtidEditorModal bind:isOpen customHeight="30" customWidth="30">
-	<div class="d-flex flex-column gap-0 pt-1">
+	<div class="d-flex h-100 flex-column gap-3 justify-content-between pt-1">
 		<div class="d-flex align-items-center gap-2 text-artid-primary fw-semibold">
 			<i class="bi bi-plus-lg fs-5 text-primary"></i>
 			<span>Aggiungi Tag</span>
@@ -107,6 +106,7 @@
 				{@const isTagInArtid = tag.id != null && artidTagsIds.has(tag.id)}
 				<button
 					class="d-inline border rounded-3 p-2"
+					style="height: min-content;"
 					class:disabled={isTagInArtid}
 					class:selected={isTagSelected}
 					onclick={() => (!isTagInArtid ? toggleTagSelection(tag.id) : '')}
@@ -116,7 +116,10 @@
 				</button>
 			{/each}
 		</div>
-		<div class="d-flex justify-content-between align-items-center border">
+		<div
+			class="d-flex justify-content-between align-items-center border"
+			style="border-color: transparent !important;"
+		>
 			<span class="text-artid-text-muted">Tag nell'artid: {tagsNumber}/{5}</span>
 			<ArtidButton
 				label="Aggiungi"
@@ -129,15 +132,12 @@
 </ArtidEditorModal>
 
 <style lang="scss">
-	.tag-container {
-		// height: 100%;
-	}
-
 	.disabled {
 		cursor: not-allowed;
 		opacity: 0.6;
 	}
 	.selected {
 		background-color: var(--artid-primary);
+		color: white;
 	}
 </style>

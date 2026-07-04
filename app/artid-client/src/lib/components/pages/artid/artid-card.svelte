@@ -5,6 +5,7 @@
 	import { resolve } from '$app/paths';
 	import { api } from '$lib/api/browser-client';
 	import { toast } from 'svelte-sonner';
+	import { invalidateAll } from '$app/navigation';
 
 	let {
 		artid,
@@ -39,6 +40,8 @@
 				toast.success(
 					newFavouriteState ? 'ArtID aggiunto ai preferiti' : 'ArtID rimosso dai preferiti'
 				);
+
+				await invalidateAll();
 			} else {
 				toast.error(
 					newFavouriteState
@@ -56,22 +59,30 @@
 	href={resolve('/(app)/artid/details/[id]', { id: String(artid.id) })}
 	class="rounded-3 border border-artid-border w-100 d-block text-decoration-none artid-card z-2"
 >
-	<div class="card-image p-4">
-		<img src={artid.thumbnailUrl ?? artidImage} alt={`${artid.title} image`} />
-		{#if filter === 'mine'}
-				<button class="position-absolute w-10 h-10 border-1 border-artid-border rounded-pill p-3 border bg-artid-section z-3"
-				      style="right: 0px; top: 0px; transform: translate(25%, -25%);"
-							title={favouriteLabel}
-							aria-label={favouriteLabel}
-							onclick={toggleFavourite}
-				>
-					<span class="w-100 h-100 d-flex justify-content-center align-items-center">
-						<i
-							class="bi bi-star{isFavourite ? '-fill text-warning' : ''} fs-5"
-							style="cursor: pointer; transform: translateY(-1px);"
-						></i>
-					</span>
-				</button>
+	<div class="d-flex align-items-center card-image p-1">
+		{#if artid.thumbnailUrl}
+			<img src={artid.thumbnailUrl ?? artidImage} alt={`${artid.title} image`} />
+		{:else}
+			<div class="artid-image-placeholder" title="Carica un'immagine">
+				<i class="bi bi-image-fill"></i>
+			</div>
+		{/if}
+
+		{#if filter !== 'sharedWithMe'}
+			<button
+				class="position-absolute w-10 h-10 border-1 border-artid-border rounded-pill p-3 border bg-artid-section z-3"
+				style="right: 0px; top: 0px; transform: translate(25%, -25%);"
+				title={favouriteLabel}
+				aria-label={favouriteLabel}
+				onclick={toggleFavourite}
+			>
+				<span class="w-100 h-100 d-flex justify-content-center align-items-center">
+					<i
+						class="bi bi-star{isFavourite ? '-fill text-warning' : ''} fs-5"
+						style="cursor: pointer; transform: translateY(-1px);"
+					></i>
+				</span>
+			</button>
 		{:else if filter === 'sharedWithMe'}
 			<span class="action">
 				<i class="bi bi-trash fs-6 text-primary"></i>
@@ -82,29 +93,46 @@
 		class="rounded-bottom-3 border-top border-artid-border p-2 px-3 text-artid-text bg-artid-surface card-description"
 	>
 		<div class="d-flex flex-column">
-			<span class="fw-semibold fs-5">{artid.title}</span>
-			<span class="text-artid-text-muted fs-6"
-			>{formatItalianDate(artid.lastModified)}</span>
+			<span class="fw-semibold" style="font-size: 16px;">{artid.title}</span>
+			<span class="text-artid-text-muted" style="font-size: 14px;"
+				>{formatItalianDate(artid.lastModified)}</span
+			>
 		</div>
 	</div>
 </a>
 
 <style lang="scss">
-  .card-image {
-    position: relative;
-  }
+	.card-image {
+		position: relative;
+		height: 200px;
+		align-items: center;
+	}
 
-  .card-image img {
-    width: 100%;
-    object-fit: cover;
-  }
+	.card-image img {
+		width: 100%;
+		object-fit: cover;
+	}
 
+	.artid-card {
+		transition: all 0.2s ease;
+	}
 
-  .artid-card {
-    transition: all 0.2s ease;
-  }
+	.artid-card:hover {
+		box-shadow:
+			0 4px 8px 0 rgba(117, 117, 117, 0.1),
+			0 2px 4px 0 rgba(117, 117, 117, 0.05);
+	}
 
-  .artid-card:hover {
-    box-shadow: 0 4px 8px 0 rgba(117, 117, 117, 0.1), 0 2px 4px 0 rgba(117, 117, 117, 0.05);
-  }
+	.artid-image-placeholder {
+		width: 100%;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		color: var(--artid-text-muted);
+
+		i {
+			font-size: 10rem;
+			line-height: 1;
+		}
+	}
 </style>

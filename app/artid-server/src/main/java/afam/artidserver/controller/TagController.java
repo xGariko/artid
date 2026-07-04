@@ -1,6 +1,7 @@
 package afam.artidserver.controller;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 import afam.artidserver.model.dto.TagCreateRequest;
 import afam.artidserver.model.dto.TagResponse;
@@ -42,11 +44,16 @@ public class TagController {
             return ResponseEntity.badRequest().build();
         }
 
-        // Salva il tag legandolo all'ID dell'utente autenticato
-        TagResponse nuovoTag = tagService.create(request.title(),
-                principal.getId());
+        try {
+            TagResponse nuovoTag = tagService.create(request.title(), principal.getId());
+            return ResponseEntity.status(HttpStatus.CREATED).body(nuovoTag);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(nuovoTag);
+        } catch (ResponseStatusException e) {
+            return ResponseEntity.status(e.getStatusCode()).build();
+
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().build();
+        }
 
     }
 }

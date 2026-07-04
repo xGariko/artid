@@ -18,7 +18,7 @@ import lombok.RequiredArgsConstructor;
 public class TagService {
 
     private final TagDAO tagDAO;
-    // @Value("#{'${app.security.blacklisted-tags}'.split(',')}")
+    @Value("${app.security.blacklist}")
     private List<String> blacklist;
 
     private final Random random = new Random();
@@ -37,25 +37,33 @@ public class TagService {
      * Crea un nuovo tag e lo assegna all'utente loggato.
      */
     public TagResponse create(String title, Long userId) {
-        if (tagDAO.existsByTitleAndIdUser(title, userId)) {
+
+        if (title == null || title.isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Il titolo del tag non può essere vuoto");
+        }
+        String cleanedTitle = title.trim();
+
+        if (tagDAO.existsByTitleAndIdUser(cleanedTitle, userId)) {
             throw new ResponseStatusException(
                     HttpStatus.CONFLICT,
-                    "Hai già creato un tag con il nome: " + title);
+                    "Hai già creato un tag con il nome: " + cleanedTitle);
         }
 
-        // boolean isViolated = blacklist.stream()
-        // .anyMatch(forbiddenWord ->
-        // title.trim().toLowerCase().contains(forbiddenWord.toLowerCase().trim()));
+        // 1. Normalizzazione della stringa:
+        // Rimuove gli spazi all'inizio/fine, converte in minuscolo e riduce gli spazi
+        // multipli interni a uno solo
+        String normalizedTitle = title.trim().toLowerCase().replaceAll("\\s+", " ");
 
-        // if (isViolated) {
-        // throw new ResponseStatusException(
-        // HttpStatus.BAD_REQUEST,
-        // "Il nome del tag contiene termini non consentiti dalle linee guida
-        // istituzionali." + title);
-        // }
+        // 2. Controllo Blacklist
+        boolean isViolated = blacklist.stream()
+                .map(String::trim)
+                .map(String::toLowerCase)
+                .anyMatch(forbiddenWord -> normalizedTitle.contains(forbiddenWord));
 
-        // String finalColor = (color == null || color.isBlank()) ?
-        // generateRandomColor() : color;
+        if (isViolated) {
+            throw new IllegalArgumentException(
+                    "Il nome del tag contiene termini non consentiti dalle linee guida istituzionali.");
+        }
 
         String color = generateRandomColor();
         Tag tag = new Tag();

@@ -15,7 +15,7 @@
 	let { data }: { data: PageData } = $props();
 
 	// Valore del filtro sidebar attivo: raccolta ("recent"|"favourite").
-	let activeFilterValue: ArtIdFilterType = $state('all');
+	let activeFilterValue: ArtIdFilterType = $state('mine');
 
 	let isOpen = $state(false);
 	let isSaving = $state(false);
@@ -41,7 +41,7 @@
 
 		const trimmed = title.trim();
 		if (trimmed.length <= 0) {
-			toast.error('Inserisci il nome dell\'artid');
+			toast.error("Inserisci il nome dell'artid");
 			return;
 		}
 
@@ -53,7 +53,7 @@
 			});
 
 			if (err || !data?.id) {
-				toast.error('Errore nella creazione dell\'ArtID');
+				toast.error("Errore nella creazione dell'ArtID");
 				return;
 			}
 
@@ -83,17 +83,19 @@
 		console.log(trimmed);
 
 		try {
-			const { data, error: err } = await api.POST('/api/tags', {
-				body: { title: trimmed }
+			const { data, response } = await api.POST('/api/tags', {
+				body: { title: trimmed },
+				credentials: 'include'
 			});
 
-			if (err) {
-				// eslint-disable-next-line @typescript-eslint/no-explicit-any
-				const serverError = err as any;
+			console.log(data);
 
-				if (serverError.status === 409 || serverError.message?.includes('già creato')) {
+			if (!response.ok) {
+				const status = response.status;
+
+				if (status === 409) {
 					toast.error(`Il tag "${trimmed}" esiste già!`);
-				} else if (serverError.status === 400) {
+				} else if (status === 400) {
 					toast.error('Il nome contiene termini non consentiti.');
 				} else {
 					toast.error('Errore nella creazione del tag');
@@ -101,7 +103,7 @@
 				return;
 			}
 
-			tagList?.push(data);
+			tagList?.push(data!);
 
 			isTagOpen = false;
 			tag = '';
@@ -117,39 +119,28 @@
 	// Conteggi per ciascun filtro — calcolati in un singolo pass sulle risorse.
 	const filterCounts = $derived.by(() => {
 		const counts = {
-			all: data.artids.length,
-			mine: 0,
+			mine: data.artids.length,
 			sharedWithMe: 0,
-			recent: 0,
-			favourite: 0
+			recent: data.artids.length,
+			favourite: data.artids.filter((artid) => artid.favourite).length
 		};
-		// for (const resource of data.resources) {
-		// 	counts[resourceTypeFromMime(resource.mimeType)]++;
-		// 	if (resource.favorite) counts.favourite++;
-		// 	if (isRecent(resource.lastModified)) counts.recent++;
-		// }
 		return counts;
 	});
 
 	// Sottoinsieme di risorse mostrato in tabella, in base al filtro sidebar.
 	const visibleArtids = $derived.by(() => {
 		switch (activeFilterValue) {
-			case 'all':
-				return data.artids;
 			case 'mine':
-				return data.artids.filter((artid) => artid);
+				return data.artids;
 			case 'recent':
 				return data.artids.filter((artid) => isRecent(artid.lastModified));
 			case 'sharedWithMe':
 				// TODO: collegare alle condivisioni quando l'endpoint sarà disponibile.
 				return [];
+			case 'favourite':
+				return data.artids.filter((artid) => artid.favourite);
 			default:
-			// {
-			// 	const targetType = activeFilterValue as ResourceType;
-			// 	return data.resources.filter(
-			// 		(resource) => resourceTypeFromMime(resource.mimeType) === targetType,
-			// 	);
-			// }
+				return [];
 		}
 	});
 
@@ -158,7 +149,6 @@
 		{
 			label: 'Raccolte',
 			buttons: [
-				{ icon: 'folder', label: 'Tutti', value: 'all', count: filterCounts.all },
 				{ icon: 'file-earmark-richtext', label: 'I miei', value: 'mine', count: filterCounts.mine },
 				{
 					icon: 'share',
@@ -205,7 +195,9 @@
 </div>
 
 <ArtidEditorModal bind:isOpen customHeight="25">
-	<div class="text-artid-primary fw-semibold new-artid-modal h-100 d-flex justify-content-between flex-column">
+	<div
+		class="text-artid-primary fw-semibold new-artid-modal h-100 d-flex justify-content-between flex-column"
+	>
 		<div class="d-flex align-items-center gap-2">
 			<i class="bi bi-folder2-open fs-5 text-primary"></i>
 			<span>Nuovo ArtID</span>
@@ -268,6 +260,5 @@
 				/>
 			</div>
 		</div>
-
 	</div>
 </ArtidEditorModal>

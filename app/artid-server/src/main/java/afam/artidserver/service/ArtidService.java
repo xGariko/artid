@@ -147,10 +147,29 @@ public class ArtidService {
     }
 
     @Transactional
-    public void linkArtidResource(Long id, Long resourceId) {
-        jdbcTemplate.update(
-                "INSERT INTO artid_resource (id_resource, id, rank) VALUES (?, ?, 0)",
-                resourceId, id);
+    public boolean linkArtidResource(Long id, Long resourceId, Long userId) {
+        // Conta quante risorse ha già questo specifico ArtID
+        return artidDAO.findByIdAndIdUserAndDeletedAtIsNull(id, userId)
+                .map(artid -> {
+
+                    // Controllo duplicati: il materiale è già associato a questo ArtID?
+                    if (artidDAO.existsResourceInArtid(id, resourceId)) {
+                        return false; // Evita l'inserimento duplicato
+                    }
+                    // Se esiste ed è mio, conto i materiali già presenti
+                    long currentCount = artidDAO.countResourcesByArtidId(id);
+
+                    // Calcolo il rank successivo
+                    int nextRank = (int) currentCount + 1;
+
+                    // Eseguo la insert
+                    jdbcTemplate.update(
+                            "INSERT INTO artid_resource (id_resource, id, rank) VALUES (?, ?, ?)",
+                            resourceId, id, nextRank);
+
+                    return true; // Operazione riuscita
+                })
+                .orElse(false); // Artid non trovato o non di proprietà dell'utente
     }
 
     @Transactional
@@ -174,9 +193,11 @@ public class ArtidService {
                 thumbnailUrl);
     }
 
-    // Presigned GET URL della thumbnail (bucket di default, come i materiali); null se assente.
+    // Presigned GET URL della thumbnail (bucket di default, come i materiali); null
+    // se assente.
     private String presignThumbnail(Long idThumbnail) {
-        if (idThumbnail == null) return null;
+        if (idThumbnail == null)
+            return null;
         return fileDAO.findById(idThumbnail)
                 .map(File::getFilePath)
                 .filter(key -> key != null && !key.isBlank())
@@ -184,14 +205,16 @@ public class ArtidService {
                 .orElse(null);
     }
 
-    // Presigna in un colpo solo le thumbnail di più ArtID: una sola query su file, niente N+1.
+    // Presigna in un colpo solo le thumbnail di più ArtID: una sola query su file,
+    // niente N+1.
     private Map<Long, String> presignThumbnails(List<Artid> artids) {
         List<Long> thumbnailIds = artids.stream()
                 .map(Artid::getIdThumbnail)
                 .filter(Objects::nonNull)
                 .distinct()
                 .toList();
-        if (thumbnailIds.isEmpty()) return Map.of();
+        if (thumbnailIds.isEmpty())
+            return Map.of();
 
         Map<Long, String> urlByThumbnailId = new HashMap<>();
         namedJdbcTemplate.query(
@@ -217,11 +240,61 @@ public class ArtidService {
     public boolean removeResourceFromArtid(Long artidId, Long resourceId, Long userId) {
         return artidDAO.findByIdAndIdUserAndDeletedAtIsNull(artidId, userId)
                 .map(artid -> {
+
+                    Optional<Integer> rankOpt = artidDAO.findRankByArtidIdAndResourceId(artidId, resourceId);
+
+                    if (rankOpt.isEmpty()) {
+                        return false; // Il legame risorsa-artid non esiste
+                    }
+                    int deletedRank = rankOpt.get();
+
+                    // 2. Cancella la risorsa
                     int rowsAffected = artidDAO.removeResourceByResourceId(artidId, resourceId);
-                    return rowsAffected > 0;
+
+                    // 3. Se è stata cancellata con successo, aggiorna i rank rimasti
+                    if (rowsAffected > 0) {
+                        artidDAO.decrementRanksAfterDeletion(artidId, deletedRank);
+                        return true;
+                    }
+
+                    return false;
                 })
                 .orElse(false);
 
+    }
+
+    @Transactional
+    public boolean reorderResource(Long artidId, Long resourceId, Integer newRank, Long userId) {
+        // 1. Controllo di sicurezza: l'artid esiste ed è dell'utente autenticato?
+        return artidDAO.findByIdAndIdUserAndDeletedAtIsNull(artidId, userId)
+                .map(artid -> {
+
+                    // 2. Recuperiamo il vecchio rank del materiale prima dello spostamento
+                    Optional<Integer> oldRankOpt = artidDAO.findRankByArtidIdAndResourceId(artidId, resourceId);
+                    if (oldRankOpt.isEmpty()) {
+                        return false; // Il legame risorsa-artid non esiste
+                    }
+                    int oldRank = oldRankOpt.get();
+
+                    // Se la posizione è la stessa, non c'è bisogno di fare query
+                    if (oldRank == newRank)
+                        return true;
+
+                    // 3. Eseguiamo lo shift corretto in base alla direzione
+                    if (oldRank < newRank) {
+                        // Il materiale è sceso (es: da posizione 2 a 5)
+                        artidDAO.shiftRanksUp(artidId, oldRank, newRank);
+                    } else {
+                        // Il materiale è salito (es: da posizione 5 a 2)
+                        artidDAO.shiftRanksDown(artidId, oldRank, newRank);
+                    }
+
+                    // 4. Aggiorniamo il rank del materiale spostato col suo nuovo valore definitivo
+                    artidDAO.updateResourceRank(artidId, resourceId, newRank);
+
+                    return true;
+                })
+                .orElse(false); // 404 se l'ArtID non è tuo o non esiste
     }
 
     /**
@@ -266,9 +339,12 @@ public class ArtidService {
                         artid.setDescription(request.description().trim());
                     }
 
-                    // Nuova thumbnail: la carichiamo su Storage e registriamo un record File (come i
-                    // materiali, bucket di default). Il vecchio file va cancellato solo DOPO l'UPDATE che
-                    // sposta id_thumbnail sul nuovo record, altrimenti la FK punta ancora al vecchio.
+                    // Nuova thumbnail: la carichiamo su Storage e registriamo un record File (come
+                    // i
+                    // materiali, bucket di default). Il vecchio file va cancellato solo DOPO
+                    // l'UPDATE che
+                    // sposta id_thumbnail sul nuovo record, altrimenti la FK punta ancora al
+                    // vecchio.
                     Long oldThumbnailId = null;
                     String oldThumbnailKey = null;
                     if (image != null && !image.isEmpty()) {
@@ -301,9 +377,12 @@ public class ArtidService {
     }
 
     /**
-     * Carica i byte della thumbnail su Storage (bucket di default, come i materiali) e registra il
-     * record {@link File} con la object key. La thumbnail deve essere un'immagine. Se la transazione
-     * fa rollback l'oggetto appena caricato viene rimosso, per non lasciare orfani su Storage.
+     * Carica i byte della thumbnail su Storage (bucket di default, come i
+     * materiali) e registra il
+     * record {@link File} con la object key. La thumbnail deve essere un'immagine.
+     * Se la transazione
+     * fa rollback l'oggetto appena caricato viene rimosso, per non lasciare orfani
+     * su Storage.
      */
     private File saveThumbnailFile(MultipartFile image) {
         String contentType = image.getContentType();
@@ -331,9 +410,11 @@ public class ArtidService {
         return fileDAO.save(file);
     }
 
-    // Cancella l'oggetto su Storage solo dopo il commit (vecchia thumbnail sostituita).
+    // Cancella l'oggetto su Storage solo dopo il commit (vecchia thumbnail
+    // sostituita).
     private void deleteObjectAfterCommit(String objectKey) {
-        if (objectKey == null) return;
+        if (objectKey == null)
+            return;
         if (!TransactionSynchronizationManager.isSynchronizationActive()) {
             safeDelete(objectKey);
             return;
@@ -346,9 +427,11 @@ public class ArtidService {
         });
     }
 
-    // Rimuove l'oggetto appena caricato se la transazione fa rollback (evita orfani su Storage).
+    // Rimuove l'oggetto appena caricato se la transazione fa rollback (evita orfani
+    // su Storage).
     private void deleteObjectOnRollback(String objectKey) {
-        if (objectKey == null || !TransactionSynchronizationManager.isSynchronizationActive()) return;
+        if (objectKey == null || !TransactionSynchronizationManager.isSynchronizationActive())
+            return;
         TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
             @Override
             public void afterCompletion(int status) {
@@ -359,7 +442,8 @@ public class ArtidService {
         });
     }
 
-    // La pulizia su Storage è best-effort: un fallimento non deve propagarsi (il DB è la fonte di verità).
+    // La pulizia su Storage è best-effort: un fallimento non deve propagarsi (il DB
+    // è la fonte di verità).
     private void safeDelete(String objectKey) {
         try {
             storageService.delete(objectKey);
@@ -369,7 +453,8 @@ public class ArtidService {
     }
 
     private static String extractExtension(String fileName) {
-        if (fileName == null) return null;
+        if (fileName == null)
+            return null;
         int dot = fileName.lastIndexOf('.');
         return dot > 0 && dot < fileName.length() - 1 ? fileName.substring(dot + 1) : null;
     }

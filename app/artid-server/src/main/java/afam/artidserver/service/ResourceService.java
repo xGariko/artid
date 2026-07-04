@@ -121,7 +121,7 @@ public class ResourceService {
         Resource saved = resourceDAO.save(resource);
 
         if (request.artidId() != null) {
-            artidService.linkArtidResource(request.artidId(), saved.getId());
+            artidService.linkArtidResource(request.artidId(), saved.getId(), userId);
         }
         return toResponse(saved, FileMetadata.of(savedFile));
     }
@@ -170,7 +170,7 @@ public class ResourceService {
         // Il design corrente vincola un materiale a un solo ArtID → wipe+insert.
         jdbcTemplate.update("DELETE FROM artid_resource WHERE id_resource = ?", saved.getId());
         if (request.artidId() != null) {
-            artidService.linkArtidResource(request.artidId(), saved.getId());
+            artidService.linkArtidResource(request.artidId(), saved.getId(), userId);
         }
 
         if (oldFileIdToDelete != null) {

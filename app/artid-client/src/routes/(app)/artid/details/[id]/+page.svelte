@@ -135,9 +135,51 @@
 		draggableMaterials = e.detail.items;
 	}
 
-	function handleDndFinalize(e: CustomEvent) {
+	async function handleDndFinalize(e: CustomEvent) {
 		draggableMaterials = e.detail.items;
-		// Qui puoi fare una chiamata API per salvare il nuovo ordine nel database Java!
+		const { trigger, id } = e.detail.info;
+
+		if (trigger === 'droppedIntoZone') {
+			// 1. Trova la posizione VECCHIA dell'elemento prima di applicare il nuovo ordine
+			// Guardiamo dove si trovava nell'array stabile corrente
+			const oldIndex = draggableMaterials.findIndex((m) => m.id === id);
+
+			// 2. Aggiorna lo stato locale con il NUOVO ordine
+			const updatedItems = e.detail.items as ResourceResponse[];
+
+			// 3. Trova la NUOVA posizione dell'elemento
+			const newIndex = updatedItems.findIndex((m) => m.id === id);
+
+			// AGGIORNAMENTO STATO LOCALE
+			draggableMaterials = updatedItems;
+
+			// 4. CONTROLLO DI GUARDIA: Se la posizione non è cambiata, ci fermiamo qui!
+			if (oldIndex === newIndex) {
+				return;
+			}
+
+			const newRank = newIndex + 1; // Backend basato su 1
+
+			try {
+				const { response } = await api.PUT('/api/artids/{id}/resources/{resourceId}/reorder', {
+					params: {
+						path: { id: Number(artid.id), resourceId: id }
+					},
+					body: newRank,
+					credentials: 'include'
+				});
+
+				if (!response.ok) {
+					toast.error("Errore nel salvataggio dell'ordine.");
+				} else {
+					toast.success('Ordinamento aggiornato.');
+				}
+			} catch {
+				toast.error('Errore di rete durante il riordinamento.');
+			} finally {
+				await invalidateAll();
+			}
+		}
 	}
 
 	let isOpen = $state(false);
@@ -178,7 +220,7 @@
 
 	let showDeleteModal = $state(false);
 
-	function askDelete(){
+	function askDelete() {
 		showDeleteModal = true;
 	}
 
@@ -192,7 +234,7 @@
 				toast.success('ArtId cancellato con successo');
 				await goto(resolve('/(app)/artid'));
 			} else {
-				toast.error('Errore durante la cancellazione dell\'artid');
+				toast.error("Errore durante la cancellazione dell'artid");
 			}
 		} catch {
 			toast.error('Errore di rete');
@@ -416,19 +458,19 @@
 						onclick={() => (isInternalShareOpen = !isInternalShareOpen)}
 					/>
 					<ArtidButton
-							label="Crea link"
-							icon="link-45deg"
-							fullWidth={false}
-							btnStyle="primary"
-							onclick={() => (isCreateLinkOpen = true)}
-						/>
+						label="Crea link"
+						icon="link-45deg"
+						fullWidth={false}
+						btnStyle="primary"
+						onclick={() => (isCreateLinkOpen = true)}
+					/>
 				</div>
 			</div>
 		</div>
 	</div>
 
 	<div
-		class="bg-artid-section h-100 overflow-hidden w-75 rounded-3 border border-artid-border d-flex justify-content-between"
+		class="bg-artid-section overflow-hidden w-75 rounded-3 border border-artid-border d-flex justify-content-between"
 		style="min-height: 0;"
 	>
 		<div class="w-50 h-100 overflow-y-auto border-end border-artid-border d-flex flex-column">
@@ -497,7 +539,7 @@
 			</div>
 		</div>
 
-		<div class="w-50 h-100 d-flex flex-column overflow-hidden">
+		<div class="w-50 d-flex flex-column overflow-hidden">
 			<div
 				class="bg-artid-surface border-0 border-bottom border-artid-border px-3 py-2 text-artid-text fw-semibold fs-5"
 			>
@@ -521,7 +563,7 @@
 								type="text"
 								class="form-control rounded-3 ps-5 py-2 search-input"
 								placeholder="Cerca materiali"
-								disabled="{filteredMaterials.length === 0}"
+								disabled={filteredMaterials.length === 0}
 								bind:value={searchQuery}
 							/>
 						</div>
@@ -537,30 +579,39 @@
 						{:else}
 							<ul
 								class="list-group list-unstyled"
-								use:dndzone={{ items: filteredMaterials, flipDurationMs }}
+								use:dndzone={{
+									items: draggableMaterials,
+									flipDurationMs,
+									dragDisabled: searchQuery.trim() !== '',
+									dropTargetClasses: ['dndzone']
+								}}
 								onconsider={handleDndConsider}
 								onfinalize={handleDndFinalize}
 							>
-
 								{#each filteredMaterials as material (material.id)}
-									<li class="list-group-item d-flex justify-content-between align-items-center gap-3">
-										<i class="bi bi-grip-horizontal fs-4 text-artid-text-muted" style="cursor: grab;"
+									<li
+										class="list-group-item d-flex justify-content-between align-items-center gap-3"
+									>
+										<i
+											class="bi bi-grip-horizontal fs-4 text-artid-text-muted"
+											style:cursor={searchQuery.trim() !== '' ? 'not-allowed' : 'grab'}
+											style:opacity={searchQuery.trim() !== '' ? 0.3 : 1}
 										></i>
 										<span
 											class="badge-type fw-bold text-white"
 											style:background-color={badgeColorForExtension(material.extension)}
 										>
-										{badgeLabelForExtension(material.extension)}
-									</span>
+											{badgeLabelForExtension(material.extension)}
+										</span>
 										<span class="flex-grow-1 text-truncate">
-										{material.title}
-									</span>
+											{material.title}
+										</span>
 										<button
 											class="border-0 bg-transparent"
 											onclick={() => handleDeleteMaterial(material.id!)}
 											aria-label="remove material"
 										>
-											<i class="bi bi-x fs-4" style="color: red;"></i>
+											<i class="bi bi-x fs-4 text-danger"></i>
 										</button>
 									</li>
 								{/each}
@@ -582,7 +633,6 @@
 	</div>
 </div>
 
-
 <ArtidModal
 	bind:isOpen={showDeleteModal}
 	title="Conferma eliminazione"
@@ -597,103 +647,107 @@
 <ArtidCreateLinkModal bind:isOpen={isCreateLinkOpen} artidId={Number(id)} />
 
 <style lang="scss">
-  .artid-favourite {
-    border-right: 1px solid;
-  }
+	.artid-favourite {
+		border-right: 1px solid;
+	}
 
-  .tag-container {
-    width: 100%;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
+	.tag-container {
+		width: 100%;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+	}
 
-  .tag {
-    position: relative;
-    /* display: flex;
+	.tag {
+		position: relative;
+		/* display: flex;
 		align-items: center; */
-    /* gap: 1rem; */
-    /* padding-left: 1rem; */
+		/* gap: 1rem; */
+		/* padding-left: 1rem; */
 
-    .tag-color {
-      width: 8px;
-      height: 8px;
-      border-radius: 100%;
-    }
+		.tag-color {
+			width: 8px;
+			height: 8px;
+			border-radius: 100%;
+		}
 
-    .tag-name {
-      font-size: 12px;
-      font-weight: bold;
-    }
-  }
+		.tag-name {
+			font-size: 12px;
+			font-weight: bold;
+		}
+	}
 
-  button:disabled {
-    color: var(--artid-text-muted) !important;
-    cursor: not-allowed;
-  }
+	button:disabled {
+		color: var(--artid-text-muted) !important;
+		cursor: not-allowed;
+	}
 
-  .a {
-    border-right: 1px solid;
-  }
+	.a {
+		border-right: 1px solid;
+	}
 
-  .artid-image {
-    width: 150px;
-    object-fit: contain;
-    aspect-ratio: 1 / 1;
-  }
+	.artid-image {
+		width: 150px;
+		object-fit: contain;
+		aspect-ratio: 1 / 1;
+	}
 
-  // Placeholder mostrato quando l'ArtID non ha ancora una thumbnail: stesso
-  // ingombro dell'immagine, tile flat con bordo tratteggiato = "slot vuoto".
-  .artid-image-placeholder {
-    width: 150px;
-    aspect-ratio: 1 / 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: 2px dashed var(--artid-border);
-    border-radius: 0.75rem;
-    background-color: var(--artid-surface);
-    color: var(--artid-primary);
-    transition:
-      border-color 0.15s ease,
-      background-color 0.15s ease,
-      color 0.15s ease;
+	// Placeholder mostrato quando l'ArtID non ha ancora una thumbnail: stesso
+	// ingombro dell'immagine, tile flat con bordo tratteggiato = "slot vuoto".
+	.artid-image-placeholder {
+		width: 150px;
+		aspect-ratio: 1 / 1;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		border: 2px dashed var(--artid-border);
+		border-radius: 0.75rem;
+		background-color: var(--artid-surface);
+		color: var(--artid-primary);
+		transition:
+			border-color 0.15s ease,
+			background-color 0.15s ease,
+			color 0.15s ease;
 
-    i {
-      font-size: 3rem;
-      line-height: 1;
-    }
+		i {
+			font-size: 3rem;
+			line-height: 1;
+		}
 
-    &:hover {
-      border-color: var(--artid-primary);
-      background-color: var(--artid-muted);
-    }
-  }
+		&:hover {
+			border-color: var(--artid-primary);
+			background-color: var(--artid-muted);
+		}
+	}
 
-  .badge-type {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 2.25rem;
-    height: 2.25rem;
-    flex-shrink: 0;
-    border-radius: 0.4rem;
-    font-size: 0.7rem;
-    letter-spacing: 0.02em;
-  }
+	.badge-type {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: 2.25rem;
+		height: 2.25rem;
+		flex-shrink: 0;
+		border-radius: 0.4rem;
+		font-size: 0.7rem;
+		letter-spacing: 0.02em;
+	}
 
-  .description-editor {
-    :global(.ql-toolbar.ql-snow) {
-      border-color: var(--artid-border);
-      border-top-left-radius: 0.5rem;
-      border-top-right-radius: 0.5rem;
-    }
+	.description-editor {
+		:global(.ql-toolbar.ql-snow) {
+			border-color: var(--artid-border);
+			border-top-left-radius: 0.5rem;
+			border-top-right-radius: 0.5rem;
+		}
 
-    :global(.ql-container.ql-snow) {
-      height: 10rem;
-      border-color: var(--artid-border);
-      border-bottom-left-radius: 0.5rem;
-      border-bottom-right-radius: 0.5rem;
-    }
-  }
+		:global(.ql-container.ql-snow) {
+			height: 10rem;
+			border-color: var(--artid-border);
+			border-bottom-left-radius: 0.5rem;
+			border-bottom-right-radius: 0.5rem;
+		}
+	}
+
+	:global(.dndzone) {
+		outline: 2px solid var(--artid-primary) !important;
+	}
 </style>
