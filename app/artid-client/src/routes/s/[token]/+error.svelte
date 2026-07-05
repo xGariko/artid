@@ -2,9 +2,6 @@
 	import ArtidNavbar from '$lib/components/layout/artid-navbar.svelte';
 	import { page } from '$app/state';
 
-	// Opzionale: puoi renderlo dinamico.
-	// In SvelteKit l'errore di rete spesso genera uno status 0 o 500
-	let isOfflineError = $derived(page.status === 0 || page.status === 500 || page.error?.message?.includes('fetch'));
 </script>
 
 <!-- Passiamo la prop per forzare il pulsante "Accedi" -->
