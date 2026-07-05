@@ -7,6 +7,7 @@
 	import ArtidInput from '$lib/components/ui/artid-input.svelte';
 	import ArtidModal from '$lib/components/ui/artid-modal.svelte';
 	import type { ArtIdVisibilityType } from '$lib/utilities';
+	import { isFileWithinUploadLimit, FILE_TOO_LARGE_MESSAGE } from '$lib/utilities';
 	import { toast } from 'svelte-sonner';
 	import 'quill/dist/quill.snow.css';
 
@@ -28,14 +29,19 @@
 	let srcImage = $derived(selectedImage ? imagePreview : artid.thumbnailUrl);
 	function handleImageSelect(event: Event) {
 		const target = event.target as HTMLInputElement;
-		if (target.files && target.files.length > 0) {
-			if (imagePreview) {
-				URL.revokeObjectURL(imagePreview);
-			}
-			selectedImage = target.files[0];
-			imagePreview = URL.createObjectURL(selectedImage);
-			toast.warning('Ricordati di cliccare il tasto "Salva" per aggiornare l\'immagine');
+		const file = target.files?.[0];
+		if (!file) return;
+		if (!isFileWithinUploadLimit(file)) {
+			toast.error(FILE_TOO_LARGE_MESSAGE);
+			target.value = ''; // consente di riselezionare (anche lo stesso file dopo averlo ridotto)
+			return;
 		}
+		if (imagePreview) {
+			URL.revokeObjectURL(imagePreview);
+		}
+		selectedImage = file;
+		imagePreview = URL.createObjectURL(selectedImage);
+		toast.warning('Ricordati di cliccare il tasto "Salva" per aggiornare l\'immagine');
 	}
 
 	// Titolo

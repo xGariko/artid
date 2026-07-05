@@ -68,6 +68,10 @@
 			model.internalShareEnabled !== baseline.internalShareEnabled
 	);
 
+	// I campi obbligatori alla registrazione (nome e cognome) non possono restare vuoti: se svuotati,
+	// "Salva" è disabilitato. Email e password non rientrano perché non modificabili da questo form.
+	let requiredFilled = $derived(model.name.trim() !== '' && model.surname.trim() !== '');
+
 	let fieldErrors = $state<Record<string, string>>({});
 	let isSaving = $state(false);
 	let propicInput: HTMLInputElement | null = $state(null);
@@ -239,7 +243,7 @@
 
 			// Il profilo persistito ora coincide col model: azzero il dirty-check.
 			baseline = { ...model };
-			toast.success('Profilo aggiornato');
+			toast.success('Informazioni aggiornate con successo');
 			invalidateAll();
 		} catch (e) {
 			toast.error(e instanceof Error ? e.message : 'Errore di rete');
@@ -720,7 +724,7 @@
 				label={isSaving ? 'Salvataggio…' : 'Salva'}
 				icon="check-lg"
 				btnStyle="success"
-				disabled={isSaving || !isDirty}
+				disabled={isSaving || !isDirty || !requiredFilled}
 				onclick={save}
 				fullWidth={false}
 			/>

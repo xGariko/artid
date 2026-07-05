@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
+	import type { SubmitFunction } from '@sveltejs/kit';
 	import { resolve } from '$app/paths';
 	import { page } from '$app/state';
 	import ArtidInput from '$lib/components/ui/artid-input.svelte';
@@ -41,15 +42,15 @@
 	// Regex email allineata al controllo server-side (?/requestOtp).
 	const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-	// Passo di conferma prima dell'invio OTP: "Accedi" non invia più subito il codice ma mostra la
-	// conferma; l'OTP parte solo all'"Ok" (che submitta il form verso ?/requestOtp).
+	// Passo di conferma prima dell'invio OTP: "Accedi" valida le credenziali (client + server via
+	// ?/validate) SENZA inviare il codice; l'OTP parte solo all'"Ok" (che submitta verso ?/requestOtp).
 	let confirmPhase = $state(false);
 	// Errori di validazione client, mostrati sotto i campi (stessi controlli del server).
 	let clientErrors = $state<{ email?: string; password?: string }>({});
 
-	// "Accedi": valida i campi PRIMA della conferma (stessi controlli di ?/requestOtp), così l'"Ok"
-	// appare solo con input valido. La verifica delle credenziali resta server-side e scatta all'Ok.
-	function goToConfirm() {
+	// Validazione client (stessi controlli di ?/validate): blocca il round-trip su input palesemente
+	// invalidi. La verifica vera delle credenziali resta server-side (?/validate).
+	function validateCredentialsClient(): boolean {
 		const errors: { email?: string; password?: string } = {};
 		const email = credentials.email.trim();
 		if (!email) {
@@ -61,24 +62,26 @@
 			errors.password = 'La password è obbligatoria.';
 		}
 		clientErrors = errors;
-		if (Object.keys(errors).length > 0) return;
-		confirmPhase = true;
+		return Object.keys(errors).length === 0;
 	}
 
-	// Invio OTP (all'Ok): overlay durante la submit; su errore (credenziali errate) torna alla fase
-	// credenziali mostrando il messaggio del server.
-	const onRequestOtp = () => {
+	// Submit unificato del form credenziali. "Accedi" (?/validate) verifica le credenziali lato
+	// server e, se valide, apre la conferma; "Ok" (?/requestOtp) invia davvero l'OTP. Overlay durante
+	// la submit; reset:false preserva i campi (nascosti con d-none) così l'"Ok" li reinvia.
+	const onSubmit: SubmitFunction = ({ action, cancel }) => {
+		if (action.search === '?/validate' && !validateCredentialsClient()) {
+			cancel();
+			return;
+		}
 		$loading = true;
-		return async ({
-			result,
-			update
-		}: {
-			result: { type: string };
-			update: () => Promise<void>;
-		}) => {
+		return async ({ result, update }) => {
 			$loading = false;
-			await update();
-			if (result.type === 'failure') confirmPhase = false;
+			await update({ reset: false });
+			if (action.search === '?/validate') {
+				if (result.type === 'success') confirmPhase = true;
+			} else if (result.type === 'failure') {
+				confirmPhase = false;
+			}
 		};
 	};
 
@@ -195,7 +198,7 @@
 		{/if}
 	{/if}
 
-	<form method="POST" action="?/requestOtp" class="auth-form" use:enhance={onRequestOtp}>
+	<form method="POST" action="?/requestOtp" class="auth-form" use:enhance={onSubmit}>
 		<!-- Fase credenziali: i campi restano nel DOM (nascosti con d-none) anche durante la conferma,
 			così l'"Ok" li invia insieme alla richiesta OTP. -->
 		<div class:d-none={confirmPhase}>
@@ -231,7 +234,7 @@
 			{/if}
 
 			<div class="row p-1 mt-2">
-				<ArtidButton label="Accedi" type="button" onclick={goToConfirm} />
+				<ArtidButton label="Accedi" type="submit" formaction="?/validate" />
 			</div>
 		</div>
 

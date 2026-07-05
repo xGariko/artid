@@ -74,16 +74,18 @@
 </a>
 
 <style lang="scss">
-	.card-image {
-		position: relative;
-		height: 200px;
-		align-items: center;
-	}
+  .card-image {
+    position: relative;
+    height: 200px;
+    align-items: center;
+    justify-content: center;
+  }
 
-	.card-image img {
-		width: 100%;
-		object-fit: cover;
-	}
+  .card-image img {
+    max-width: 100%;
+    object-fit: cover;
+    max-height: 100%;
+  }
 
 	.artid-card {
 		transition: all 0.2s ease;

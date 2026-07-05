@@ -1,6 +1,6 @@
 import { fail, redirect } from "@sveltejs/kit";
 import type { Actions } from "./$types";
-import { requestOtp, verifyOtp, resendOtp } from "$lib/auth.ts";
+import { requestOtp, validateCredentials, verifyOtp, resendOtp } from "$lib/auth.ts";
 
 type LoginField = "email" | "password";
 type FieldErrors = Partial<Record<LoginField, string>>;
@@ -9,6 +9,7 @@ type FieldErrors = Partial<Record<LoginField, string>>;
 // narrowing. `step: "otp"` indica che siamo nella fase di verifica del codice.
 type LoginActionData = {
 	step?: "otp";
+	validated?: boolean;
 	email?: string;
 	errors?: FieldErrors;
 	formError?: string;
@@ -25,7 +26,36 @@ const INVALID_CODE =
 	"Errore: codice non valido, controlla nella mail che non sia scaduto. Se è scaduto clicca Riprova.";
 
 export const actions: Actions = {
-	// Step 1: valida le credenziali; in caso positivo il server invia l'OTP via email.
+	// Step di conferma (RAD): valida le credenziali SENZA inviare l'OTP, così la schermata "Ok"
+	// (che poi invia davvero il codice via ?/requestOtp) appare solo con credenziali corrette.
+	validate: async ({ request, locals }) => {
+		const form = await request.formData();
+		const email = (form.get("email") as string)?.trim() ?? "";
+		const password = (form.get("password") as string) ?? "";
+
+		const errors: FieldErrors = {};
+		if (!email) {
+			errors.email = "L'email è obbligatoria.";
+		} else if (!EMAIL_REGEX.test(email)) {
+			errors.email = "Inserisci un indirizzo email valido.";
+		}
+		if (!password) {
+			errors.password = "La password è obbligatoria.";
+		}
+
+		if (Object.keys(errors).length > 0) {
+			return fail(400, { errors, email } as LoginActionData);
+		}
+
+		const result = await validateCredentials(locals.api, { email, password });
+		if (!result.ok) {
+			return fail(401, { errors: {}, formError: result.error, email } as LoginActionData);
+		}
+
+		return { validated: true, email } as LoginActionData;
+	},
+
+	// Step 1 (all'"Ok"): rivalida le credenziali e, in caso positivo, invia l'OTP via email.
 	requestOtp: async ({ request, locals }) => {
 		const form = await request.formData();
 		const email = (form.get("email") as string)?.trim() ?? "";

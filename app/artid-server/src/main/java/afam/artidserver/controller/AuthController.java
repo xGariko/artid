@@ -65,6 +65,23 @@ public class AuthController {
     }
 
     /**
+     * Validazione delle sole credenziali, SENZA generare né inviare l'OTP. Alimenta lo step di
+     * conferma (RAD) mostrato prima del dispatch del codice: l'utente arriva all'"Ok" solo con
+     * credenziali corrette. 401 se errate, 200 se valide. L'OTP parte poi da {@link #login}.
+     */
+    @PostMapping("/login/validate")
+    public ResponseEntity<Void> validateLogin(@RequestBody LoginRequest request) {
+        try {
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
+            );
+        } catch (AuthenticationException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        return ResponseEntity.ok().build();
+    }
+
+    /**
      * Step 2 del login: verifica l'OTP e, se valido, rilascia il token JWT.
      * Risposta indistinta (401) per email inesistente o codice errato/scaduto.
      */
@@ -143,6 +160,19 @@ public class AuthController {
         }
         OffsetDateTime expiresAt = registrationService.startChallenge(request);
         return ResponseEntity.ok(new OtpChallengeResponse(true, request.getEmail(), expiresAt));
+    }
+
+    /**
+     * Validazione della sola disponibilità dell'email, SENZA creare la registrazione pending né
+     * inviare l'OTP. Alimenta lo step di conferma (RAD) prima del dispatch del codice. 409 se
+     * l'email è già registrata, 200 se libera. La challenge parte poi da {@link #register}.
+     */
+    @PostMapping("/register/validate")
+    public ResponseEntity<Void> validateRegistration(@RequestBody RegisterRequest request) {
+        if (userService.findByMail(request.getEmail()).isPresent()) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        }
+        return ResponseEntity.ok().build();
     }
 
     /**

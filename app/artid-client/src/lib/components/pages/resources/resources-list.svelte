@@ -138,6 +138,31 @@
 		}
 	}
 
+	async function toggleResourceFavorite(resource: ResourceResponse): Promise<void> {
+		if (resource.id == null) return;
+		const newFavoriteState = !resource.favorite;
+		try {
+			const response = await api.PUT('/api/resources/{id}/favourite', {
+				params: { path: { id: resource.id } },
+				body: newFavoriteState
+			});
+			if (response.error) {
+				toast.error(
+					newFavoriteState
+						? 'Impossibile aggiungere la risorsa ai preferiti'
+						: 'Impossibile rimuovere la risorsa dai preferiti'
+				);
+				return;
+			}
+			await invalidateAll();
+			toast.success(
+				newFavoriteState ? 'Risorsa aggiunta ai preferiti' : 'Risorsa rimossa dai preferiti'
+			);
+		} catch {
+			toast.error('Errore di rete');
+		}
+	}
+
 	let selectedResources = $derived(resources.filter((r) => selectedResourceIds.has(r.id!)));
 </script>
 
@@ -236,11 +261,22 @@
 					<span class="text-artid-text-muted ms-1">ArtID</span>
 				</div>
 				<div class="col-1 text-center">
-					<i
-						class="bi bi-star{resource.favorite
-							? '-fill text-warning'
-							: ' text-artid-text-muted'} fs-5"
-					></i>
+					<button
+						type="button"
+						class="btn btn-link p-0 border-0"
+						title={resource.favorite ? 'Rimuovi dai preferiti' : 'Aggiungi ai preferiti'}
+						aria-label={resource.favorite ? 'Rimuovi dai preferiti' : 'Aggiungi ai preferiti'}
+						onclick={(event) => {
+							event.stopPropagation();
+							toggleResourceFavorite(resource);
+						}}
+					>
+						<i
+							class="bi bi-star{resource.favorite
+								? '-fill text-warning'
+								: ' text-artid-text-muted'} fs-5"
+						></i>
+					</button>
 				</div>
 			</div>
 		{/each}

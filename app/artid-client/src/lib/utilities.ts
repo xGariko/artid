@@ -35,6 +35,19 @@ export function toDateInputValue(date: Date): string {
 	return `${year}-${month}-${day}`;
 }
 
+// Limite massimo di upload lato client, allineato a spring.servlet.multipart.max-file-size (50MB,
+// dove MB = 1024*1024 come da parsing DataSize di Spring). Blocca il file prima dell'invio così
+// l'utente riceve subito un errore chiaro invece del 413/500 dal backend.
+export const MAX_UPLOAD_SIZE_BYTES = 50 * 1024 * 1024;
+
+// Messaggio d'errore mostrato via toast quando un file supera il limite di upload.
+export const FILE_TOO_LARGE_MESSAGE = 'Il file selezionato supera il limite di 50 MB.';
+
+// True se il file rientra nel limite di upload.
+export function isFileWithinUploadLimit(file: File): boolean {
+	return file.size <= MAX_UPLOAD_SIZE_BYTES;
+}
+
 // Formatta una dimensione in byte come stringa human-readable (kb/mb/gb).
 export function formatFileSize(bytes: number | null | undefined): string {
 	if (bytes == null) return '—';

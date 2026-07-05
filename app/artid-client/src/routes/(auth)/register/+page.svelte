@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
+	import type { SubmitFunction } from '@sveltejs/kit';
 	import { resolve } from '$app/paths';
 	import ArtidInput from '$lib/components/ui/artid-input.svelte';
 	import ArtidOtpInput from '$lib/components/ui/artid-otp-input.svelte';
@@ -8,6 +9,7 @@
 	import ArtidButton from '$lib/components/ui/artid-button.svelte';
 	import ArtidOtpConfirm from '$lib/components/ui/artid-otp-confirm.svelte';
 	import { RegisterRequestSchema, type RegisterRequest } from '$lib/models/schemas';
+	import { toDateInputValue } from '$lib/utilities';
 	import { loading } from '$lib/stores/loading.ts';
 	import type { ActionData } from './$types';
 
@@ -30,20 +32,20 @@
 		email: 'Inserisci un indirizzo email valido.',
 		password: 'La password deve contenere almeno 8 caratteri.',
 		confirmPassword: 'Le password non coincidono.',
-		birthdate: 'Data di nascita non valida.',
+		birthdate: 'Inserisci una data di nascita valida e antecedente a oggi.',
 		birthplace: 'Luogo di nascita non valido.'
 	};
 
-	// Passo di conferma prima dell'invio OTP: "Registrati" non invia più subito il codice ma mostra la
-	// conferma; l'OTP (e la creazione dell'account) partono solo all'"Ok".
+	// Passo di conferma prima dell'invio OTP: "Registrati" valida i dati (client + server via
+	// ?/validate) SENZA inviare il codice; l'OTP (e la creazione dell'account) partono solo all'"Ok".
 	let confirmPhase = $state(false);
 	// Errori di validazione client, mostrati sotto i campi (stessi controlli del server).
 	let clientErrors = $state<Partial<Record<RegisterFieldError, string>>>({});
 
-	// "Registrati": valida i campi PRIMA della conferma (stessa validazione di ?/requestOtp: Zod +
-	// coincidenza password), così l'"Ok" appare solo con dati validi. L'unicità dell'email resta
-	// server-side e scatta all'Ok.
-	function goToConfirm() {
+	// Validazione client (stessa di ?/validate: Zod + coincidenza password): blocca il round-trip su
+	// dati palesemente invalidi. L'unicità dell'email resta server-side (?/validate). Ritorna true
+	// se i dati passano.
+	function validateRegistrationClient(): boolean {
 		const errors: Partial<Record<RegisterFieldError, string>> = {};
 		const parsed = RegisterRequestSchema.safeParse({
 			name: userDTO.name.trim(),
@@ -63,24 +65,26 @@
 			errors.confirmPassword = FIELD_MESSAGES.confirmPassword;
 		}
 		clientErrors = errors;
-		if (Object.keys(errors).length > 0) return;
-		confirmPhase = true;
+		return Object.keys(errors).length === 0;
 	}
 
-	// Invio OTP (all'Ok): overlay durante la submit; su errore (es. email già registrata) torna alla
-	// fase dati mostrando il messaggio del server.
-	const onRequestOtp = () => {
+	// Submit unificato del form dati. "Registrati" (?/validate) verifica dati ed email lato server e,
+	// se validi, apre la conferma; "Ok" (?/requestOtp) invia davvero l'OTP. Overlay durante la submit;
+	// reset:false preserva i campi (nascosti con d-none) così l'"Ok" li reinvia.
+	const onSubmit: SubmitFunction = ({ action, cancel }) => {
+		if (action.search === '?/validate' && !validateRegistrationClient()) {
+			cancel();
+			return;
+		}
 		$loading = true;
-		return async ({
-			result,
-			update
-		}: {
-			result: { type: string };
-			update: () => Promise<void>;
-		}) => {
+		return async ({ result, update }) => {
 			$loading = false;
-			await update();
-			if (result.type === 'failure') confirmPhase = false;
+			await update({ reset: false });
+			if (action.search === '?/validate') {
+				if (result.type === 'success') confirmPhase = true;
+			} else if (result.type === 'failure') {
+				confirmPhase = false;
+			}
 		};
 	};
 
@@ -101,6 +105,14 @@
 	let confirmPassword = $state('');
 	let code = $state('');
 
+	// Limite nativo del date picker: ieri, così la selezione rispecchia la regola "antecedente a oggi"
+	// (la validazione Zod resta la fonte di verità, lato client e server).
+	const maxBirthdate = (() => {
+		const yesterday = new Date();
+		yesterday.setDate(yesterday.getDate() - 1);
+		return toDateInputValue(yesterday);
+	})();
+
 	let passwordMismatch = $derived(
 		confirmPassword.length > 0 && userDTO.password !== confirmPassword
 	);
@@ -110,6 +122,44 @@
 			? 'Le password non coincidono'
 			: (clientErrors.confirmPassword ?? form?.errors?.confirmPassword ?? undefined)
 	);
+
+	// Form di verifica: lo inviamo via JS appena il codice è completo, senza pulsante (come nel login).
+	let verifyForm: HTMLFormElement | undefined = $state();
+
+	// Forza il remount dell'input OTP: dopo un tentativo fallito svuota le caselle e riporta il focus
+	// sulla prima, così l'utente reinserisce il codice da capo.
+	let otpResetKey = $state(0);
+
+	// Evita verifiche concorrenti: una sola submit in volo per volta.
+	let verifying = false;
+
+	// Cifre complete: invia il form di verifica (auto-submit senza pulsante).
+	function onOtpComplete() {
+		if (verifying) return;
+		verifying = true;
+		verifyForm?.requestSubmit();
+	}
+
+	// Verifica OTP: overlay durante la submit; se il codice è errato svuota le caselle e aspetta che
+	// l'utente lo reinserisca — evita il re-invio in loop dello stesso codice già fallito.
+	const onVerify = () => {
+		$loading = true;
+		return async ({
+			result,
+			update
+		}: {
+			result: { type: string };
+			update: () => Promise<void>;
+		}) => {
+			$loading = false;
+			await update();
+			verifying = false;
+			if (result.type === 'failure') {
+				code = '';
+				otpResetKey++;
+			}
+		};
+	};
 
 	// Pattern condiviso col login: attiva l'overlay di caricamento durante la submit.
 	const withLoading = () => {
@@ -128,11 +178,25 @@
 		<strong>{form?.email}</strong>
 	</p>
 
-	<form method="POST" action="?/verify" class="auth-form" use:enhance={withLoading}>
+	<form
+		method="POST"
+		action="?/verify"
+		class="auth-form"
+		use:enhance={onVerify}
+		bind:this={verifyForm}
+	>
 		<input type="hidden" name="email" value={form?.email ?? ''} />
 
 		<div class="p-1 mt-1">
-			<ArtidOtpInput name="code" bind:value={code} error={form?.codeError} autofocus />
+			{#key otpResetKey}
+				<ArtidOtpInput
+					name="code"
+					bind:value={code}
+					error={form?.codeError}
+					oncomplete={onOtpComplete}
+					autofocus
+				/>
+			{/key}
 		</div>
 
 		{#if form?.codeError}
@@ -144,16 +208,15 @@
 		{#if form?.formError}
 			<div class="text-danger small text-center mt-2">{form.formError}</div>
 		{/if}
+	</form>
 
-		<div class="row p-1 mt-2">
-			<ArtidButton label="Verifica e crea account" type="submit" />
-		</div>
-
-		<p class="text-center mt-3 mb-0">
+	<!-- Rinvio in un form separato: il form di verifica non ha pulsanti di submit, così l'invio
+		automatico via requestSubmit() usa sempre l'azione ?/verify senza ambiguità. -->
+	<form method="POST" action="?/resend" class="text-center mt-3" use:enhance={withLoading}>
+		<input type="hidden" name="email" value={form?.email ?? ''} />
+		<p class="mb-0">
 			Non hai ricevuto il codice?
-			<button type="submit" formaction="?/resend" class="btn btn-link p-0 align-baseline auth-link">
-				Invia di nuovo
-			</button>
+			<button type="submit" class="btn btn-link p-0 align-baseline auth-link">Invia di nuovo</button>
 		</p>
 	</form>
 
@@ -165,7 +228,7 @@
 		<h2 class="fw-bold text-center mb-4">Registrati</h2>
 	{/if}
 
-	<form method="POST" action="?/requestOtp" class="auth-form" use:enhance={onRequestOtp}>
+	<form method="POST" action="?/requestOtp" class="auth-form" use:enhance={onSubmit}>
 		<!-- Fase dati: i campi restano nel DOM (nascosti con d-none) durante la conferma, così l'"Ok"
 			li invia insieme alla richiesta OTP. -->
 		<div class:d-none={confirmPhase}>
@@ -226,6 +289,7 @@
 						type="date"
 						name="birthdate"
 						label="Data di nascita"
+						max={maxBirthdate}
 						bind:value={userDTO.birthdate}
 						error={clientErrors.birthdate ?? form?.errors?.birthdate}
 					/>
@@ -244,7 +308,7 @@
 			{/if}
 
 			<div class="row p-1 mt-2">
-				<ArtidButton label="Registrati" type="button" onclick={goToConfirm} />
+				<ArtidButton label="Registrati" type="submit" formaction="?/validate" />
 			</div>
 		</div>
 

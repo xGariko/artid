@@ -110,6 +110,25 @@ export async function requestOtp(api: ApiClient, payload: LoginPayload): Promise
 	return { ok: true, email: data.email ?? payload.email };
 }
 
+// Validazione delle sole credenziali, SENZA invio OTP: alimenta lo step di conferma (RAD) prima del
+// dispatch, così l'"Ok" appare solo con credenziali corrette. L'OTP parte poi da requestOtp().
+export async function validateCredentials(
+	api: ApiClient,
+	payload: LoginPayload
+): Promise<{ ok: true } | { ok: false; error: string }> {
+	const { response } = await api.POST('/api/auth/login/validate', { body: payload });
+
+	if (!response.ok) {
+		const error =
+			response.status === 401
+				? 'Email o password non corretti.'
+				: 'Impossibile verificare le credenziali. Riprova tra poco.';
+		return { ok: false, error };
+	}
+
+	return { ok: true };
+}
+
 // Step 2 del login: verifica l'OTP e, se valido, apre la sessione.
 export async function verifyOtp(
 	api: ApiClient,
@@ -182,6 +201,25 @@ export async function requestRegistration(
 	}
 
 	return { ok: true, email: data.email ?? payload.email };
+}
+
+// Validazione della sola disponibilità dell'email, SENZA creare il pending né inviare l'OTP:
+// alimenta lo step di conferma (RAD) prima del dispatch. L'account e l'OTP nascono poi da
+// requestRegistration() all'"Ok". 409 → email già registrata (errore sul campo email).
+export async function validateRegistrationEmail(
+	api: ApiClient,
+	payload: RegisterPayload
+): Promise<RegistrationOtpResult> {
+	const { response } = await api.POST('/api/auth/register/validate', { body: payload });
+
+	if (!response.ok) {
+		if (response.status === 409) {
+			return { ok: false, error: 'Esiste già un account con questa email.', field: 'email' };
+		}
+		return { ok: false, error: 'Errore durante la verifica. Riprova.' };
+	}
+
+	return { ok: true, email: payload.email };
 }
 
 // Step 2: verifica l'OTP e, se valido, crea l'account e apre la sessione.

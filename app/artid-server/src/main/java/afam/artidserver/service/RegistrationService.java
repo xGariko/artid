@@ -90,7 +90,7 @@ public class RegistrationService {
             registrationOtpDAO.save(pending);
         });
 
-        emailService.sendText(request.getEmail(), SUBJECT, buildBody(request.getName(), code, expiresAt));
+        emailService.sendHtml(request.getEmail(), SUBJECT, buildBody(request.getName(), code, expiresAt));
         return expiresAt;
     }
 
@@ -159,7 +159,7 @@ public class RegistrationService {
         pending.setAttempts(0);
         registrationOtpDAO.save(pending);
 
-        emailService.sendText(email, SUBJECT, buildBody(pending.getName(), code, expiresAt));
+        emailService.sendHtml(email, SUBJECT, buildBody(pending.getName(), code, expiresAt));
         return Optional.of(expiresAt);
     }
 
@@ -168,11 +168,14 @@ public class RegistrationService {
         return String.format("%0" + codeLength + "d", random.nextInt(bound));
     }
 
+    // Corpo email identico a quello del login: stesso template HTML (OtpEmailTemplate) e stessi
+    // heading/intro usati da OtpService.
     private String buildBody(String name, String code, OffsetDateTime expiresAt) {
-        String greetingName = (name == null || name.isBlank()) ? "Membro" : name;
-        return "Salve " + greetingName + ", per completare la registrazione ad ArtID inserisci il "
-                + "codice di verifica: " + code + ". Il codice sarà valido fino alle "
-                + EXPIRY_TIME_FORMAT.format(expiresAt) + ", non condividerlo con nessuno. "
-                + "SE NON SEI STATO TU A RICHIEDERLO IGNORA QUESTA EMAIL.";
+        return OtpEmailTemplate.render(
+                name,
+                code,
+                EXPIRY_TIME_FORMAT.format(expiresAt),
+                "Il tuo codice di accesso",
+                "usa questo codice per accedere al tuo account ArtID.");
     }
 }

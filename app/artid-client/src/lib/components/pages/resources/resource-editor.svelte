@@ -7,6 +7,7 @@
 	import ArtidButton from '$lib/components/ui/artid-button.svelte';
 	import ArtidEditorModal from '$lib/components/ui/artid-editor-modal.svelte';
 	import ArtidInput from '$lib/components/ui/artid-input.svelte';
+	import { isFileWithinUploadLimit, FILE_TOO_LARGE_MESSAGE } from '$lib/utilities';
 
 	let {
 		isOpen = $bindable(),
@@ -93,7 +94,13 @@
 
 	function handleFilePick(event: Event): void {
 		const input = event.currentTarget as HTMLInputElement;
-		selectedFile = input.files?.[0] ?? null;
+		const file = input.files?.[0] ?? null;
+		if (file && !isFileWithinUploadLimit(file)) {
+			toast.error(FILE_TOO_LARGE_MESSAGE);
+			input.value = ''; // consente di riselezionare (anche lo stesso file dopo averlo ridotto)
+			return;
+		}
+		selectedFile = file;
 	}
 
 	function handleDragOver(event: DragEvent): void {
@@ -108,7 +115,12 @@
 	function handleDrop(event: DragEvent): void {
 		event.preventDefault();
 		isDragging = false;
-		selectedFile = event.dataTransfer?.files?.[0] ?? null;
+		const file = event.dataTransfer?.files?.[0] ?? null;
+		if (file && !isFileWithinUploadLimit(file)) {
+			toast.error(FILE_TOO_LARGE_MESSAGE);
+			return;
+		}
+		selectedFile = file;
 	}
 
 	async function handleSubmit(): Promise<void> {

@@ -232,7 +232,12 @@
       "Bash(ls -1 pom.xml build.gradle build.gradle.kts settings.gradle settings.gradle.kts)",
       "Bash(ls -d target/classes)",
       "Bash(ls -d build/classes)",
-      "Bash(ls -d out)"
+      "Bash(ls -d out)",
+      "Bash(node -e \"const s=require\\('./package.json'\\).scripts; console.log\\(JSON.stringify\\(s,null,2\\)\\)\")",
+      "Bash(node -e \"console.log\\('zod', require\\('./node_modules/zod/package.json'\\).version\\)\")",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:8080/v3/api-docs --max-time 5)",
+      "PowerShell(& \"C:\\\\progetti\\\\artid\\\\app\\\\artid-server\\\\mvnw.cmd\" -f \"C:\\\\progetti\\\\artid\\\\app\\\\artid-server\\\\pom.xml\" -q -o compile 2>&1)",
+      "PowerShell(& \"C:\\\\progetti\\\\artid\\\\app\\\\artid-server\\\\mvnw.cmd\" -f \"C:\\\\progetti\\\\artid\\\\app\\\\artid-server\\\\pom.xml\" -q compile; \"EXIT=$LASTEXITCODE\"; Get-ChildItem \"C:\\\\progetti\\\\artid\\\\app\\\\artid-server\\\\target\\\\classes\\\\afam\\\\artidserver\\\\exception\",\"C:\\\\progetti\\\\artid\\\\app\\\\artid-server\\\\target\\\\classes\\\\afam\\\\artidserver\\\\model\\\\dto\\\\ErrorResponse.class\" -ErrorAction SilentlyContinue | Select-Object FullName)"
     ]
   }
 }

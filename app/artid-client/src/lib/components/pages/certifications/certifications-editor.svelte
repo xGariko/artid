@@ -1,16 +1,14 @@
 <script lang="ts">
 	import { invalidateAll } from '$app/navigation';
 	import { toast } from 'svelte-sonner';
-	import type Quill from 'quill';
-	import 'quill/dist/quill.snow.css';
 	import ArtidButton from '$lib/components/ui/artid-button.svelte';
 	import ArtidEditorModal from '$lib/components/ui/artid-editor-modal.svelte';
 	import ArtidInput from '$lib/components/ui/artid-input.svelte';
+	import { isFileWithinUploadLimit, FILE_TOO_LARGE_MESSAGE } from '$lib/utilities';
 
 	export interface CertificationResponse {
 		id?: number;
 		title?: string;      // Modificato in opzionale (?) per allinearsi a +page.svelte
-		description?: string;
 		isPublic?: boolean;
 		public?: boolean;    // Aggiunto per tollerare il mapping nativo del backend
 		extension?: string;
@@ -30,69 +28,47 @@
 	const isEditMode = $derived(certification != null);
 
 	let title = $state('');
-	let description = $state('');
 	let isPublic = $state(false);
 	let selectedFile = $state<File | null>(null);
 	let fileInput: HTMLInputElement | null = $state(null);
 	let isDragging = $state(false);
 	let isSaving = $state(false);
 
-	let quillContainer = $state<HTMLDivElement | undefined>(undefined);
-	let quill = $state.raw<Quill | null>(null);
+	// In modifica "Salva" si attiva solo se cambia il titolo o la visibilità (dirty-check sui valori
+	// originali della certificazione). In creazione non serve: basta titolo + file.
+	const isDirty = $derived(
+		title !== (certification?.title ?? '') ||
+			isPublic !== (certification?.isPublic ?? certification?.public ?? false)
+	);
 
 	// Resetta i campi all'apertura del modale
 	$effect(() => {
 		if (!isOpen) return;
 		title = certification?.title ?? '';
-		description = certification?.description ?? '';
 		isPublic = certification?.isPublic ?? certification?.public ?? false;
 		selectedFile = null;
 	});
 
-	$effect(() => {
-		if (!quillContainer) {
-			quill = null;
-			return;
-		}
-		const node = quillContainer;
-		let cancelled = false;
-		(async () => {
-			const { default: QuillCtor } = await import('quill');
-			if (cancelled) return;
-			const instance = new QuillCtor(node, {
-				theme: 'snow',
-				placeholder: 'Aggiungi una descrizione o delle note per questa certificazione…',
-				modules: {
-					toolbar: [
-						[{ header: [1, 2, false] }],
-						['bold', 'italic', 'underline'],
-						[{ list: 'ordered' }, { list: 'bullet' }],
-						['clean']
-					]
-				}
-			});
-			instance.on('text-change', () => {
-				const html = instance.root.innerHTML;
-				if (html !== description) description = html;
-			});
-			quill = instance;
-		})();
-		return () => {
-			cancelled = true;
-		};
-	});
-
-	$effect(() => {
-		if (!quill) return;
-		const target = description || '';
-		if (quill.root.innerHTML !== target) {
-			quill.root.innerHTML = target;
-		}
-	});
-
 	function handleFilePick(event: Event): void {
 		const input = event.currentTarget as HTMLInputElement;
-		selectedFile = input.files?.[0] ?? null;
+		const file = input.files?.[0] ?? null;
+		if (file && !isFileWithinUploadLimit(file)) {
+			toast.error(FILE_TOO_LARGE_MESSAGE);
+			input.value = ''; // consente di riselezionare (anche lo stesso file dopo averlo ridotto)
+			return;
+		}
+		selectedFile = file;
+	}
+
+	function handleDrop(event: DragEvent): void {
+		event.preventDefault();
+		isDragging = false;
+		const file = event.dataTransfer?.files?.[0] ?? null;
+		if (file && !isFileWithinUploadLimit(file)) {
+			toast.error(FILE_TOO_LARGE_MESSAGE);
+			return;
+		}
+		selectedFile = file;
 	}
 
 	async function handleSubmit(): Promise<void> {
@@ -107,7 +83,6 @@
 		try {
 			const formData = new FormData();
 			formData.append('title', title);
-			formData.append('description', description ?? '');
 			formData.append('isPublic', String(isPublic));
 			if (selectedFile) {
 				formData.append('file', selectedFile);
@@ -135,7 +110,7 @@
 	}
 </script>
 
-<ArtidEditorModal bind:isOpen customHeight="70" customWidth="50">
+<ArtidEditorModal bind:isOpen customHeight={isEditMode ? '30' : '45'} customWidth="50">
 	<div class="d-flex flex-column gap-4 certification-editor pt-1 w-100">
 		<div class="d-flex align-items-center justify-content-between pe-5">
 			<div class="d-flex align-items-center gap-2 text-artid-primary fw-semibold">
@@ -162,13 +137,8 @@
 			</div>
 		</div>
 
-		<div class="d-flex flex-column gap-1">
-			<label for="cert-description" class="text-primary small fw-medium ps-1">Descrizione / Note</label>
-			<div class="quill-editor">
-				<div id="cert-description" bind:this={quillContainer}></div>
-			</div>
-		</div>
-
+		<!-- In modifica il file non è ricaricabile (come per i materiali): l'upload appare solo in creazione. -->
+		{#if !isEditMode}
 		<button
 			type="button"
 			class="dropzone d-flex align-items-center justify-content-between p-4 rounded-3 bg-artid-section text-start w-100"
@@ -176,7 +146,7 @@
 			onclick={() => fileInput?.click()}
 			ondragover={(e) => { e.preventDefault(); isDragging = true; }}
 			ondragleave={() => isDragging = false}
-			ondrop={(e) => { e.preventDefault(); isDragging = false; selectedFile = e.dataTransfer?.files?.[0] ?? null; }}
+			ondrop={handleDrop}
 		>
 			<div class="d-flex flex-column gap-1">
      <span class="fw-bold text-artid-text">
@@ -195,6 +165,7 @@
 			onchange={handleFilePick}
 			accept=".pdf,image/*"
 		/>
+		{/if}
 
 		<div class="d-flex justify-content-end gap-2">
 			<ArtidButton
@@ -210,7 +181,9 @@
 				icon="check2"
 				btnStyle="success"
 				fullWidth={false}
-				disabled={isSaving || title.trim().length === 0 || (!selectedFile && !isEditMode)}
+				disabled={isSaving ||
+					title.trim().length === 0 ||
+					(isEditMode ? !isDirty : !selectedFile)}
 				onclick={handleSubmit}
 			/>
 		</div>
@@ -230,26 +203,5 @@
 
   .dropzone.is-dragging {
     background-color: var(--artid-primary-subtle) !important;
-  }
-
-  .quill-editor :global(.ql-toolbar.ql-snow) {
-    border: 1px solid var(--artid-border);
-    border-top-left-radius: 0.5rem;
-    border-top-right-radius: 0.5rem;
-    background-color: var(--artid-section);
-  }
-
-  .quill-editor :global(.ql-container.ql-snow) {
-    border: 1px solid var(--artid-border);
-    border-top: 0;
-    border-bottom-left-radius: 0.5rem;
-    border-bottom-right-radius: 0.5rem;
-    background-color: var(--artid-section);
-    font-family: var(--artid-font-sans);
-    font-size: 1rem;
-  }
-
-  .quill-editor :global(.ql-editor) {
-    min-height: 8rem;
   }
 </style>

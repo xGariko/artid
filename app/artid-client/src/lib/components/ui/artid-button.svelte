@@ -5,6 +5,7 @@
 		outline = false,
 		icon,
 		type = 'button',
+		formaction,
 		onclick,
 		disabled = false,
 		ariaLabel,
@@ -15,6 +16,7 @@
 		outline?: boolean,
 		icon?: string,
 		type?: 'button' | 'submit' | 'reset',
+		formaction?: string,
 		onclick?: () => void,
 		disabled?: boolean,
 		ariaLabel?: string,
@@ -26,6 +28,7 @@
 	class="btn btn-{outline ? 'outline-' : ''}{btnStyle} rounded-2 px-3 py-2 {fullWidth ? 'w-100' : ''} fw-semibold"
 	onclick={() => onclick?.()}
 	type={type}
+	{formaction}
 	disabled={disabled}
 	aria-label={ariaLabel}
 >
