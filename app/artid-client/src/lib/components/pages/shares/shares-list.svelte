@@ -75,6 +75,16 @@
 		)
 	);
 
+	const hasNonExpiredSelection = $derived(
+		shares.some(
+			(share) =>
+				share.id != null &&
+				selectedSharesIds.has(share.id) &&
+				'expirationDate' in share &&
+				!isExpired(share.expirationDate)
+		)
+	);
+
 	const hasActiveSelection = $derived(
 		shares.some(
 			(share) =>
@@ -105,16 +115,16 @@
 	const minExpirationDate = $derived.by(() => {
 		const now = new Date();
 		let min = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
-		const current = selectedExternalShare?.expirationDate;
-		if (current) {
-			const currentDate = new Date(current);
-			const dayAfterCurrent = new Date(
-				currentDate.getFullYear(),
-				currentDate.getMonth(),
-				currentDate.getDate() + 1
-			);
-			if (dayAfterCurrent > min) min = dayAfterCurrent;
-		}
+		// const current = selectedExternalShare?.expirationDate;
+		// if (current) {
+		// 	const currentDate = new Date(current);
+		// 	const dayAfterCurrent = new Date(
+		// 		currentDate.getFullYear(),
+		// 		currentDate.getMonth(),
+		// 		currentDate.getDate() + 1
+		// 	);
+		// 	if (dayAfterCurrent > min) min = dayAfterCurrent;
+		// }
 		return toDateInputValue(min);
 	});
 
@@ -260,6 +270,14 @@
 		goto(resolve('/(app)/artid/details/[id]/preview', { id: String(artidId) }));
 	}
 
+	function openDetails(artidId: number | undefined): void {
+		if (artidId == null) {
+			toast.error('L\'ArtID selezionato è stato cancellato.');
+			return;
+		}
+		goto(resolve('/(app)/artid/details/[id]', { id: String(artidId) }));
+	}
+
 	// Pulsante "Copia": genera il link pubblico della condivisione e lo copia negli appunti.
 	async function copyShareLink(shareId: number | undefined): Promise<void> {
 		if (shareId == null) return;
@@ -292,8 +310,8 @@
 				} else {
 					if (share.clickCounter == 0) {
 						return (
-							'Il link è scaduto ma il' +
-							'contenuto non + stato ancora visualizzato. Puoi annullare la ' +
+							'Il link è scaduto ma il ' +
+							'contenuto non è stato ancora visualizzato. Puoi annullare la ' +
 							'cellazione e rimandare la scadenza del link con l’apposito pulsante. ' +
 							'Eliminare comunque?'
 						);
@@ -312,6 +330,13 @@
 	async function handleDelete(): Promise<void> {
 		if (isSaving) return;
 		if (selectedSharesIds.size === 0) return; //anche se non serve
+		if (selectedSharesIds.size > 1 && (filter == "externals" || filter == "expired")) {
+			if (hasNonExpiredSelection) {
+				toast.error('Non è possibile eliminare contemporaneamente link non scaduti. Non è stato eliminato alcun link.');
+				showDeleteModal = false;
+				return;
+			}
+		}
 
 		isSaving = true;
 		let type = (filter == 'externals' || filter == 'expired') ? 'external' : 'internal';
@@ -406,9 +431,19 @@
 					title={share.title}
 				>
 					{#if share.title}
-						<a href="">{share.title}</a>
+						<a href={resolve('/(app)/artid/details/[id]', { id: String(share.idArtid) })}
+						   onclick={(event) => {
+								event.stopPropagation();
+								event.preventDefault();
+								openDetails(share.idArtid);
+							}}>{share.title}</a>
 					{:else}
-						<a href="" class="text-artid-text-muted ms-{titleSize}">Non trovato</a>
+						<a href="" onclick={(event) => {
+								event.stopPropagation();
+								event.preventDefault();
+								openDetails(share.idArtid);
+							}}
+							 class="text-artid-text-muted">Non trovato</a>
 					{/if}
 				</div>
 
@@ -417,10 +452,13 @@
 				</div>
 				{#if filter === 'externals' || filter === 'expired'}
 					{@const extShare = share as ExternalShareArtIDResponse}
-					<div class="col-1 text-artid-text text-nowrap">
+					<div class="col-1 {isExpired(extShare.expirationDate) ? 'text-danger' : 'text-artid-text'} text-nowrap">
+						{#if isExpired(extShare.expirationDate)}
+							<i class="bi bi-clock-history fs-6"></i>
+						{/if}
 						{formatItalianDate(extShare.expirationDate)}
 					</div>
-					<div class="col-1 text-artid-text text-nowrap">{extShare.clickCounter}</div>
+					<div class="col-1 text-artid-text text-nowrap d-flex justify-content-center">{extShare.clickCounter}</div>
 					<div class="col-1 text-artid-text text-nowrap">
 						{formatItalianDate(extShare.firstOpened)}
 					</div>
@@ -437,12 +475,6 @@
 							</span>
 							{extShare.isActive ? 'Attivo' : 'Disattivo'}
 						</div>
-						{#if isExpired(extShare.expirationDate)}
-							<div>
-								<span class="rounded-circle bg-danger circle-small"> </span>
-								Scaduto
-							</div>
-						{/if}
 					</div>
 					<div class="col-3 text-artid-text">
 						{extShare.description}
@@ -538,7 +570,11 @@
 			fullWidth={false}
 			ariaLabel="Elimina selezionati"
 			onclick={() => {
-				showDeleteModal = true;
+				if(selectedExternalShare && isExpired(selectedExternalShare.expirationDate) && selectedExternalShare.clickCounter! > 0) {
+						handleDelete();
+				} else {
+						showDeleteModal = true;
+				}
 			}}
 		/>
 	</div>

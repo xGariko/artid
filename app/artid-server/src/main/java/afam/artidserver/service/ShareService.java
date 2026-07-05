@@ -187,25 +187,30 @@ public class ShareService {
         try {
             shareId = shareLinkCipher.decrypt(token);
         } catch (IllegalArgumentException e) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Link non valido");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Link non valido.");
         }
 
         ExternalShare share = externalShareDAO.findById(shareId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Link non valido"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Link non valido."));
 
         // Visibile solo se la condivisione è attiva e non scaduta.
         boolean expired = share.getExpirationDate() != null && !share.getExpirationDate().isAfter(OffsetDateTime.now());
-        if (!Boolean.TRUE.equals(share.getIsActive()) || expired) {
-            throw new ResponseStatusException(HttpStatus.GONE, "Link scaduto o non più disponibile");
+        if (expired) {
+            throw new ResponseStatusException(HttpStatus.GONE, "Il link non è più valido.");
         }
+
+        if(!Boolean.TRUE.equals(share.getIsActive())) {
+            throw new ResponseStatusException(HttpStatus.GONE, "Questo link è stato momentaneamente disattivato. Contatta l’autore per sapere quando tornerà attivo.");
+        }
+
 
         // ArtID collegato + suo proprietario (l'anteprima usa l'owner, così prescinde dalla visibilità).
         Artid artid = artidDAO.findById(share.getIdArtid())
                 .filter(a -> a.getDeletedAt() == null)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.GONE, "Contenuto non più disponibile"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.GONE, "L'ArtID desiderato non esiste più."));
 
         PublicArtidDetailResponse detail = userService.getOwnerArtidPreview(artid.getId(), artid.getIdUser())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.GONE, "Contenuto non più disponibile"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.GONE, "Non è possibile visualizzare questo ArtID"));
 
         // Statistiche di visualizzazione: contatore, prima e ultima visione.
         boolean firstOpen = share.getFirstOpened() == null;
