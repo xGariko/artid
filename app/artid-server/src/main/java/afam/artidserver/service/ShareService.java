@@ -247,6 +247,27 @@ public class ShareService {
         return detail;
     }
 
+    /**
+     * Dettaglio di un ArtID condiviso INTERNAMENTE con l'utente loggato (destinatario). L'accesso è
+     * concesso dalla condivisione interna accettata (id_user_to = utente, is_accepted = true): come
+     * per i link esterni, l'anteprima usa il read-model del proprietario e quindi IGNORA la
+     * visibilità dell'ArtID (funziona anche per ArtID unlisted/privati). 404 se non esiste una
+     * condivisione accettata verso l'utente o se l'ArtID non esiste più.
+     */
+    public PublicArtidDetailResponse openInternalSharedArtid(Long artidId, Long userId) {
+        if (!internalShareDAO.existsByIdArtidAndIdUserToAndIsAcceptedTrue(artidId, userId)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "ArtID non trovato.");
+        }
+
+        Artid artid = artidDAO.findById(artidId)
+                .filter(a -> a.getDeletedAt() == null)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        "L'ArtID desiderato non esiste più."));
+
+        return userService.getOwnerArtidPreview(artid.getId(), artid.getIdUser())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "ArtID non trovato."));
+    }
+
     // Email (fire-and-forget) al proprietario alla prima apertura del link di
     // condivisione.
     private void notifyOwnerFirstOpen(Artid artid) {

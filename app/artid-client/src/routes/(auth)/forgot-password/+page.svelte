@@ -1,62 +1,39 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import { resolve } from '$app/paths';
-	import { page } from '$app/state';
 	import ArtidInput from '$lib/components/ui/artid-input.svelte';
 	import ArtidOtpInput from '$lib/components/ui/artid-otp-input.svelte';
-
 	import ArtidButton from '$lib/components/ui/artid-button.svelte';
 	import ArtidOtpConfirm from '$lib/components/ui/artid-otp-confirm.svelte';
 	import { loading } from '$lib/stores/loading';
 	import type { ActionData } from './$types';
-	import ArtidSpidButton from '$lib/components/ui/artid-spid-button.svelte';
 
 	let { form }: { form: ActionData } = $props();
 
-	// Messaggio di ritorno dal recupero password (redirect a /login?msg=...), mostrato solo nella fase
-	// credenziali. reset-success / account-not-found → testi verbatim dal RAD (caso d'uso DIM PASS).
-	let flashMessage = $derived.by(() => {
-		const msg = page.url.searchParams.get('msg');
-		if (msg === 'reset-success') {
-			return {
-				type: 'success',
-				text: 'Password resettata con successo. Ti arriverà una email con la tua password temporanea.'
-			};
-		}
-		if (msg === 'account-not-found') {
-			return { type: 'danger', text: 'Non esiste un account con questa email.' };
-		}
-		return null;
-	});
+	const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-	// Dopo la validazione delle credenziali il server risponde con step "otp": si passa alla
-	// schermata di inserimento del codice. Un reload riporta alla fase credenziali (form = null).
-	let otpPhase = $derived(form?.step === 'otp');
-
-	let credentials = $state({
-		email: form?.email ?? '',
-		password: ''
-	});
-
-	// Passo di conferma prima dell'invio OTP: "Accedi" non invia più subito il codice ma mostra la
-	// conferma; l'OTP parte solo all'"Ok" (che submitta il form verso ?/requestOtp).
+	// Passo di conferma prima dell'invio OTP: "Conferma" non invia più subito il codice ma mostra la
+	// conferma; l'OTP parte solo all'"Ok".
 	let confirmPhase = $state(false);
 	let clientError = $state('');
 
-	// "Accedi": validazione minima lato client (campi non vuoti) per avere un'email da mostrare nella
-	// conferma. La validazione vera delle credenziali resta server-side e scatta all'Ok.
+	// "Conferma": validazione del formato email lato client (messaggi RAD) per avere un'email da
+	// mostrare nella conferma. Il controllo "esiste un account" resta server-side e scatta all'Ok.
 	function goToConfirm() {
 		clientError = '';
-		if (!credentials.email.trim() || !credentials.password) {
-			clientError = 'Inserisci email e password.';
+		if (!email.trim()) {
+			clientError = 'Errore: Bisogna compilare il campo dell\'email!';
+			return;
+		}
+		if (!EMAIL_REGEX.test(email.trim())) {
+			clientError = 'Errore: L\'email non è nel formato corretto! Usa nome@dominio.ext.';
 			return;
 		}
 		confirmPhase = true;
 	}
 
-	// Invio OTP (all'Ok): overlay durante la submit; su errore (credenziali errate) torna alla fase
-	// credenziali mostrando il messaggio del server.
-	const onRequestOtp = () => {
+	// Invio OTP (all'Ok): overlay durante la submit; su errore torna alla fase email col messaggio.
+	const onRequestReset = () => {
 		$loading = true;
 		return async ({
 			result,
@@ -71,6 +48,11 @@
 		};
 	};
 
+	// Dopo la validazione dell'email il server risponde con step "otp": si passa all'inserimento del
+	// codice. Un reload riporta alla fase email (form = null).
+	let otpPhase = $derived(form?.step === 'otp');
+
+	let email = $state(form?.email ?? '');
 	let code = $state('');
 
 	// Form di verifica: lo inviamo via JS appena il codice è completo, senza pulsante.
@@ -175,18 +157,15 @@
 	</p>
 {:else}
 	{#if !confirmPhase}
-		<h2 class="fw-bold text-center mb-4">Accedi</h2>
-
-		{#if flashMessage}
-			<div class="alert alert-{flashMessage.type} text-center py-2" role="alert">
-				{flashMessage.text}
-			</div>
-		{/if}
+		<h2 class="fw-bold text-center mb-2">Recupero password</h2>
+		<p class="text-center text-secondary mb-4">
+			Inserisci l'email del tuo account: ti invieremo un codice per reimpostare la password.
+		</p>
 	{/if}
 
-	<form method="POST" action="?/requestOtp" class="auth-form" use:enhance={onRequestOtp}>
-		<!-- Fase credenziali: i campi restano nel DOM (nascosti con d-none) anche durante la conferma,
-			così l'"Ok" li invia insieme alla richiesta OTP. -->
+	<form method="POST" action="?/requestReset" class="auth-form" use:enhance={onRequestReset}>
+		<!-- Fase email: il campo resta nel DOM (nascosto con d-none) durante la conferma, così l'"Ok"
+			lo invia insieme alla richiesta. -->
 		<div class:d-none={confirmPhase}>
 			<div class="row">
 				<div class="col-12 p-1">
@@ -194,25 +173,10 @@
 						type="email"
 						name="email"
 						label="Email"
-						bind:value={credentials.email}
-						error={form?.errors?.email}
+						bind:value={email}
+						error={form?.emailError}
 					/>
 				</div>
-			</div>
-			<div class="row">
-				<div class="col-12 p-1">
-					<ArtidInput
-						type="password"
-						name="password"
-						label="Password"
-						bind:value={credentials.password}
-						error={form?.errors?.password}
-					/>
-				</div>
-			</div>
-
-			<div class="d-flex justify-content-end px-1">
-				<a href={resolve('/forgot-password')} class="auth-link small">Password dimenticata?</a>
 			</div>
 
 			{#if clientError}
@@ -223,25 +187,18 @@
 			{/if}
 
 			<div class="row p-1 mt-2">
-				<ArtidButton label="Accedi" type="button" onclick={goToConfirm} />
+				<ArtidButton label="Conferma" type="button" onclick={goToConfirm} />
 			</div>
 		</div>
 
 		{#if confirmPhase}
-			<ArtidOtpConfirm email={credentials.email} onback={() => (confirmPhase = false)} />
+			<ArtidOtpConfirm email={email.trim()} onback={() => (confirmPhase = false)} />
 		{/if}
 	</form>
 
 	{#if !confirmPhase}
-		<div class="d-flex justify-content-center align-items-center my-3">
-			<hr class="w-25 position-absolute" />
-			<span class="p-2 bg-artid-light z-2">Oppure</span>
-		</div>
-
-		<ArtidSpidButton label="Entra con SPID" />
-
 		<p class="text-center mt-4 mb-0">
-			Non hai un account? <a href={resolve('/register')} class="auth-link">Registrati</a>
+			Ti sei ricordato la password? <a href={resolve('/login')} class="auth-link">Accedi</a>
 		</p>
 	{/if}
 {/if}

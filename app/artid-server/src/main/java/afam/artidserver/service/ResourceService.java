@@ -22,6 +22,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.time.OffsetDateTime;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -41,6 +42,19 @@ public class ResourceService {
     private final NamedParameterJdbcTemplate namedJdbcTemplate;
 
     private static final Logger logger = LoggerFactory.getLogger(ResourceService.class);
+
+    // Conteggio degli ArtID (non eliminati) a cui è collegato ciascun materiale. Nella join
+    // artid_resource "id" è l'id dell'ArtID e "id_resource" quello del materiale; il JOIN su artid
+    // esclude gli ArtID soft-deleted anche se la riga di join sopravvive. I materiali senza
+    // collegamenti non compaiono nel risultato → default 0 nel chiamante.
+    private static final String ARTID_COUNT_BY_RESOURCE_SQL = """
+            SELECT ar.id_resource AS id_resource, COUNT(*) AS artid_count
+              FROM artid_resource ar
+              JOIN artid a ON a.id = ar.id
+             WHERE ar.id_resource IN (:ids)
+               AND a.deleted_at IS NULL
+             GROUP BY ar.id_resource
+            """;
 
     // Proiezione lightweight per le letture: solo metadati, niente byte. La
     // dimensione ora
@@ -88,9 +102,36 @@ public class ResourceService {
                 : findFilesMetadata(fileIds).stream()
                         .collect(Collectors.toMap(FileMetadata::id, Function.identity()));
 
+        Map<Long, Long> artidCountByResource = countArtidsByResource(
+                resources.stream().map(Resource::getId).toList());
+
         return resources.stream()
-                .map(r -> toResponse(r, r.getIdFile() != null ? metadataById.get(r.getIdFile()) : null))
+                .map(r -> toResponse(r,
+                        r.getIdFile() != null ? metadataById.get(r.getIdFile()) : null,
+                        artidCountByResource.getOrDefault(r.getId(), 0L)))
                 .toList();
+    }
+
+    // Conteggio ArtID per materiale in un'unica query batch (niente N+1). I materiali senza
+    // collegamenti non compaiono nella query → il chiamante applica il default 0.
+    private Map<Long, Long> countArtidsByResource(List<Long> resourceIds) {
+        if (resourceIds.isEmpty()) {
+            return Map.of();
+        }
+        Map<Long, Long> counts = new HashMap<>();
+        // Blocco (non espressione): la lambda deve restituire void per risolvere a RowCallbackHandler
+        // e non a ResultSetExtractor (put() restituirebbe un valore, rendendo l'overload ambiguo).
+        namedJdbcTemplate.query(ARTID_COUNT_BY_RESOURCE_SQL,
+                new MapSqlParameterSource("ids", resourceIds),
+                rs -> {
+                    counts.put(rs.getLong("id_resource"), rs.getLong("artid_count"));
+                });
+        return counts;
+    }
+
+    // Variante single-resource per i percorsi create/update (una riga sola dopo il salvataggio).
+    private long countArtids(Long resourceId) {
+        return countArtidsByResource(List.of(resourceId)).getOrDefault(resourceId, 0L);
     }
 
     public Optional<DownloadableFile> findDownloadable(Long resourceId, Long userId) {
@@ -123,7 +164,7 @@ public class ResourceService {
         if (request.artidId() != null) {
             artidService.linkArtidResource(request.artidId(), saved.getId(), userId);
         }
-        return toResponse(saved, FileMetadata.of(savedFile));
+        return toResponse(saved, FileMetadata.of(savedFile), countArtids(saved.getId()));
     }
 
     @Transactional
@@ -179,7 +220,7 @@ public class ResourceService {
             deleteObjectAfterCommit(oldObjectKeyToDelete);
         }
 
-        return Optional.of(toResponse(saved, fileMeta));
+        return Optional.of(toResponse(saved, fileMeta, countArtids(saved.getId())));
     }
 
     @Transactional
@@ -286,7 +327,7 @@ public class ResourceService {
         return dot > 0 && dot < fileName.length() - 1 ? fileName.substring(dot + 1) : null;
     }
 
-    private ResourceResponse toResponse(Resource r, FileMetadata f) {
+    private ResourceResponse toResponse(Resource r, FileMetadata f, long artidCount) {
         return new ResourceResponse(
                 r.getId(),
                 r.getIdUser(),
@@ -300,6 +341,6 @@ public class ResourceService {
                 f != null ? f.extension() : null,
                 f != null ? f.mimeType() : null,
                 f != null ? f.fileSize() : null,
-                0L);
+                artidCount);
     }
 }

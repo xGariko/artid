@@ -79,4 +79,8 @@ public interface InternalShareDAO extends ListCrudRepository<InternalShare, Long
 
     @Query("SELECT COUNT(*) > 0 FROM internal_share WHERE id_artid = :artidId")
     boolean existsActiveInternalShare(@Param("artidId") Long artidId);
+
+    // Autorizza la vista dettaglio di un ArtID condiviso: vero se l'ArtID è condiviso (e accettato)
+    // con l'utente destinatario. Consente l'accesso a prescindere dalla visibilità dell'ArtID.
+    boolean existsByIdArtidAndIdUserToAndIsAcceptedTrue(Long idArtid, Long idUserTo);
 }

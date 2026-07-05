@@ -4,7 +4,7 @@ import { fetchCurrentUser, getToken, logout } from '$lib/auth';
 import { createApiClient } from '$lib/api/client';
 
 // Pagine "auth-only": accessibili senza login, ma se sei loggato vieni rimandato in dashboard.
-const PUBLIC_PATHS = ['/login', '/register', '/welcome', '/spid'];
+const PUBLIC_PATHS = ['/login', '/register', '/welcome', '/spid', '/forgot-password'];
 
 // Pagine aperte a tutti, con o senza login (nessun redirect in nessuno dei due sensi).
 // `/s/` (con slash finale) è la pagina del link di condivisione: lo slash evita che il prefisso

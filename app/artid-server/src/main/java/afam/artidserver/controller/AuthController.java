@@ -5,6 +5,7 @@ import afam.artidserver.model.entity.User;
 import afam.artidserver.security.AuthenticatedUser;
 import afam.artidserver.security.JwtUtil;
 import afam.artidserver.service.OtpService;
+import afam.artidserver.service.PasswordResetService;
 import afam.artidserver.service.RegistrationService;
 import afam.artidserver.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -37,6 +38,7 @@ public class AuthController {
     private final PasswordEncoder passwordEncoder;
     private final OtpService otpService;
     private final RegistrationService registrationService;
+    private final PasswordResetService passwordResetService;
 
     /**
      * Step 1 del login: valida le credenziali e, se corrette, genera l'OTP e ne avvia l'invio
@@ -90,6 +92,41 @@ public class AuthController {
     @PostMapping("/resend-otp")
     public ResponseEntity<Void> resendOtp(@RequestBody ResendOtpRequest request) {
         userService.findByMail(request.getEmail()).ifPresent(otpService::resend);
+        return ResponseEntity.ok().build();
+    }
+
+    // --- Recupero password (RAD, caso d'uso DIM PASS): riusa il pattern OTP a due step del login. ---
+
+    /**
+     * Step 1 del recupero password: se esiste un Membro con quell'email, genera e invia l'OTP
+     * (riuso di GENERA OTP) senza resettare ancora nulla. 404 se nessun account corrisponde: come da
+     * RAD il client mostra "Non esiste un account con questa email" (scelta esplicita, diversa
+     * dall'anti-enumeration di login/registrazione). La risposta torna appena l'OTP è persistito,
+     * senza attendere l'SMTP.
+     */
+    @PostMapping("/forgot-password")
+    public ResponseEntity<OtpChallengeResponse> forgotPassword(@RequestBody ForgotPasswordRequest request) {
+        User user = userService.findByMail(request.getEmail()).orElse(null);
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+        OffsetDateTime expiresAt = otpService.generateAndSend(user);
+        return ResponseEntity.ok(new OtpChallengeResponse(true, user.getMail(), expiresAt));
+    }
+
+    /**
+     * Step 2 del recupero password: verifica l'OTP e, se valido, imposta una password temporanea
+     * casuale e la invia via email. NON rilascia una sessione: il RAD riporta al LOGIN. Risposta
+     * indistinta (401) per email inesistente o codice errato/scaduto. Il "Riprova" riusa
+     * {@link #resendOtp}: l'OTP è una normale challenge sull'account esistente.
+     */
+    @PostMapping("/reset-password")
+    public ResponseEntity<Void> resetPassword(@RequestBody VerifyOtpRequest request) {
+        User user = userService.findByMail(request.getEmail()).orElse(null);
+        if (user == null || !otpService.verify(user.getId(), request.getCode())) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        passwordResetService.resetAndNotify(user);
         return ResponseEntity.ok().build();
     }
 

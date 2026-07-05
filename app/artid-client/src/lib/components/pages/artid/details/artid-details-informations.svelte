@@ -162,7 +162,7 @@
 	const visibilityValues = [
 		{ label: 'Pubblico', value: 'public' as ArtIdVisibilityType },
 		{ label: 'Privato', value: 'private' as ArtIdVisibilityType },
-		{ label: 'Unlisted', value: 'unlisted' as ArtIdVisibilityType }
+		{ label: 'Non in elenco', value: 'unlisted' as ArtIdVisibilityType }
 	];
 
 	let selectedVisibility: ArtIdVisibilityType | null = $state(

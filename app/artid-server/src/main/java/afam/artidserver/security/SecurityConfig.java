@@ -41,6 +41,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/login", "/api/auth/register",
                                 "/api/auth/verify-otp", "/api/auth/resend-otp",
                                 "/api/auth/verify-registration", "/api/auth/resend-registration-otp",
+                                "/api/auth/forgot-password", "/api/auth/reset-password",
                                 "/api/auth/spid", "/api/auth/spid/verify-otp").permitAll()
                         .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                         // Catalogo pubblico (pagina Explore): ricerca profili pubblici senza login.

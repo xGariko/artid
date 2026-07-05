@@ -6,11 +6,51 @@
 	import ArtidSpidButton from '$lib/components/ui/artid-spid-button.svelte';
 
 	import ArtidButton from '$lib/components/ui/artid-button.svelte';
+	import ArtidOtpConfirm from '$lib/components/ui/artid-otp-confirm.svelte';
 	import type { RegisterRequest } from '$lib/models/schemas';
 	import { loading } from '$lib/stores/loading.ts';
 	import type { ActionData } from './$types';
 
 	let { form }: { form: ActionData } = $props();
+
+	const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+	// Passo di conferma prima dell'invio OTP: "Registrati" non invia più subito il codice ma mostra la
+	// conferma; l'OTP (e la creazione dell'account) partono solo all'"Ok".
+	let confirmPhase = $state(false);
+	let clientError = $state('');
+
+	// "Registrati": validazione minima lato client per avere un'email valida da mostrare nella
+	// conferma. La validazione completa (Zod + email già registrata) resta server-side e scatta all'Ok.
+	function goToConfirm() {
+		clientError = '';
+		if (!EMAIL_REGEX.test(userDTO.email.trim())) {
+			clientError = 'Inserisci un indirizzo email valido.';
+			return;
+		}
+		if (!userDTO.password || userDTO.password !== confirmPassword) {
+			clientError = 'Le password non coincidono.';
+			return;
+		}
+		confirmPhase = true;
+	}
+
+	// Invio OTP (all'Ok): overlay durante la submit; su errore (es. email già registrata) torna alla
+	// fase dati mostrando il messaggio del server.
+	const onRequestOtp = () => {
+		$loading = true;
+		return async ({
+			result,
+			update
+		}: {
+			result: { type: string };
+			update: () => Promise<void>;
+		}) => {
+			$loading = false;
+			await update();
+			if (result.type === 'failure') confirmPhase = false;
+		};
+	};
 
 	// Dopo la validazione dei dati il server risponde con step "otp": si passa alla schermata di
 	// inserimento del codice inviato via email. L'account viene creato solo dopo la verifica.
@@ -87,91 +127,106 @@
 		<a href={resolve('/register')} class="auth-link">Usa un altro indirizzo</a>
 	</p>
 {:else}
-	<h2 class="fw-bold text-center mb-4">Registrati</h2>
+	{#if !confirmPhase}
+		<h2 class="fw-bold text-center mb-4">Registrati</h2>
+	{/if}
 
-	<form method="POST" action="?/requestOtp" class="auth-form" use:enhance={withLoading}>
-		<div class="row">
-			<div class="col-12 col-md-6 p-1">
-				<ArtidInput name="name" label="Nome" bind:value={userDTO.name} error={form?.errors?.name} />
+	<form method="POST" action="?/requestOtp" class="auth-form" use:enhance={onRequestOtp}>
+		<!-- Fase dati: i campi restano nel DOM (nascosti con d-none) durante la conferma, così l'"Ok"
+			li invia insieme alla richiesta OTP. -->
+		<div class:d-none={confirmPhase}>
+			<div class="row">
+				<div class="col-12 col-md-6 p-1">
+					<ArtidInput name="name" label="Nome" bind:value={userDTO.name} error={form?.errors?.name} />
+				</div>
+				<div class="col-12 col-md-6 p-1">
+					<ArtidInput
+						name="surname"
+						label="Cognome"
+						bind:value={userDTO.surname}
+						error={form?.errors?.surname}
+					/>
+				</div>
 			</div>
-			<div class="col-12 col-md-6 p-1">
-				<ArtidInput
-					name="surname"
-					label="Cognome"
-					bind:value={userDTO.surname}
-					error={form?.errors?.surname}
-				/>
+			<div class="row">
+				<div class="col-12 p-1">
+					<ArtidInput
+						type="email"
+						name="email"
+						label="Email"
+						bind:value={userDTO.email}
+						error={form?.errors?.email}
+					/>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-12 p-1">
+					<ArtidInput
+						type="password"
+						name="password"
+						label="Password"
+						bind:value={userDTO.password}
+						error={form?.errors?.password}
+					/>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-12 p-1">
+					<ArtidInput
+						type="password"
+						name="confirmPassword"
+						label="Ripeti password"
+						bind:value={confirmPassword}
+						error={confirmPasswordError}
+					/>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-12 col-md-6 p-1">
+					<ArtidInput
+						type="date"
+						name="birthdate"
+						label="Data di nascita"
+						bind:value={userDTO.birthdate}
+						error={form?.errors?.birthdate}
+					/>
+				</div>
+				<div class="col-12 col-md-6 p-1">
+					<ArtidInput
+						name="birthplace"
+						label="Luogo di nascita"
+						bind:value={userDTO.birthplace}
+						error={form?.errors?.birthplace}
+					/>
+				</div>
+			</div>
+			{#if clientError}
+				<div class="text-danger small text-center mt-2">{clientError}</div>
+			{/if}
+			{#if form?.formError}
+				<div class="text-danger small text-center mt-2">{form.formError}</div>
+			{/if}
+
+			<div class="row p-1 mt-2">
+				<ArtidButton label="Registrati" type="button" onclick={goToConfirm} />
 			</div>
 		</div>
-		<div class="row">
-			<div class="col-12 p-1">
-				<ArtidInput
-					type="email"
-					name="email"
-					label="Email"
-					bind:value={userDTO.email}
-					error={form?.errors?.email}
-				/>
-			</div>
-		</div>
-		<div class="row">
-			<div class="col-12 p-1">
-				<ArtidInput
-					type="password"
-					name="password"
-					label="Password"
-					bind:value={userDTO.password}
-					error={form?.errors?.password}
-				/>
-			</div>
-		</div>
-		<div class="row">
-			<div class="col-12 p-1">
-				<ArtidInput
-					type="password"
-					name="confirmPassword"
-					label="Ripeti password"
-					bind:value={confirmPassword}
-					error={confirmPasswordError}
-				/>
-			</div>
-		</div>
-		<div class="row">
-			<div class="col-12 col-md-6 p-1">
-				<ArtidInput
-					type="date"
-					name="birthdate"
-					label="Data di nascita"
-					bind:value={userDTO.birthdate}
-					error={form?.errors?.birthdate}
-				/>
-			</div>
-			<div class="col-12 col-md-6 p-1">
-				<ArtidInput
-					name="birthplace"
-					label="Luogo di nascita"
-					bind:value={userDTO.birthplace}
-					error={form?.errors?.birthplace}
-				/>
-			</div>
-		</div>
-		{#if form?.formError}
-			<div class="text-danger small text-center mt-2">{form.formError}</div>
+
+		{#if confirmPhase}
+			<ArtidOtpConfirm email={userDTO.email} onback={() => (confirmPhase = false)} />
 		{/if}
-
-		<div class="row p-1 mt-2">
-			<ArtidButton label="Registrati" type="submit" />
-		</div>
 	</form>
 
-	<div class="d-flex justify-content-center align-items-center my-3">
-		<hr class="w-25 position-absolute" />
-		<span class="p-2 bg-artid-light z-2">Oppure</span>
-	</div>
+	{#if !confirmPhase}
+		<div class="d-flex justify-content-center align-items-center my-3">
+			<hr class="w-25 position-absolute" />
+			<span class="p-2 bg-artid-light z-2">Oppure</span>
+		</div>
 
-	<ArtidSpidButton label="Entra con SPID" />
+		<ArtidSpidButton label="Entra con SPID" />
 
-	<p class="text-center mt-4 mb-0">
-		Hai già un account? <a href={resolve('/login')} class="auth-link">Accedi</a>
-	</p>
+		<p class="text-center mt-4 mb-0">
+			Hai già un account? <a href={resolve('/login')} class="auth-link">Accedi</a>
+		</p>
+	{/if}
 {/if}

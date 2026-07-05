@@ -34,8 +34,7 @@
 </script>
 
 <a
-	href={resolve('/explore/[id]/artid/[artidId]', {
-		id: String(sharedArtid.idUserFrom),
+	href={resolve('/(app)/artid/shared/[artidId]', {
 		artidId: String(sharedArtid.idArtid)
 	})}
 	data-sveltekit-preload-data="off"

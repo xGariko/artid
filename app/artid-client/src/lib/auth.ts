@@ -130,6 +130,35 @@ export async function resendOtp(api: ApiClient, email: string): Promise<void> {
 	await api.POST('/api/auth/resend-otp', { body: { email } });
 }
 
+// --- Recupero password (RAD, caso d'uso DIM PASS): stesso schema a due passi del login, ma l'OTP è
+// una challenge su un utente ESISTENTE e lo step 2 non apre una sessione — resetta la password, che
+// arriva via email. Il "Riprova" riusa resendOtp() (l'OTP è una normale challenge di login). ---
+
+// Step 1: se esiste un account con quell'email, il server invia l'OTP. 404 → nessun account: come da
+// RAD la pagina mostra il messaggio esplicito "Non esiste un account con questa email".
+export async function requestPasswordReset(
+	api: ApiClient,
+	email: string
+): Promise<{ ok: true; email: string } | { ok: false; status: 'notFound' | 'error' }> {
+	const { data, response } = await api.POST('/api/auth/forgot-password', { body: { email } });
+
+	if (response.ok && data?.otpRequired) {
+		return { ok: true, email: data.email ?? email };
+	}
+	// 404 = nessun account con quella email; altro (es. 502) = invio email fallito.
+	return { ok: false, status: response.status === 404 ? 'notFound' : 'error' };
+}
+
+// Step 2: verifica l'OTP e, se valido, il server imposta e invia via email una password temporanea.
+// Nessuna sessione aperta: il RAD riporta al LOGIN.
+export async function resetPassword(
+	api: ApiClient,
+	payload: VerifyOtpPayload
+): Promise<{ ok: boolean }> {
+	const { response } = await api.POST('/api/auth/reset-password', { body: payload });
+	return { ok: response.ok };
+}
+
 // --- Registrazione con verifica email: stesso schema a due passi del login, ma l'account
 // viene creato solo allo step 2 (dopo l'OTP). I dati pendenti vivono lato server (registration_otp). ---
 

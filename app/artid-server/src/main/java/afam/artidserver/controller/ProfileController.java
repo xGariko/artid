@@ -1,6 +1,7 @@
 package afam.artidserver.controller;
 
 import afam.artidserver.model.dto.AvatarResponse;
+import afam.artidserver.model.dto.ChangePasswordRequest;
 import afam.artidserver.model.dto.ProfileCompletionResponse;
 import afam.artidserver.model.dto.ProfileResponse;
 import afam.artidserver.model.dto.ProfileUpdateRequest;
@@ -10,6 +11,7 @@ import afam.artidserver.model.mock.MockSpidIdentity;
 import afam.artidserver.security.AuthenticatedUser;
 import afam.artidserver.service.AvatarService;
 import afam.artidserver.service.MockSpidIdentityProvider;
+import afam.artidserver.service.PasswordChangeService;
 import afam.artidserver.service.ProfileService;
 import afam.artidserver.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -38,6 +40,7 @@ public class ProfileController {
     private final UserService userService;
     private final AvatarService avatarService;
     private final MockSpidIdentityProvider identityProvider;
+    private final PasswordChangeService passwordChangeService;
 
     @GetMapping
     public ResponseEntity<ProfileResponse> profile(@AuthenticationPrincipal AuthenticatedUser principal) {
@@ -118,6 +121,31 @@ public class ProfileController {
     @GetMapping("/completion")
     public ResponseEntity<ProfileCompletionResponse> completion(@AuthenticationPrincipal AuthenticatedUser principal) {
         return ResponseEntity.ok(new ProfileCompletionResponse(profileService.completionPercentage(principal.getUser())));
+    }
+
+    // --- Cambio password (RAD, caso d'uso MODIFICA PASSWORD): la nuova password si applica solo dopo
+    // la verifica di un OTP inviato all'email del Membro autenticato. ---
+
+    /** Step 1: invia l'OTP all'email del Membro autenticato (riuso GENERA OTP). */
+    @PostMapping("/change-password/request-otp")
+    public ResponseEntity<Void> changePasswordRequestOtp(@AuthenticationPrincipal AuthenticatedUser principal) {
+        passwordChangeService.requestOtp(principal.getUser());
+        return ResponseEntity.ok().build();
+    }
+
+    /**
+     * Step 2: verifica l'OTP e, se valido, imposta la nuova password. 401 per OTP errato/scaduto,
+     * 400 se la nuova password non rispetta il formato richiesto.
+     */
+    @PostMapping("/change-password")
+    public ResponseEntity<Void> changePassword(@AuthenticationPrincipal AuthenticatedUser principal,
+                                               @RequestBody ChangePasswordRequest request) {
+        return switch (passwordChangeService.changePassword(
+                principal.getUser(), request.getCode(), request.getNewPassword())) {
+            case OK -> ResponseEntity.ok().build();
+            case INVALID_OTP -> ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            case INVALID_FORMAT -> ResponseEntity.badRequest().build();
+        };
     }
 
     // --- Foto profilo (bucket privato "propics", servita via presigned URL) ---

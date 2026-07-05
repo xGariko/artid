@@ -34,7 +34,8 @@ public class MockSpidIdentityProvider {
             new MockSpidIdentity("GLLFNC87R12A944J", SHARED_PASSWORD, "Francesco", "Galli", "francesco.galli@spid.test", LocalDate.of(1987, 10, 12), "Bologna"),
             new MockSpidIdentity("CNTLRA91D63C351Q", SHARED_PASSWORD, "Laura", "Conti", "laura.conti@spid.test", LocalDate.of(1991, 4, 23), "Genova"),
             new MockSpidIdentity("MRNDVD89H05L736P", SHARED_PASSWORD, "Davide", "Marino", "davide.marino@spid.test", LocalDate.of(1989, 6, 5), "Venezia"),
-            new MockSpidIdentity("GRECHR94S48E506R", SHARED_PASSWORD, "Chiara", "Greco", "chiara.greco@spid.test", LocalDate.of(1994, 11, 8), "Bari")
+            new MockSpidIdentity("GRECHR94S48E506R", SHARED_PASSWORD, "Chiara", "Greco", "chiara.greco@spid.test", LocalDate.of(1994, 11, 8), "Bari"),
+            new MockSpidIdentity("VNIGRL04L20G273B", SHARED_PASSWORD, "Gabriele", "Iovino", "gabrieleiovino839@gmail.com", LocalDate.of(1994, 11, 8), "Bari")
     );
 
     /**

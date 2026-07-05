@@ -202,7 +202,31 @@
       "Bash(curl -s http://localhost:8080/api/shares/public/tokentaroccato)",
       "Bash(curl -s -i http://localhost:8080/api/shares/public/tokentaroccato)",
       "Bash(curl -s -o /dev/null -w \"HTTP %{http_code}\\\\n\" \"http://localhost:8080/api/users/search?query=test\")",
-      "Bash(curl -s -o /dev/null -w \"HTTP %{http_code}\\\\n\" http://localhost:8080/v3/api-docs)"
+      "Bash(curl -s -o /dev/null -w \"HTTP %{http_code}\\\\n\" http://localhost:8080/v3/api-docs)",
+      "Read(//c/Users/GABRIE~1/AppData/Local/Temp/claude/C--progetti-artid/99cb9e74-056f-454e-a1c0-e2cdf801c62a/scratchpad/**)",
+      "Bash(pdftotext -layout \"/c/Users/Gabriele Iovino/Desktop/SDD.pdf\" SDD.txt)",
+      "Bash(pdftotext -layout \"/c/Users/Gabriele Iovino/Desktop/ODD.pdf\" ODD.txt)",
+      "Bash(pdftotext -layout \"/c/Users/Gabriele Iovino/Desktop/RAD.pdf\" RAD.txt)",
+      "Bash(find C:/progetti/artid/app/artid-client/src/lib -iname *.ts)",
+      "PowerShell(Set-Location C:\\\\progetti\\\\artid\\\\app\\\\artid-server; .\\\\mvnw.cmd -q -DskipTests compile; \"EXIT=$LASTEXITCODE\")",
+      "Bash(grep -rln '$app/state' C:/progetti/artid/app/artid-client/src)",
+      "Bash(python -c \"import sys,json; d=json.load\\(sys.stdin\\); ps=d.get\\('paths',{}\\); print\\('forgot-password:', '/api/auth/forgot-password' in ps\\); print\\('reset-password:', '/api/auth/reset-password' in ps\\); print\\('total auth paths:', [p for p in ps if '/auth/' in p]\\)\")",
+      "PowerShell(Set-Location C:\\\\progetti\\\\artid\\\\app\\\\artid-client; npm run api:generate 2>&1 | Select-Object -Last 8; \"GEN_EXIT=$LASTEXITCODE\")",
+      "PowerShell(Set-Location C:\\\\progetti\\\\artid\\\\app\\\\artid-client; npm run check 2>&1 | Select-Object -Last 30; \"CHECK_EXIT=$LASTEXITCODE\")",
+      "PowerShell(Set-Location C:\\\\progetti\\\\artid\\\\app\\\\artid-client; npm run check 2>&1 | Select-String -Pattern '\\\\bERROR\\\\b' | ForEach-Object { $_.Line })",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:5173/)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code} -> %{redirect_url}\\\\n\" http://localhost:5173/forgot-password)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code} -> %{redirect_url}\\\\n\" http://localhost:5174/forgot-password)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://localhost:5173/login)",
+      "Bash(curl -s http://localhost:5173/forgot-password)",
+      "Bash(python -c \"import sys,json; ps=json.load\\(sys.stdin\\).get\\('paths',{}\\); print\\('change-password:', '/api/profile/change-password' in ps\\); print\\('request-otp:', '/api/profile/change-password/request-otp' in ps\\)\")",
+      "PowerShell(Set-Location C:\\\\progetti\\\\artid\\\\app\\\\artid-client; npm run api:generate 2>&1 | Select-Object -Last 4; \"GEN_EXIT=$LASTEXITCODE\")",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://localhost:8080/v3/api-docs)",
+      "Bash(python -c \"import sys,json; d=json.load\\(sys.stdin\\); ps=d.get\\('paths',{}\\); comp=d.get\\('components',{}\\).get\\('schemas',{}\\); print\\('change-password:', '/api/profile/change-password' in ps\\); print\\('request-otp:', '/api/profile/change-password/request-otp' in ps\\); print\\('ResourceResponse.artidCount:', 'artidCount' in comp.get\\('ResourceResponse',{}\\).get\\('properties',{}\\)\\)\")",
+      "PowerShell(Set-Location C:\\\\progetti\\\\artid\\\\app\\\\artid-client; npm run api:generate 2>&1 | Select-Object -Last 6; \"GEN_EXIT=$LASTEXITCODE\")",
+      "PowerShell(Set-Location C:\\\\progetti\\\\artid\\\\app\\\\artid-client; npm run check 2>&1 | Select-String -Pattern '\\\\bERROR\\\\b' | ForEach-Object { $_.Line }; \"CHECK_EXIT=$LASTEXITCODE\")",
+      "Bash(python -c \"import sys,json; ps=json.load\\(sys.stdin\\).get\\('paths',{}\\); print\\('internal/{artidId}:', '/api/shares/internal/{artidId}' in ps\\)\")",
+      "PowerShell(Set-Location C:\\\\progetti\\\\artid\\\\app\\\\artid-client; npm run api:generate 2>&1 | Select-Object -Last 3; \"GEN=$LASTEXITCODE\"; npm run check 2>&1 | Select-String -Pattern '\\\\bERROR\\\\b' | ForEach-Object { $_.Line }; \"CHECK=$LASTEXITCODE\")"
     ]
   }
 }

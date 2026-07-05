@@ -8,6 +8,7 @@
 	import type { Profile } from '$lib/api/types';
 	import ArtidSpidButton from '$lib/components/ui/artid-spid-button.svelte';
 	import ArtidEditorModal from '$lib/components/ui/artid-editor-modal.svelte';
+	import ArtidOtpInput from '$lib/components/ui/artid-otp-input.svelte';
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
 
@@ -316,6 +317,112 @@
 		await goto(resolve('/welcome'));
 	}
 
+	// --- Cambio password (RAD, caso d'uso MODIFICA PASSWORD): la nuova password scelta dall'utente
+	// viene applicata solo dopo la verifica di un OTP inviato via email. Due fasi nella stessa modale:
+	// "form" (nuova + conferma) → "otp" (codice a 6 cifre). ---
+
+	// Formato password RAD: ≥8 caratteri con maiuscola, minuscola, numero e carattere speciale.
+	const PASSWORD_FORMAT = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/;
+
+	let changePasswordModalOpen = $state(false);
+	let changePwPhase = $state<'form' | 'confirm' | 'otp'>('form');
+	let newPassword = $state('');
+	let confirmNewPassword = $state('');
+	let otpCode = $state('');
+	// Forza il remount dell'input OTP dopo un errore/rinvio: svuota le caselle e rifocalizza la prima.
+	let otpResetKey = $state(0);
+	let changingPassword = $state(false);
+
+	function openChangePasswordModal() {
+		newPassword = '';
+		confirmNewPassword = '';
+		otpCode = '';
+		changePwPhase = 'form';
+		changePasswordModalOpen = true;
+	}
+
+	// Step 1 (RAD passi 5-6): valida i campi con i messaggi del RAD, poi mostra la conferma di invio.
+	// L'OTP non parte qui: viene inviato solo all'"Ok" (vedi confirmSendChangePasswordOtp).
+	function submitNewPassword(): void {
+		if (!newPassword.trim() || !confirmNewPassword.trim()) {
+			toast.error('Errore: Bisogna compilare tutti i campi!');
+			return;
+		}
+		if (!PASSWORD_FORMAT.test(newPassword)) {
+			toast.error(
+				'Errore: Formato della password non corretto! Almeno 8 caratteri con maiuscola, minuscola, numero e carattere speciale.'
+			);
+			return;
+		}
+		if (newPassword !== confirmNewPassword) {
+			toast.error(
+				'Errore: I campi "Nuova password" e "Conferma nuova password" devono essere uguali!'
+			);
+			return;
+		}
+		changePwPhase = 'confirm';
+	}
+
+	// Step 2 (RAD passi 7-8): all'"Ok" invia davvero l'OTP all'email del Membro e passa alla verifica.
+	async function confirmSendChangePasswordOtp(): Promise<void> {
+		if (changingPassword) return;
+		changingPassword = true;
+		try {
+			const { response } = await api.POST('/api/profile/change-password/request-otp', {});
+			if (!response.ok) {
+				toast.error('Impossibile inviare il codice OTP. Riprova tra poco.');
+				return;
+			}
+			otpCode = '';
+			otpResetKey++;
+			changePwPhase = 'otp';
+		} catch (e) {
+			toast.error(e instanceof Error ? e.message : 'Errore di rete');
+		} finally {
+			changingPassword = false;
+		}
+	}
+
+	// Step 2 (RAD passi 9-11): verifica l'OTP e applica la nuova password. Auto-submit a 6 cifre.
+	async function submitChangePasswordOtp(): Promise<void> {
+		if (changingPassword) return;
+		changingPassword = true;
+		try {
+			const { response } = await api.POST('/api/profile/change-password', {
+				body: { code: otpCode, newPassword }
+			});
+			if (response.ok) {
+				changePasswordModalOpen = false;
+				toast.success('Password modificata correttamente');
+				return;
+			}
+			// 400 = formato non valido (già filtrato lato client); 401 = OTP errato/scaduto.
+			toast.error(
+				response.status === 400
+					? 'Errore: Formato della password non corretto!'
+					: 'Errore: codice non valido, controlla nella mail che non sia scaduto. Se è scaduto clicca Invia di nuovo.'
+			);
+			otpCode = '';
+			otpResetKey++;
+		} catch (e) {
+			toast.error(e instanceof Error ? e.message : 'Errore di rete');
+		} finally {
+			changingPassword = false;
+		}
+	}
+
+	// "Invia di nuovo": rigenera e rinvia l'OTP. Fire-and-forget (il server risponde 200 comunque).
+	async function resendChangePasswordOtp(): Promise<void> {
+		try {
+			await api.POST('/api/profile/change-password/request-otp', {});
+			toast.info('Ti abbiamo inviato un nuovo codice.');
+			otpCode = '';
+			otpResetKey++;
+		} catch {
+			// Nessun feedback d'errore sul rinvio: l'utente può ritentare.
+		}
+	}
+
 	// --- Collega SPID (RAD, caso d'uso COL_SPID). Il provider è mockato lato server: qui inviamo le
 	// credenziali della schermata del provider e, al successo, l'anagrafica viene SOVRASCRITTA con i
 	// dati del provider (e l'account risulta verificato). ---
@@ -621,7 +728,7 @@
 				label="Cambia password"
 				icon="pencil-square"
 				btnStyle="primary"
-				onclick={() => {}}
+				onclick={openChangePasswordModal}
 				fullWidth={false}
 			/>
 
@@ -693,6 +800,122 @@
 				/>
 			</div>
 		</div>
+	</div>
+</ArtidEditorModal>
+
+<ArtidEditorModal bind:isOpen={changePasswordModalOpen} customHeight="40">
+	<div class="d-flex flex-column align-items-start justify-content-around w-100 h-100 flex-fill">
+		<div class="text-artid-primary fw-semibold w-100 d-flex align-items-center gap-2">
+			<i class="bi bi-shield-lock fs-5 text-primary"></i>
+			<span>Modifica password</span>
+		</div>
+
+		{#if changePwPhase === 'form'}
+			<div class="w-100 mb-3">
+				<ArtidInput
+					type="password"
+					name="new_password"
+					label="Nuova password"
+					placeholder="Nuova password"
+					bind:value={newPassword}
+					addClass="mb-2"
+				/>
+				<ArtidInput
+					type="password"
+					name="confirm_new_password"
+					label="Conferma nuova password"
+					placeholder="Conferma nuova password"
+					bind:value={confirmNewPassword}
+					addClass="mb-2"
+				/>
+				<span class="text-muted small fst-italic">
+					Almeno 8 caratteri, con maiuscola, minuscola, numero e carattere speciale.
+				</span>
+			</div>
+
+			<div class="w-100">
+				<div class="d-flex justify-content-end gap-2">
+					<ArtidButton
+						label="Annulla"
+						fullWidth={false}
+						btnStyle="secondary"
+						outline={true}
+						disabled={changingPassword}
+						onclick={() => (changePasswordModalOpen = false)}
+					/>
+					<ArtidButton
+						label="Conferma"
+						fullWidth={false}
+						btnStyle="primary"
+						icon="check-lg"
+						disabled={changingPassword}
+						onclick={submitNewPassword}
+					/>
+				</div>
+			</div>
+		{:else if changePwPhase === 'confirm'}
+			<div class="w-100 mb-3">
+				<p class="text-muted mb-0">
+					Verrà inviato un codice a 6 cifre all'indirizzo <strong>{profile.email}</strong>.
+				</p>
+			</div>
+
+			<div class="w-100">
+				<div class="d-flex justify-content-end gap-2">
+					<ArtidButton
+						label="Indietro"
+						fullWidth={false}
+						btnStyle="secondary"
+						outline={true}
+						disabled={changingPassword}
+						onclick={() => (changePwPhase = 'form')}
+					/>
+					<ArtidButton
+						label="Ok"
+						fullWidth={false}
+						btnStyle="primary"
+						disabled={changingPassword}
+						onclick={confirmSendChangePasswordOtp}
+					/>
+				</div>
+			</div>
+		{:else}
+			<div class="w-100 mb-3">
+				<p class="text-muted small mb-3">
+					Ti abbiamo inviato un codice a 6 cifre all'indirizzo <strong>{profile.email}</strong>.
+				</p>
+				{#key otpResetKey}
+					<ArtidOtpInput
+						name="code"
+						bind:value={otpCode}
+						oncomplete={submitChangePasswordOtp}
+						autofocus
+					/>
+				{/key}
+				<p class="mt-3 mb-0 small">
+					Non hai ricevuto il codice?
+					<button
+						type="button"
+						class="btn btn-link p-0 align-baseline"
+						disabled={changingPassword}
+						onclick={resendChangePasswordOtp}>Invia di nuovo</button
+					>
+				</p>
+			</div>
+
+			<div class="w-100">
+				<div class="d-flex justify-content-end gap-2">
+					<ArtidButton
+						label="Annulla"
+						fullWidth={false}
+						btnStyle="secondary"
+						outline={true}
+						disabled={changingPassword}
+						onclick={() => (changePasswordModalOpen = false)}
+					/>
+				</div>
+			</div>
+		{/if}
 	</div>
 </ArtidEditorModal>
 
