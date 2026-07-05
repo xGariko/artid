@@ -239,4 +239,11 @@ public class ArtidController {
         return ResponseEntity.ok().build();
     }
 
+    @GetMapping("/{id}/shares")
+    public ResponseEntity<Boolean> getArtidShareStatus(@PathVariable("id") Long artidId) {
+        boolean isShared = shareService.getArtidShareStatus(artidId);
+
+        return ResponseEntity.ok(isShared);
+    }
+
 }

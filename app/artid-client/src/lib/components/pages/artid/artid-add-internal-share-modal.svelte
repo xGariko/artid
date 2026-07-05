@@ -135,7 +135,7 @@
 				label="Condividi"
 				fullWidth={false}
 				icon="share-fill"
-				disabled={isSaving}
+				disabled={isSaving || toShareEmails.length <= 0}
 				onclick={shareArtid}
 			/>
 		</div>

@@ -73,14 +73,12 @@
 		if (isSaving) return;
 
 		const trimmed = tag.trim();
-		if (trimmed.length <= 0) {
-			toast.error('Inserisci il nome del tag');
+		if (trimmed.length <= 2) {
+			toast.error('Il tag deve essere lungo almeno 3 caratteri');
 			return;
 		}
 
 		isSaving = true;
-
-		console.log(trimmed);
 
 		try {
 			const { data, response } = await api.POST('/api/tags', {
@@ -88,15 +86,13 @@
 				credentials: 'include'
 			});
 
-			console.log(data);
-
 			if (!response.ok) {
 				const status = response.status;
 
 				if (status === 409) {
-					toast.error(`Il tag "${trimmed}" esiste già!`);
+					toast.error(`Il tag "${trimmed}" già esiste`);
 				} else if (status === 400) {
-					toast.error('Il nome contiene termini non consentiti.');
+					toast.error('Il tag non può chiamarsi in questo modo');
 				} else {
 					toast.error('Errore nella creazione del tag');
 				}
@@ -223,7 +219,7 @@
 				fullWidth={false}
 				btnStyle="success"
 				icon="check2"
-				disabled={isSaving}
+				disabled={isSaving || title.trim().length <= 0}
 				onclick={createNewArtid}
 			/>
 		</div>
@@ -238,7 +234,7 @@
 		</div>
 		<div class="d-flex justify-content-between flex-column h-100">
 			<div class="my-2">
-				<ArtidInput name="tag" label="Tag" bind:value={tag} />
+				<ArtidInput name="tag" label="Tag" bind:value={tag} maxlength={50} />
 			</div>
 			<div class="d-flex justify-content-end h-auto gap-2">
 				<ArtidButton

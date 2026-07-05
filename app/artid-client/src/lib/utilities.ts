@@ -149,3 +149,5 @@ export function isExpired(isoDate: string | null | undefined): boolean {
 
 	return new Date(isoDate).getTime() < Date.now();
 }
+
+export type ArtIdVisibilityType = 'public' | 'private' | 'unlisted';

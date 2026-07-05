@@ -347,6 +347,17 @@ public class ShareService {
         }
     }
 
+    @Transactional(readOnly = true)
+    public boolean getArtidShareStatus(Long artidId) {
+        boolean hasInternal = internalShareDAO.existsActiveInternalShare(artidId);
+
+        boolean hasExternal = externalShareDAO.existsActiveExternalShare(artidId);
+
+        boolean isShared = hasInternal || hasExternal;
+
+        return isShared;
+    }
+
     public InternalShareResponse toResponse(InternalShare share) {
         return new InternalShareResponse(
                 share.getId(),

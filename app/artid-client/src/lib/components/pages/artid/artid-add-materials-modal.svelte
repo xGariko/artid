@@ -51,14 +51,25 @@
 	async function handleSubmit() {
 		isSaving = true;
 		try {
-			const results = await Promise.all(
-				[...selectedMaterialsIds].map((materialId) =>
-					api.POST('/api/artids/{id}/resources', {
-						params: { path: { id: artidId } },
-						body: materialId
-					})
-				)
-			);
+			const results = [];
+
+			// const results = await Promise.all(
+			// 	// [...selectedMaterialsIds].map((materialId) =>
+			// 	// 	api.POST('/api/artids/{id}/resources', {
+			// 	// 		params: { path: { id: artidId } },
+			// 	// 		body: materialId
+			// 	// 	})
+			// 	// )
+
+			// );
+
+			for (const materialId of selectedMaterialsIds) {
+				const res = await api.POST('/api/artids/{id}/resources', {
+					params: { path: { id: artidId } },
+					body: materialId
+				});
+				results.push(res);
+			}
 
 			await invalidateAll();
 			if (results.some((r) => r.error)) {

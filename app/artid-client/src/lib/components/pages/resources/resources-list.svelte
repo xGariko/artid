@@ -5,7 +5,12 @@
 	import ArtidButton from '$lib/components/ui/artid-button.svelte';
 	import ArtidModal from '$lib/components/ui/artid-modal.svelte';
 
-	import { badgeColorForExtension, badgeLabelForExtension, formatFileSize, formatItalianDate } from '$lib/utilities';
+	import {
+		badgeColorForExtension,
+		badgeLabelForExtension,
+		formatFileSize,
+		formatItalianDate
+	} from '$lib/utilities';
 	import { toast } from 'svelte-sonner';
 
 	let {
@@ -43,9 +48,9 @@
 	// True se ogni risorsa filtrata è selezionata (controlla lo stato del checkbox header).
 	const areAllFilteredSelected = $derived(
 		filteredResources.length > 0 &&
-		filteredResources.every(
-			(resource) => resource.id != null && selectedResourceIds.has(resource.id)
-		)
+			filteredResources.every(
+				(resource) => resource.id != null && selectedResourceIds.has(resource.id)
+			)
 	);
 
 	const hasSelection = $derived(selectedResourceIds.size > 0);
@@ -109,19 +114,25 @@
 			);
 			await invalidateAll();
 			if (results.some((r) => r.error)) {
-				toast.error('Errore nell\'eliminazione delle risorse');
+				toast.error("Errore nell'eliminazione delle risorse");
 			} else {
 				toast.success('Risorse eliminate con successo');
 			}
 		} catch {
-			toast.error('Errore nell\'eliminazione delle risorse');
+			toast.error("Errore nell'eliminazione delle risorse");
 		}
 	}
+
+	let selectedResources = $derived(resources.filter((r) => selectedResourceIds.has(r.id!)));
 </script>
 
-<div class="bg-artid-section h-100 w-60 rounded-3 border border-artid-border p-3 d-flex flex-column gap-3 artid-list">
+<div
+	class="bg-artid-section h-100 w-60 rounded-3 border border-artid-border p-3 d-flex flex-column gap-3 artid-list"
+>
 	<div class="position-relative">
-		<i class="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-3 text-artid-primary"></i>
+		<i
+			class="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-3 text-artid-primary"
+		></i>
 		<input
 			type="text"
 			class="form-control rounded-3 ps-5 py-2 search-input"
@@ -177,19 +188,26 @@
 						{badgeLabelForExtension(resource.extension)}
 					</span>
 				</div>
-				<div class="col-3 pe-3 text-truncate fw-medium text-artid-text resource-title" title={resource.title}>
+				<div
+					class="col-3 pe-3 text-truncate fw-medium text-artid-text resource-title"
+					title={resource.title}
+				>
 					{resource.title}
 				</div>
 				<div class="col-2 text-artid-text">{formatFileSize(resource.fileSize)}</div>
 				<div class="col-2 text-artid-text text-nowrap">{formatItalianDate(resource.createdAt)}</div>
-				<div class="col-2 text-artid-text text-nowrap">{formatItalianDate(resource.lastModified)}</div>
+				<div class="col-2 text-artid-text text-nowrap">
+					{formatItalianDate(resource.lastModified)}
+				</div>
 				<div class="col-1 text-artid-text text-nowrap">
 					{resource.artidCount ?? 0}
 					<span class="text-artid-text-muted ms-1">ArtID</span>
 				</div>
 				<div class="col-1 text-center">
 					<i
-						class="bi bi-star{resource.favorite ? '-fill text-warning' : ' text-artid-text-muted'} fs-5"
+						class="bi bi-star{resource.favorite
+							? '-fill text-warning'
+							: ' text-artid-text-muted'} fs-5"
 					></i>
 				</div>
 			</div>
@@ -226,7 +244,9 @@
 			disabled={!hasSelection}
 			fullWidth={false}
 			ariaLabel="Elimina selezionati"
-			onclick={() => { showDeleteModal = true; }}
+			onclick={() => {
+				showDeleteModal = true;
+			}}
 		/>
 	</div>
 </div>
@@ -235,63 +255,64 @@
 	bind:isOpen={showDeleteModal}
 	title="Conferma eliminazione"
 	onConfirm={deleteSelectedResources}
-	message="Una volta eliminata la risorsa non sarà recuperabile."
+	message="Sei sicuro di voler cancellare i materiali selezionati? '{selectedResources
+		.map((r) => r.title)
+		.join(',')}'"
 	btnStyle="danger"
 />
 
-
 <style>
-    .artid-list {
-        min-width: 60rem;
-    }
+	.artid-list {
+		min-width: 60rem;
+	}
 
-    .search-input {
-        border-color: var(--artid-border);
-    }
+	.search-input {
+		border-color: var(--artid-border);
+	}
 
-    .search-input:focus {
-        border-color: var(--artid-primary);
-        box-shadow: 0 0 0 0.2rem var(--artid-primary-subtle);
-    }
+	.search-input:focus {
+		border-color: var(--artid-primary);
+		box-shadow: 0 0 0 0.2rem var(--artid-primary-subtle);
+	}
 
-    /* Header sticky: resta sopra le righe ma sotto le modali (z-index basso). */
-    .sticky-header {
-        position: sticky;
-        top: 0;
-        z-index: 1;
-    }
+	/* Header sticky: resta sopra le righe ma sotto le modali (z-index basso). */
+	.sticky-header {
+		position: sticky;
+		top: 0;
+		z-index: 1;
+	}
 
-    /* Righe cliccabili con feedback hover (sostituisce .table-hover). */
-    .resource-row {
-				transition: 0.2s ease all;
-        cursor: pointer;
-    }
+	/* Righe cliccabili con feedback hover (sostituisce .table-hover). */
+	.resource-row {
+		transition: 0.2s ease all;
+		cursor: pointer;
+	}
 
-    .resource-row:hover {
-        transition: 0.2s ease all;
-        background-color: var(--artid-surface);
-    }
+	.resource-row:hover {
+		transition: 0.2s ease all;
+		background-color: var(--artid-surface);
+	}
 
-    /* Riga selezionata: tinta brand, evidenziata anche in hover. */
-    .resource-row.selected {
-        transition: 0.2s ease all;
-        box-shadow: inset 6px 0px 0px -3px var(--artid-primary);
-    }
+	/* Riga selezionata: tinta brand, evidenziata anche in hover. */
+	.resource-row.selected {
+		transition: 0.2s ease all;
+		box-shadow: inset 6px 0px 0px -3px var(--artid-primary);
+	}
 
-    /* Consente al titolo di troncare con ellissi dentro la colonna flex. */
-    .resource-title {
-        min-width: 0;
-    }
+	/* Consente al titolo di troncare con ellissi dentro la colonna flex. */
+	.resource-title {
+		min-width: 0;
+	}
 
-    .badge-type {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        width: 2.25rem;
-        height: 2.25rem;
-        flex-shrink: 0;
-        border-radius: 0.4rem;
-        font-size: 0.7rem;
-        letter-spacing: 0.02em;
-    }
+	.badge-type {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: 2.25rem;
+		height: 2.25rem;
+		flex-shrink: 0;
+		border-radius: 0.4rem;
+		font-size: 0.7rem;
+		letter-spacing: 0.02em;
+	}
 </style>

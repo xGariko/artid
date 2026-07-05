@@ -75,4 +75,6 @@ public interface InternalShareDAO extends ListCrudRepository<InternalShare, Long
             @Param("idUserTo") Long idUserTo,
             @Param("idArtid") Long idArtid);
 
+    @Query("SELECT COUNT(*) > 0 FROM internal_share WHERE id_artid = :artidId")
+    boolean existsActiveInternalShare(@Param("artidId") Long artidId);
 }

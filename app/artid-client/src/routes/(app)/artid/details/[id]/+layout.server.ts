@@ -11,17 +11,23 @@ export const load: LayoutServerLoad = async ({ params, locals }) => {
 		throw error(404, 'ArtID non trovato');
 	}
 
-	const [artidResponse, materials, tags] = await Promise.all([
+	const [artidResponse, materials, tags, isActivelyShared] = await Promise.all([
 		locals.api.GET('/api/artids/{id}', {
 			params: { path: { id } }
 		}),
 		locals.api.GET('/api/artids/{id}/resources', { params: { path: { id } } }),
-		locals.api.GET('/api/artids/{id}/tags', { params: { path: { id } } })
+		locals.api.GET('/api/artids/{id}/tags', { params: { path: { id } } }),
+		locals.api.GET('/api/artids/{id}/shares', { params: { path: { id } } })
 	]);
 
 	if (!artidResponse.data) {
 		throw error(artidResponse.response.status === 404 ? 404 : 500, 'ArtID non trovato');
 	}
 
-	return { artid: artidResponse.data, materials: materials.data, tags: tags.data };
+	return {
+		artid: artidResponse.data,
+		materials: materials.data,
+		tags: tags.data,
+		isActivelyShared: isActivelyShared.data
+	};
 };

@@ -11,38 +11,46 @@ import java.util.List;
 
 public interface ExternalShareDAO extends ListCrudRepository<ExternalShare, Long> {
 
-    long countByIdCreator(Long idUser);
+        long countByIdCreator(Long idUser);
 
-    @Query("""
-            SELECT s.*, a.title, f.file_path
-            FROM external_share s
-            LEFT JOIN artid a ON s.id_artid = a.id
-            LEFT JOIN file f ON f.id = a.id_thumbnail
-            WHERE s.id_creator = :userId
-            ORDER BY s.created_at
-            """)
-    List<ExternalShareArtIDResponse> getExternalSharesByUserID(@Param("userId") Long userId);
+        @Query("""
+                        SELECT s.*, a.title, f.file_path
+                        FROM external_share s
+                        LEFT JOIN artid a ON s.id_artid = a.id
+                        LEFT JOIN file f ON f.id = a.id_thumbnail
+                        WHERE s.id_creator = :userId
+                        ORDER BY s.created_at
+                        """)
+        List<ExternalShareArtIDResponse> getExternalSharesByUserID(@Param("userId") Long userId);
 
-    @Modifying
-    @Query("""
-            UPDATE external_share s
-            SET is_active = false
-            WHERE s.id IN (:shareIds) AND s.id_creator = :userId
-            """)
-    void disableSharesByIds(@Param("userId") Long userId, @Param("shareIds") List<Long> shareIds);
+        @Modifying
+        @Query("""
+                        UPDATE external_share s
+                        SET is_active = false
+                        WHERE s.id IN (:shareIds) AND s.id_creator = :userId
+                        """)
+        void disableSharesByIds(@Param("userId") Long userId, @Param("shareIds") List<Long> shareIds);
 
-    @Modifying
-    @Query("""
-            UPDATE external_share s
-            SET is_active = true
-            WHERE s.id IN (:shareIds) AND s.id_creator = :userId
-            """)
-    void enableSharesByIds(@Param("userId") Long userId, @Param("shareIds") List<Long> shareIds);
+        @Modifying
+        @Query("""
+                        UPDATE external_share s
+                        SET is_active = true
+                        WHERE s.id IN (:shareIds) AND s.id_creator = :userId
+                        """)
+        void enableSharesByIds(@Param("userId") Long userId, @Param("shareIds") List<Long> shareIds);
 
-    @Modifying
-    @Query(value = """
-        DELETE FROM external_share s
-        WHERE s.id IN (:shareIds) AND s.id_creator = :userId
-        """)
-    void deleteSharesByIds(@Param("userId") Long userId, @Param("shareIds") List<Long> shareIds);
+        @Modifying
+        @Query(value = """
+                        DELETE FROM external_share s
+                        WHERE s.id IN (:shareIds) AND s.id_creator = :userId
+                        """)
+        void deleteSharesByIds(@Param("userId") Long userId, @Param("shareIds") List<Long> shareIds);
+
+        @Query("""
+                        SELECT COUNT(*) > 0
+                        FROM external_share
+                        WHERE id_artid = :artidId
+                        """)
+        boolean existsActiveExternalShare(@Param("artidId") Long artidId);
+
 }
