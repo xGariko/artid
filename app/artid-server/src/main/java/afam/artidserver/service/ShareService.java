@@ -221,6 +221,9 @@ public class ShareService {
                     "Questo link è stato momentaneamente disattivato. Contatta l’autore per sapere quando tornerà attivo.");
         }
 
+        if (share.getIdArtid() == null) {
+            throw new ResponseStatusException(HttpStatus.GONE, "L'ArtID desiderato non esiste più.");
+        }
         // ArtID collegato + suo proprietario (l'anteprima usa l'owner, così prescinde
         // dalla visibilità).
         Artid artid = artidDAO.findById(share.getIdArtid())

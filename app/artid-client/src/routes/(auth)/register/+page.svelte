@@ -12,6 +12,8 @@
 	import { toDateInputValue } from '$lib/utilities';
 	import { loading } from '$lib/stores/loading.ts';
 	import type { ActionData } from './$types';
+	import { toast } from '$lib/toast.ts';
+	import { user } from '$lib/stores/auth.ts';
 
 	let { form }: { form: ActionData } = $props();
 
@@ -52,19 +54,35 @@
 			surname: userDTO.surname.trim(),
 			email: userDTO.email.trim(),
 			password: userDTO.password,
-			birthdate: userDTO.birthdate || undefined,
-			birthplace: userDTO.birthplace || undefined
+			confirmPassword: userDTO.confirmPassword,
+			birthdate: userDTO.birthdate,
+			birthplace: userDTO.birthplace
 		});
+		clientErrors = errors;
 		if (!parsed.success) {
 			for (const issue of parsed.error.issues) {
 				const field = issue.path[0] as RegisterFieldError | undefined;
 				if (field && !errors[field]) errors[field] = FIELD_MESSAGES[field] ?? issue.message;
 			}
 		}
-		if (userDTO.password && userDTO.password !== confirmPassword) {
-			errors.confirmPassword = FIELD_MESSAGES.confirmPassword;
-		}
+		// if (userDTO.password && userDTO.password !== confirmPassword) {
+		// 	errors.confirmPassword = FIELD_MESSAGES.confirmPassword;
+		// }
 		clientErrors = errors;
+
+		toast.dismiss();
+		if(!userDTO.email || !userDTO.password || !userDTO.name || !userDTO.surname || !userDTO.birthdate || !userDTO.birthplace) {
+			toast.error("Errore: Bisogna compilare tutti i campi!")
+		} else {
+			if (errors.email) {
+				toast.error("Errore: Formato dell'email non corretto! Utilizzare una mail del tipo mail@dominio.ext")
+			} else if(errors.password) {
+				toast.error("Errore: Formato della password non corretto! La password deve avere almeno 8 caratteri.")
+			} else if(errors.confirmPassword) {
+				toast.error("Errore: I campi delle password devono essere uguali!")
+			}
+		}
+
 		return Object.keys(errors).length === 0;
 	}
 
@@ -98,11 +116,12 @@
 		surname: form?.surname ?? '',
 		email: form?.email ?? '',
 		password: '',
-		birthdate: form?.birthdate || undefined,
-		birthplace: form?.birthplace || undefined
+		confirmPassword: '',
+		birthdate: form?.birthdate ?? '',
+		birthplace: form?.birthplace ?? '',
 	});
 
-	let confirmPassword = $state('');
+	// let confirmPassword = $state('');
 	let code = $state('');
 
 	// Limite nativo del date picker: ieri, così la selezione rispecchia la regola "antecedente a oggi"
@@ -113,15 +132,15 @@
 		return toDateInputValue(yesterday);
 	})();
 
-	let passwordMismatch = $derived(
-		confirmPassword.length > 0 && userDTO.password !== confirmPassword
-	);
+	// let passwordMismatch = $derived(
+	// 	userDTO.confirmPassword.length > 0 && userDTO.password !== userDTO.confirmPassword
+	// );
 
-	let confirmPasswordError = $derived(
-		passwordMismatch
-			? 'Le password non coincidono'
-			: (clientErrors.confirmPassword ?? form?.errors?.confirmPassword ?? undefined)
-	);
+	// let confirmPasswordError = $derived(
+	// 	passwordMismatch
+	// 		? 'Le password non coincidono'
+	// 		: (clientErrors.confirmPassword ?? form?.errors?.confirmPassword ?? undefined)
+	// );
 
 	// Form di verifica: lo inviamo via JS appena il codice è completo, senza pulsante (come nel login).
 	let verifyForm: HTMLFormElement | undefined = $state();
@@ -177,7 +196,6 @@
 		Ti abbiamo inviato un codice a 6 cifre all'indirizzo<br />
 		<strong>{form?.email}</strong>
 	</p>
-
 	<form
 		method="POST"
 		action="?/verify"
@@ -278,8 +296,8 @@
 						type="password"
 						name="confirmPassword"
 						label="Ripeti password"
-						bind:value={confirmPassword}
-						error={confirmPasswordError}
+						bind:value={userDTO.confirmPassword}
+						error={clientErrors.confirmPassword ?? form?.errors?.confirmPassword}
 					/>
 				</div>
 			</div>

@@ -41,6 +41,8 @@ export const actions: Actions = {
 		}
 		if (!password) {
 			errors.password = "La password è obbligatoria.";
+		} else if (password.length < 8) {
+			errors.password = "La password deve avere almeno 8 caratteri."
 		}
 
 		if (Object.keys(errors).length > 0) {

@@ -11,6 +11,7 @@
 	import { loading } from '$lib/stores/loading';
 	import type { ActionData } from './$types';
 	import ArtidSpidButton from '$lib/components/ui/artid-spid-button.svelte';
+	import { toast } from '$lib/toast';
 
 	let { form }: { form: ActionData } = $props();
 
@@ -60,7 +61,20 @@
 		}
 		if (!credentials.password) {
 			errors.password = 'La password è obbligatoria.';
+		} else if (credentials.password.length < 8) {
+			errors.password = 'La password deve avere almeno 8 caratteri.';
 		}
+		toast.dismiss();
+		if(!email || !credentials.password) {
+			toast.error("Errore: Bisogna compilare tutti i campi!")
+		} else {
+			if (errors.email) {
+				toast.error("Errore: Formato dell'email non corretto! Utilizzare una mail del tipo mail@dominio.ext")
+			} else if(errors.password) {
+				toast.error("Errore: Formato della password non corretto! La password deve avere almeno 8 caratteri.")
+			}
+		}
+
 		clientErrors = errors;
 		return Object.keys(errors).length === 0;
 	}
