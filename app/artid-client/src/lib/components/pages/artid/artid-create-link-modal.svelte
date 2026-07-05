@@ -31,6 +31,7 @@
 
 	// Risultato dello step 2: link pubblico della condivisione creata.
 	let shareUrl = $state('');
+	let shareToken = $state('');
 
 	// Ripristina lo stepper ad ogni (ri)apertura, così non conserva dati di una creazione precedente.
 	$effect(() => {
@@ -78,6 +79,7 @@
 
 			const { token } = await response.json();
 			shareUrl = `${window.location.origin}/s/${token}`;
+			shareToken = token;
 			step = 3;
 		} catch (e) {
 			toast.error(e instanceof Error ? e.message : 'Errore di rete');
@@ -98,7 +100,7 @@
 	// Anteprima in-app dell'ArtID collegato (come nelle azioni della lista condivisioni).
 	function openPreview(): void {
 		isOpen = false;
-		goto(resolve('/(app)/artid/details/[id]/preview', { id: String(artidId) }));
+		goto(resolve('/s/[token]', {token: shareToken}));
 	}
 </script>
 
