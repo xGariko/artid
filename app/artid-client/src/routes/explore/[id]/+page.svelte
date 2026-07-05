@@ -3,6 +3,7 @@
 	import ExplorePagination from '$lib/components/pages/explore/explore-pagination.svelte';
 	import ExploreProfileHeader from '$lib/components/pages/explore/explore-profile-header.svelte';
 	import ExplorePublicArtidCard from '$lib/components/pages/explore/explore-public-artid-card.svelte';
+	import { sanitizeHtml } from '$lib/sanitize';
 	import type { PageData } from './$types';
 
 	let { data }: { data: PageData } = $props();
@@ -38,6 +39,17 @@
 
 		<div class="p-4">
 			<ExploreProfileHeader {profile} />
+
+			{#if profile.biography}
+				<div class="d-flex align-items-center gap-2 mt-4 mb-2 text-artid-text-muted small fw-semibold text-uppercase">
+					<i class="bi bi-person-lines-fill"></i>
+					<span>Biografia</span>
+				</div>
+				<!-- Biografia rich-text (Quill): sanitizzata prima del rendering con {@html} (vedi $lib/sanitize). -->
+				<div class="text-artid-text profile-biography">
+					{@html sanitizeHtml(profile.biography)}
+				</div>
+			{/if}
 
 			{#if certifications.length > 0}
 				<div class="d-flex align-items-center gap-2 mt-4 mb-2 text-artid-text-muted small fw-semibold text-uppercase">
@@ -101,6 +113,15 @@
 	/* Larghezza leggibile del riquadro, centrato: nessuna utility Bootstrap per un max-width in px. */
 	.explore-detail-card {
 		max-width: 960px;
+	}
+
+	/* Biografia rich-text: azzeriamo i margini di primo/ultimo blocco così resta allineata al titolo. */
+	.profile-biography :global(> :first-child) {
+		margin-top: 0;
+	}
+
+	.profile-biography :global(> :last-child) {
+		margin-bottom: 0;
 	}
 
 	/* Chip attestato scaricabile: feedback piatto (bordo/sfondo brand), nessuna ombra. */

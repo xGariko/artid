@@ -50,6 +50,9 @@ public class PasswordChangeService {
         }
         User full = userService.findById(user.getId()).orElseThrow();
         full.setPasswordHash(passwordEncoder.encode(newPassword));
+        // Da qui in poi l'account ha una password reale: anche un Membro nato da SPID potrà eliminarlo
+        // con la password invece che con le credenziali SPID.
+        full.setPasswordSet(true);
         userService.save(full);
         return Result.OK;
     }

@@ -24,6 +24,13 @@ public class User {
     @Column("password_hash")
     private String passwordHash;
 
+    // true = l'account ha una password reale scelta dall'utente (registrazione classica, o Membro
+    // SPID che l'ha poi impostata via "Modifica Password"). false = nato da SPID e mai dotato di una
+    // password vera: password_hash è solo un valore casuale/inutilizzabile (vedi SpidAuthService).
+    // Guida l'eliminazione account: password vs credenziali SPID. Non derivabile dai soli dati.
+    @Column("password_set")
+    private Boolean passwordSet;
+
     private LocalDate birthdate;
     private String birthplace;
     private String address;

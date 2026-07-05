@@ -23,6 +23,9 @@ public record PublicArtidDetailResponse(
         // true se l'identità dell'autore è verificata via SPID.
         boolean authorVerified,
         String authorLinkedinId,
+        String authorFacebookId,
+        String authorInstagramId,
+        // Email di contatto dell'autore (colonna business_email).
         String authorBusinessEmail,
         List<PublicMaterialResponse> materials
 ) {

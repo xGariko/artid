@@ -1,8 +1,9 @@
 <script lang="ts">
 	import type { PublicArtidDetail } from '$lib/api/types';
 	import PublicMaterialCard from '$lib/components/pages/explore/public-material-card.svelte';
+	import ContactEmailButton from '$lib/components/pages/explore/contact-email-button.svelte';
 	import { sanitizeHtml } from '$lib/sanitize';
-	import { avatarColorFor, formatItalianDateLong, initialsFor, resourceTypeFromMime } from '$lib/utilities';
+	import { avatarColorFor, formatItalianDateLong, initialsFor, resourceTypeFromMime, socialUrlFor } from '$lib/utilities';
 	import { resolve } from '$app/paths';
 	import artidPlaceholder from '$lib/assets/artid_logo_outline_primary.svg';
 
@@ -23,12 +24,10 @@
 
 	const profileHref = $derived(resolve('/explore/[id]', { id: String(artid.authorId) }));
 
-	// linkedinId può essere un handle o un URL completo: normalizziamo verso l'URL del profilo.
-	const linkedinUrl = $derived.by(() => {
-		const handle = artid.authorLinkedinId?.trim();
-		if (!handle) return null;
-		return /^https?:\/\//i.test(handle) ? handle : `https://www.linkedin.com/in/${handle}`;
-	});
+	// Handle/URL social dell'autore normalizzati verso l'URL completo del profilo (null = niente bottone).
+	const linkedinUrl = $derived(socialUrlFor('linkedin', artid.authorLinkedinId));
+	const facebookUrl = $derived(socialUrlFor('facebook', artid.authorFacebookId));
+	const instagramUrl = $derived(socialUrlFor('instagram', artid.authorInstagramId));
 
 	// Larghezza colonna per tipo (come nel mockup): video a tutta larghezza, immagini 2-up, audio/file 3-up.
 	function materialColClass(mimeType: string | null | undefined): string {
@@ -97,14 +96,30 @@
 						<i class="bi bi-linkedin"></i>
 					</a>
 				{/if}
-				{#if artid.authorBusinessEmail}
+				{#if facebookUrl}
 					<a
-						href="mailto:{artid.authorBusinessEmail}"
-						class="btn btn-primary rounded-2 px-3 py-2 fw-semibold d-flex align-items-center gap-2"
+						href={facebookUrl}
+						target="_blank"
+						rel="noopener"
+						class="btn btn-primary rounded-2 d-flex align-items-center justify-content-center artid-detail__icon-btn"
+						aria-label="Profilo Facebook"
 					>
-						<i class="bi bi-envelope-fill"></i>
-						Contatta
+						<i class="bi bi-facebook"></i>
 					</a>
+				{/if}
+				{#if instagramUrl}
+					<a
+						href={instagramUrl}
+						target="_blank"
+						rel="noopener"
+						class="btn btn-primary rounded-2 d-flex align-items-center justify-content-center artid-detail__icon-btn"
+						aria-label="Profilo Instagram"
+					>
+						<i class="bi bi-instagram"></i>
+					</a>
+				{/if}
+				{#if artid.authorBusinessEmail}
+					<ContactEmailButton email={artid.authorBusinessEmail} />
 				{/if}
 			</div>
 		</div>

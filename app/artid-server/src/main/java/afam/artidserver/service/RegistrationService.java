@@ -131,6 +131,8 @@ public class RegistrationService {
         user.setSurname(pending.getSurname());
         user.setMail(email);
         user.setPasswordHash(pending.getPasswordHash()); // già hashata in startChallenge
+        // Registrazione classica: la password è quella scelta dall'utente → eliminabile con password.
+        user.setPasswordSet(true);
         user.setBirthdate(pending.getBirthdate());
         user.setBirthplace(pending.getBirthplace());
         user.setIsPublic(false);
