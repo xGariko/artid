@@ -3,7 +3,12 @@
 	import { api } from '$lib/api/browser-client';
 	import ArtidButton from '$lib/components/ui/artid-button.svelte';
 	import ArtidModal from '$lib/components/ui/artid-modal.svelte';
-	import { formatFileSize, formatItalianDate, badgeColorForExtension, badgeLabelForExtension } from '$lib/utilities';
+	import {
+		formatFileSize,
+		formatItalianDate,
+		badgeColorForExtension,
+		badgeLabelForExtension
+	} from '$lib/utilities';
 	import { toast } from 'svelte-sonner';
 	import { SvelteSet } from 'svelte/reactivity'; // Ottimizzato per Svelte 5
 
@@ -38,8 +43,7 @@
 	});
 
 	const areAllSelected = $derived(
-		certifications.length > 0 &&
-		certifications.every((c) => c.id != null && selectedIds.has(c.id))
+		certifications.length > 0 && certifications.every((c) => c.id != null && selectedIds.has(c.id))
 	);
 
 	const hasSelection = $derived(selectedIds.size > 0);
@@ -89,9 +93,9 @@
 			);
 			await invalidateAll();
 			if (results.some((r) => r.error)) {
-				toast.error("Errore nell'eliminazione di alcune certificazioni");
+				toast.error("Errore nell'eliminazione di alcuni certificati");
 			} else {
-				toast.success('Certificazioni eliminate con successo');
+				toast.success('Certificati cancellati con successo');
 			}
 		} catch {
 			toast.error("Errore durante l'eliminazione");
@@ -99,14 +103,20 @@
 	}
 </script>
 
-<div class="bg-artid-section rounded-3 border border-artid-border p-3 d-flex flex-column gap-3 artid-list">
+<div
+	class="bg-artid-section rounded-3 border border-artid-border p-3 d-flex flex-column gap-3 artid-list"
+>
 	<div class="d-flex align-items-center gap-3">
 		<i class="bi bi-patch-check-fill text-artid-dark fs-3"></i>
 		<h3 class="fs-5 fw-bold text-artid-dark m-0">I tuoi attestati</h3>
 	</div>
 
-	<div class="flex-grow-1 overflow-y-auto rounded-3 border border-artid-border table-scroll-container">
-		<div class="row g-0 align-items-center px-3 py-2 sticky-header bg-artid-muted border-bottom border-artid-border text-artid-text small fw-semibold text-nowrap">
+	<div
+		class="flex-grow-1 overflow-y-auto rounded-3 border border-artid-border table-scroll-container"
+	>
+		<div
+			class="row g-0 align-items-center px-3 py-2 sticky-header bg-artid-muted border-bottom border-artid-border text-artid-text small fw-semibold text-nowrap"
+		>
 			<div class="col-1 d-flex align-items-center">
 				<input
 					type="checkbox"
@@ -150,7 +160,10 @@
 					</span>
 				</div>
 
-				<div class="col-4 pe-3 text-truncate fw-medium text-artid-text certification-title" title={cert.title}>
+				<div
+					class="col-4 pe-3 text-truncate fw-medium text-artid-text certification-title"
+					title={cert.title}
+				>
 					{cert.title ?? ''}
 				</div>
 
@@ -180,61 +193,90 @@
 
 	<div class="d-flex align-items-center gap-2">
 		<ArtidButton label="Nuovo" icon="plus-lg" fullWidth={false} onclick={onNewRequest} />
-		<ArtidButton label="Scarica" icon="download" disabled={!hasSelection} fullWidth={false} onclick={downloadSelected} />
-		<ArtidButton label="Modifica" icon="pencil-square" outline={true} disabled={selectedIds.size !== 1} fullWidth={false} onclick={editSelected} />
-		<ArtidButton icon="trash" btnStyle="danger" outline={true} disabled={!hasSelection} fullWidth={false} ariaLabel="Elimina selezionati" onclick={() => { showDeleteModal = true; }} />
+		<ArtidButton
+			label="Scarica"
+			icon="download"
+			disabled={!hasSelection}
+			fullWidth={false}
+			onclick={downloadSelected}
+		/>
+		<ArtidButton
+			label="Modifica"
+			icon="pencil-square"
+			outline={true}
+			disabled={selectedIds.size !== 1}
+			fullWidth={false}
+			onclick={editSelected}
+		/>
+		<ArtidButton
+			icon="trash"
+			btnStyle="danger"
+			outline={true}
+			disabled={!hasSelection}
+			fullWidth={false}
+			ariaLabel="Elimina selezionati"
+			onclick={() => {
+				showDeleteModal = true;
+			}}
+		/>
 	</div>
 </div>
 
-<ArtidModal bind:isOpen={showDeleteModal} title="Conferma eliminazione" onConfirm={deleteSelected} message="Una volta eliminata la certificazione non sarà recuperabile." btnStyle="danger" />
+<ArtidModal
+	bind:isOpen={showDeleteModal}
+	title="Conferma eliminazione"
+	onConfirm={deleteSelected}
+	message="Una volta eliminata la certificazione non sarà recuperabile."
+	btnStyle="danger"
+/>
 
 <style>
-    .artid-list {
-        min-width: 60rem;
-    }
+	.artid-list {
+		min-width: 60rem;
+	}
 
-    .table-scroll-container {
-        height: 450px;
-    }
+	.table-scroll-container {
+		height: 450px;
+	}
 
-    /* Header sticky: resta sopra le righe ma sotto le modali (z-index basso). */
-    .sticky-header {
-        position: sticky;
-        top: 0;
-        z-index: 1;
-    }
+	/* Header sticky: resta sopra le righe ma sotto le modali (z-index basso). */
+	.sticky-header {
+		position: sticky;
+		top: 0;
+		z-index: 1;
+	}
 
-    /* Righe cliccabili con feedback hover (sostituisce .table-hover). */
-    .resource-row {
-        transition: 0.2s ease all;
-        cursor: pointer;
-    }
+	/* Righe cliccabili con feedback hover (sostituisce .table-hover). */
+	.resource-row {
+		transition: 0.2s ease all;
+		cursor: pointer;
+	}
 
-    .resource-row:hover {
-        transition: 0.2s ease all;
-        background-color: var(--artid-surface);
-    }
+	.resource-row:hover {
+		transition: 0.2s ease all;
+		background-color: var(--artid-surface);
+	}
 
-    /* Riga selezionata: tinta brand. */
-    .resource-row.selected {
-        transition: 0.2s ease all;
-        box-shadow: inset 6px 0px 0px -3px var(--artid-primary);
-    }
+	/* Riga selezionata: tinta brand. */
+	.resource-row.selected {
+		transition: 0.2s ease all;
+		box-shadow: inset 6px 0px 0px -3px var(--artid-primary);
+	}
 
-    /* Consente al titolo di troncare con ellissi dentro la colonna flex. */
-    .certification-title {
-        min-width: 0;
-    }
+	/* Consente al titolo di troncare con ellissi dentro la colonna flex. */
+	.certification-title {
+		min-width: 0;
+	}
 
-    .badge-type {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        width: 2.25rem;
-        height: 2.25rem;
-        flex-shrink: 0;
-        border-radius: 0.4rem;
-        font-size: 0.7rem;
-        letter-spacing: 0.02em;
-    }
+	.badge-type {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: 2.25rem;
+		height: 2.25rem;
+		flex-shrink: 0;
+		border-radius: 0.4rem;
+		font-size: 0.7rem;
+		letter-spacing: 0.02em;
+	}
 </style>
