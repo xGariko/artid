@@ -190,7 +190,7 @@
 					msg = 'Link attivati con successo. Puoi disattivarli in qualsiasi momento.';
 					break;
 				case 'disable':
-					msg = 'Link attivati con successo. Puoi disattivarli in qualsiasi momento.';
+					msg = 'Link disattivati con successo. Puoi riattivarli in qualsiasi momento.';
 					break;
 			}
 			toast.success(msg);

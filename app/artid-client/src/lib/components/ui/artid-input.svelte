@@ -12,6 +12,7 @@
 		min,
 		max,
 		autocomplete,
+		disabled,
 		onChange,
 		onkeydown
 	}: {
@@ -27,6 +28,7 @@
 		min?: string | number;
 		max?: string | number;
 		autocomplete?: 'on' | 'off' | 'one-time-code';
+		disabled?: boolean;
 		onChange?: (value: string | number | Date) => void;
 		onkeydown?: (e: KeyboardEvent) => void;
 	} = $props();
@@ -43,6 +45,7 @@
 		{min}
 		{max}
 		{autocomplete}
+		{disabled}
 		onkeydown={onkeydown}
 		class="form-control {addClass ?? ''} bg-artid-section outline-none rounded-1 {error
 			? 'is-invalid'

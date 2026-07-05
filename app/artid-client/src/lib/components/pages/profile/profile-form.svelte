@@ -9,10 +9,15 @@
 	import ArtidSpidButton from '$lib/components/ui/artid-spid-button.svelte';
 	import ArtidEditorModal from '$lib/components/ui/artid-editor-modal.svelte';
 	import ArtidOtpInput from '$lib/components/ui/artid-otp-input.svelte';
+	import { toDateInputValue } from '$lib/utilities';
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
 
 	let { profile }: { profile: Profile } = $props();
+
+	// Data odierna in formato yyyy-MM-dd: limite massimo della data di nascita (oggi ammesso, futuro no).
+	const todayDateInput = toDateInputValue(new Date());
+	const BIRTHDATE_FUTURE_MESSAGE = 'La data di nascita non può essere successiva a oggi.';
 
 	let model = $state({
 		name: profile.name ?? '',
@@ -71,6 +76,10 @@
 	// I campi obbligatori alla registrazione (nome e cognome) non possono restare vuoti: se svuotati,
 	// "Salva" è disabilitato. Email e password non rientrano perché non modificabili da questo form.
 	let requiredFilled = $derived(model.name.trim() !== '' && model.surname.trim() !== '');
+
+	// La data di nascita non può in nessun caso essere successiva a oggi (confronto tra stringhe
+	// yyyy-MM-dd). Blocca il "Salva" e mostra l'errore sul campo; la guardia in save() è l'ultima difesa.
+	let birthdateInFuture = $derived(!!model.birthdate && model.birthdate > todayDateInput);
 
 	let fieldErrors = $state<Record<string, string>>({});
 	let isSaving = $state(false);
@@ -206,6 +215,11 @@
 
 	async function save(): Promise<void> {
 		if (isSaving) return;
+		if (birthdateInFuture) {
+			fieldErrors = { birthdate: BIRTHDATE_FUTURE_MESSAGE };
+			toast.error(BIRTHDATE_FUTURE_MESSAGE);
+			return;
+		}
 		isSaving = true;
 		fieldErrors = {};
 		try {
@@ -554,7 +568,13 @@
 		<div class="col-12 col-md-10 d-flex flex-column row">
 			<div class="row">
 				<div class="col-12 col-xl-4 p-1">
-					<ArtidInput name="name" label="Nome" bind:value={model.name} error={err('name')} />
+					<ArtidInput
+						name="name"
+						label="Nome"
+						bind:value={model.name}
+						error={err('name')}
+						disabled={spidLinked}
+					/>
 				</div>
 				<div class="col-12 col-md-4 p-1">
 					<ArtidInput
@@ -562,6 +582,7 @@
 						label="Cognome"
 						bind:value={model.surname}
 						error={err('surname')}
+						disabled={spidLinked}
 					/>
 				</div>
 				<div class="col-12 col-md-4 p-1">
@@ -586,8 +607,10 @@
 						type="date"
 						name="birthdate"
 						label="Data di nascita"
+						max={todayDateInput}
 						bind:value={model.birthdate}
-						error={err('birthdate')}
+						error={birthdateInFuture ? BIRTHDATE_FUTURE_MESSAGE : err('birthdate')}
+						disabled={spidLinked}
 					/>
 				</div>
 				<div class="col-12 col-md-4 p-1">
@@ -596,6 +619,7 @@
 						label="Luogo di nascita"
 						bind:value={model.birthplace}
 						error={err('birthplace')}
+						disabled={spidLinked}
 					/>
 				</div>
 				<div class="col-12 col-md-4 p-1">
@@ -723,7 +747,7 @@
 				label={isSaving ? 'Salvataggio…' : 'Salva'}
 				icon="check-lg"
 				btnStyle="success"
-				disabled={isSaving || !isDirty || !requiredFilled}
+				disabled={isSaving || !isDirty || !requiredFilled || birthdateInFuture}
 				onclick={save}
 				fullWidth={false}
 			/>
