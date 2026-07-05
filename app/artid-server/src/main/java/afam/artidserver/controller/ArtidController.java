@@ -222,7 +222,7 @@ public class ArtidController {
     }
 
     @PostMapping("/{id}/share/internal")
-    public ResponseEntity<Void> addInternalShared(@PathVariable Long id, @RequestBody String email,
+    public ResponseEntity<Void> addInternalShare(@PathVariable Long id, @RequestBody String email,
             @AuthenticationPrincipal AuthenticatedUser principal) {
 
         try {

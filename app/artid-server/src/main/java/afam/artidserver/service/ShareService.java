@@ -13,12 +13,14 @@ import afam.artidserver.security.ShareLinkCipher;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import afam.artidserver.storage.StorageService;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Duration;
+import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -113,7 +115,8 @@ public class ShareService {
         }
         OffsetDateTime current = share.getExpirationDate();
         if (current != null && !newExpirationDate.isAfter(current)) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La nuova scadenza deve essere successiva a quella attuale");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "La nuova scadenza deve essere successiva a quella attuale");
         }
 
         share.setExpirationDate(newExpirationDate);
@@ -138,7 +141,8 @@ public class ShareService {
      * pubblico. La scadenza è obbligatoria e deve essere futura; la descrizione è opzionale.
      */
     @Transactional
-    public CreateExternalShareResponse createExternalShare(Long userId, Long artidId, OffsetDateTime expirationDate, String description) {
+    public CreateExternalShareResponse createExternalShare(Long userId, Long artidId, OffsetDateTime expirationDate,
+            String description) {
         if (expirationDate == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Data di scadenza mancante");
         }
@@ -148,7 +152,8 @@ public class ShareService {
 
         // Ownership: l'ArtID deve esistere ed essere dell'utente autenticato (e non soft-deleted).
         Artid artid = artidDAO.findByIdAndIdUserAndDeletedAtIsNull(artidId, userId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Artid non trovato o non di tua proprietà"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        "Artid non trovato o non di tua proprietà"));
 
         // Spring Data JDBC include tutte le colonne mappate nell'INSERT: valorizziamo esplicitamente i
         // default (contatore, stato attivo, data creazione) per non violare i NOT NULL del DB.
@@ -295,22 +300,51 @@ public class ShareService {
             throw new IllegalArgumentException("Non puoi condividere un materiale con te stesso");
         }
 
-        // 5. Verifica se l'utente destinatario accetta condivisioni
-        if (!Boolean.TRUE.equals(targetUser.getInternalShareEnabled())) {
-            throw new IllegalStateException("L'utente ha disattivato la ricezione di condivisioni");
-        }
+        InternalShare share = internalShareDAO.findByIdUserFromAndIdUserToAndIdArtid(
+                userId,
+                targetUser.getId(),
+                artid.getId()).map(existingShare -> {
+                    // CASO UPDATE:
+                    existingShare.setRecipientMail(targetUser.getMail());
+                    existingShare.setIsAccepted(Boolean.TRUE.equals(targetUser.getInternalShareEnabled()));
+                    existingShare.setCreatedAt(OffsetDateTime.now());
 
-        // 6. Se tutti i controlli passano, crea e salva l'associazione di condivisione
-        InternalShare share = new InternalShare();
-        share.setIdUserFrom(userId); // Chi condivide
-        share.setIdUserTo(targetUser.getId()); // Chi riceve
-        share.setIdArtid(artid.getId()); // L'ArtID condiviso
-        share.setRecipientMail(targetUser.getMail()); // La mail del destinatario
-        share.setIsAccepted(false); // Di default parte non accettata
+                    return existingShare;
+                }).orElseGet(() -> {
+                    // CASO INSERT:
+                    InternalShare newShare = new InternalShare();
+                    newShare.setIdUserFrom(userId);
+                    newShare.setIdUserTo(targetUser.getId());
+                    newShare.setIdArtid(artid.getId());
+                    newShare.setRecipientMail(targetUser.getMail());
+                    newShare.setIsAccepted(Boolean.TRUE.equals(targetUser.getInternalShareEnabled()));
+
+                    newShare.setCreatedAt(OffsetDateTime.now());
+
+                    return newShare;
+                });
 
         internalShareDAO.save(share);
 
-        // TODO se già c'è che devo fare?
+        // TODO se accetta condivisioni invia mail
+
+    }
+
+    @Transactional
+    public void declineInternalShare(Long idArtid, Long userId) {
+
+        // Eseguiamo l'update iniettando l'utente loggato come destinatario obbligatorio
+        int rowsUpdated = internalShareDAO.declineInternalShare(
+                userId,
+                idArtid);
+
+        // Se rowsUpdated è 0, significa che l'idUserTo non corrispondeva all'utente
+        // loggato,
+        // oppure che i dati passati non sono validi. Blocchiamo l'operazione.
+        if (rowsUpdated == 0) {
+            throw new AccessDeniedException(
+                    "Non sei autorizzato a rifiutare questa condivisione o la risorsa non esiste.");
+        }
     }
 
     public InternalShareResponse toResponse(InternalShare share) {
@@ -358,10 +392,10 @@ public class ShareService {
         return new InternalShareArtIDResponse(
                 share.id(),
                 share.idUserFrom(),
-//                share.idUserTo(),
+                // share.idUserTo(),
                 share.idArtid(),
                 share.recipientMail(),
-//                share.isAccepted(),
+                // share.isAccepted(),
                 share.createdAt(),
                 share.title(),
                 presignObjectKey(share.filePath()) // Nuovo valore aggiornato
