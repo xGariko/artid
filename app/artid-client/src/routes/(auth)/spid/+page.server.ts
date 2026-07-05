@@ -8,7 +8,7 @@ type FieldErrors = Partial<Record<SpidField, string>>;
 // Forma unica di ritorno delle action (come login): la pagina legge i campi senza narrowing.
 // `step: "otp"` indica il ramo "email già registrata" in attesa del codice.
 type SpidActionData = {
-	step?: 'otp';
+	step?: 'otp' | 'confirm';
 	email?: string;
 	username?: string;
 	errors?: FieldErrors;
@@ -49,9 +49,26 @@ export const actions: Actions = {
 			redirect(303, '/dashboard');
 		}
 		if (result.status === 'otp') {
-			return { step: 'otp', email: result.email, username } as SpidActionData;
+			// Email già registrata: mostriamo prima la conferma d'invio (RAD AUT_MEM_ID §8.3.3.1).
+			// L'OTP non è ancora partito: parte solo all'"Ok" (→ ?/sendOtp).
+			return { step: 'confirm', email: result.email, username } as SpidActionData;
 		}
 		return fail(401, { formError: result.error, username } as SpidActionData);
+	},
+
+	// "Ok" sulla conferma (ramo collisione email): ora parte l'invio effettivo dell'OTP (GENERA OTP).
+	// La challenge è già stata armata in authenticate, quindi resendOtp() la rigenera e la spedisce.
+	sendOtp: async ({ request, locals }) => {
+		const form = await request.formData();
+		const username = (form.get('username') as string)?.trim() ?? '';
+		const email = (form.get('email') as string)?.trim() ?? '';
+
+		if (!email || !username) {
+			return fail(400, { formError: SESSION_LOST } as SpidActionData);
+		}
+
+		await resendOtp(locals.api, email);
+		return { step: 'otp', email, username } as SpidActionData;
 	},
 
 	// Step 2 (ramo collisione email): verifica l'OTP e, se valido, apre la sessione.

@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
@@ -71,6 +72,17 @@ public class ResourceController {
         return resourceService.update(id, request, file, principal.getId())
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    // Toggle "preferito" del materiale: endpoint dedicato (come /artids/{id}/favourite) per non
+    // passare dal PUT completo, che sovrascriverebbe titolo/descrizione e richiederebbe il file.
+    @PutMapping("/{id}/favourite")
+    public ResponseEntity<Void> updateFavourite(@PathVariable Long id,
+            @AuthenticationPrincipal AuthenticatedUser principal,
+            @RequestBody boolean isFavourite) {
+        return resourceService.updateFavourite(id, isFavourite, principal.getId())
+                ? ResponseEntity.noContent().build()
+                : ResponseEntity.notFound().build();
     }
 
     @DeleteMapping("/{id}")

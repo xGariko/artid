@@ -38,19 +38,30 @@
 		password: ''
 	});
 
+	// Regex email allineata al controllo server-side (?/requestOtp).
+	const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 	// Passo di conferma prima dell'invio OTP: "Accedi" non invia più subito il codice ma mostra la
 	// conferma; l'OTP parte solo all'"Ok" (che submitta il form verso ?/requestOtp).
 	let confirmPhase = $state(false);
-	let clientError = $state('');
+	// Errori di validazione client, mostrati sotto i campi (stessi controlli del server).
+	let clientErrors = $state<{ email?: string; password?: string }>({});
 
-	// "Accedi": validazione minima lato client (campi non vuoti) per avere un'email da mostrare nella
-	// conferma. La validazione vera delle credenziali resta server-side e scatta all'Ok.
+	// "Accedi": valida i campi PRIMA della conferma (stessi controlli di ?/requestOtp), così l'"Ok"
+	// appare solo con input valido. La verifica delle credenziali resta server-side e scatta all'Ok.
 	function goToConfirm() {
-		clientError = '';
-		if (!credentials.email.trim() || !credentials.password) {
-			clientError = 'Inserisci email e password.';
-			return;
+		const errors: { email?: string; password?: string } = {};
+		const email = credentials.email.trim();
+		if (!email) {
+			errors.email = "L'email è obbligatoria.";
+		} else if (!EMAIL_REGEX.test(email)) {
+			errors.email = 'Inserisci un indirizzo email valido.';
 		}
+		if (!credentials.password) {
+			errors.password = 'La password è obbligatoria.';
+		}
+		clientErrors = errors;
+		if (Object.keys(errors).length > 0) return;
 		confirmPhase = true;
 	}
 
@@ -195,7 +206,7 @@
 						name="email"
 						label="Email"
 						bind:value={credentials.email}
-						error={form?.errors?.email}
+						error={clientErrors.email ?? form?.errors?.email}
 					/>
 				</div>
 			</div>
@@ -206,7 +217,7 @@
 						name="password"
 						label="Password"
 						bind:value={credentials.password}
-						error={form?.errors?.password}
+						error={clientErrors.password ?? form?.errors?.password}
 					/>
 				</div>
 			</div>
@@ -215,9 +226,6 @@
 				<a href={resolve('/forgot-password')} class="auth-link small">Password dimenticata?</a>
 			</div>
 
-			{#if clientError}
-				<div class="text-danger small text-center mt-2">{clientError}</div>
-			{/if}
 			{#if form?.formError}
 				<div class="text-danger small text-center mt-2">{form.formError}</div>
 			{/if}

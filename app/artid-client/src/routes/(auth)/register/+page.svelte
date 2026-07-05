@@ -7,31 +7,63 @@
 
 	import ArtidButton from '$lib/components/ui/artid-button.svelte';
 	import ArtidOtpConfirm from '$lib/components/ui/artid-otp-confirm.svelte';
-	import type { RegisterRequest } from '$lib/models/schemas';
+	import { RegisterRequestSchema, type RegisterRequest } from '$lib/models/schemas';
 	import { loading } from '$lib/stores/loading.ts';
 	import type { ActionData } from './$types';
 
 	let { form }: { form: ActionData } = $props();
 
-	const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+	type RegisterFieldError =
+		| 'name'
+		| 'surname'
+		| 'email'
+		| 'password'
+		| 'confirmPassword'
+		| 'birthdate'
+		| 'birthplace';
+
+	// Messaggi per-campo, allineati a quelli di +page.server.ts: la validazione client mostra gli
+	// stessi testi dei controlli server-side.
+	const FIELD_MESSAGES: Record<RegisterFieldError, string> = {
+		name: 'Il nome è obbligatorio.',
+		surname: 'Il cognome è obbligatorio.',
+		email: 'Inserisci un indirizzo email valido.',
+		password: 'La password deve contenere almeno 8 caratteri.',
+		confirmPassword: 'Le password non coincidono.',
+		birthdate: 'Data di nascita non valida.',
+		birthplace: 'Luogo di nascita non valido.'
+	};
 
 	// Passo di conferma prima dell'invio OTP: "Registrati" non invia più subito il codice ma mostra la
 	// conferma; l'OTP (e la creazione dell'account) partono solo all'"Ok".
 	let confirmPhase = $state(false);
-	let clientError = $state('');
+	// Errori di validazione client, mostrati sotto i campi (stessi controlli del server).
+	let clientErrors = $state<Partial<Record<RegisterFieldError, string>>>({});
 
-	// "Registrati": validazione minima lato client per avere un'email valida da mostrare nella
-	// conferma. La validazione completa (Zod + email già registrata) resta server-side e scatta all'Ok.
+	// "Registrati": valida i campi PRIMA della conferma (stessa validazione di ?/requestOtp: Zod +
+	// coincidenza password), così l'"Ok" appare solo con dati validi. L'unicità dell'email resta
+	// server-side e scatta all'Ok.
 	function goToConfirm() {
-		clientError = '';
-		if (!EMAIL_REGEX.test(userDTO.email.trim())) {
-			clientError = 'Inserisci un indirizzo email valido.';
-			return;
+		const errors: Partial<Record<RegisterFieldError, string>> = {};
+		const parsed = RegisterRequestSchema.safeParse({
+			name: userDTO.name.trim(),
+			surname: userDTO.surname.trim(),
+			email: userDTO.email.trim(),
+			password: userDTO.password,
+			birthdate: userDTO.birthdate || undefined,
+			birthplace: userDTO.birthplace || undefined
+		});
+		if (!parsed.success) {
+			for (const issue of parsed.error.issues) {
+				const field = issue.path[0] as RegisterFieldError | undefined;
+				if (field && !errors[field]) errors[field] = FIELD_MESSAGES[field] ?? issue.message;
+			}
 		}
-		if (!userDTO.password || userDTO.password !== confirmPassword) {
-			clientError = 'Le password non coincidono.';
-			return;
+		if (userDTO.password && userDTO.password !== confirmPassword) {
+			errors.confirmPassword = FIELD_MESSAGES.confirmPassword;
 		}
+		clientErrors = errors;
+		if (Object.keys(errors).length > 0) return;
 		confirmPhase = true;
 	}
 
@@ -74,7 +106,9 @@
 	);
 
 	let confirmPasswordError = $derived(
-		passwordMismatch ? 'Le password non coincidono' : (form?.errors?.confirmPassword ?? undefined)
+		passwordMismatch
+			? 'Le password non coincidono'
+			: (clientErrors.confirmPassword ?? form?.errors?.confirmPassword ?? undefined)
 	);
 
 	// Pattern condiviso col login: attiva l'overlay di caricamento durante la submit.
@@ -137,14 +171,19 @@
 		<div class:d-none={confirmPhase}>
 			<div class="row">
 				<div class="col-12 col-md-6 p-1">
-					<ArtidInput name="name" label="Nome" bind:value={userDTO.name} error={form?.errors?.name} />
+					<ArtidInput
+						name="name"
+						label="Nome"
+						bind:value={userDTO.name}
+						error={clientErrors.name ?? form?.errors?.name}
+					/>
 				</div>
 				<div class="col-12 col-md-6 p-1">
 					<ArtidInput
 						name="surname"
 						label="Cognome"
 						bind:value={userDTO.surname}
-						error={form?.errors?.surname}
+						error={clientErrors.surname ?? form?.errors?.surname}
 					/>
 				</div>
 			</div>
@@ -155,7 +194,7 @@
 						name="email"
 						label="Email"
 						bind:value={userDTO.email}
-						error={form?.errors?.email}
+						error={clientErrors.email ?? form?.errors?.email}
 					/>
 				</div>
 			</div>
@@ -166,7 +205,7 @@
 						name="password"
 						label="Password"
 						bind:value={userDTO.password}
-						error={form?.errors?.password}
+						error={clientErrors.password ?? form?.errors?.password}
 					/>
 				</div>
 			</div>
@@ -188,7 +227,7 @@
 						name="birthdate"
 						label="Data di nascita"
 						bind:value={userDTO.birthdate}
-						error={form?.errors?.birthdate}
+						error={clientErrors.birthdate ?? form?.errors?.birthdate}
 					/>
 				</div>
 				<div class="col-12 col-md-6 p-1">
@@ -196,13 +235,10 @@
 						name="birthplace"
 						label="Luogo di nascita"
 						bind:value={userDTO.birthplace}
-						error={form?.errors?.birthplace}
+						error={clientErrors.birthplace ?? form?.errors?.birthplace}
 					/>
 				</div>
 			</div>
-			{#if clientError}
-				<div class="text-danger small text-center mt-2">{clientError}</div>
-			{/if}
 			{#if form?.formError}
 				<div class="text-danger small text-center mt-2">{form.formError}</div>
 			{/if}

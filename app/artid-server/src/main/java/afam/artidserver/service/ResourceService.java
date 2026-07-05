@@ -223,6 +223,24 @@ public class ResourceService {
         return Optional.of(toResponse(saved, fileMeta, countArtids(saved.getId())));
     }
 
+    /**
+     * Aggiorna solo lo stato "preferito" del materiale, senza toccarne file né collegamenti.
+     * L'ownership è forzata: materiale non dell'utente o eliminato → {@code false} (→ 404). Come
+     * per l'ArtID ({@link ArtidService#updateFavourite}) si aggiorna anche {@code lastModified}.
+     */
+    @Transactional
+    public boolean updateFavourite(Long resourceId, boolean favorite, Long userId) {
+        return resourceDAO.findById(resourceId)
+                .filter(r -> userId.equals(r.getIdUser()) && r.getDeletedAt() == null)
+                .map(r -> {
+                    r.setFavorite(favorite);
+                    r.setLastModified(OffsetDateTime.now());
+                    resourceDAO.save(r);
+                    return true;
+                })
+                .orElse(false);
+    }
+
     @Transactional
     public boolean delete(Long resourceId, Long userId) {
         return resourceDAO.findById(resourceId)

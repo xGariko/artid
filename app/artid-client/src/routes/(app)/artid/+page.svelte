@@ -120,7 +120,7 @@
 		const counts = {
 			mine: data.artids.length,
 			sharedWithMe: data.sharedArtids.length,
-			recent: data.artids.length,
+			recent: data.artids.filter((artid) => isRecent(artid.lastModified)).length,
 			favourite: data.artids.filter((artid) => artid.favourite).length
 		};
 		return counts;

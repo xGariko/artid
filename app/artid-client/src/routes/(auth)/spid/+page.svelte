@@ -25,8 +25,12 @@
 		'TIM id'
 	];
 
-	// Fase OTP: il server ha riconosciuto un'email già registrata e ha inviato il codice.
+	// Fase OTP: l'utente ha confermato l'invio e il codice è stato spedito all'email esistente.
 	let otpPhase = $derived(form?.step === 'otp');
+
+	// Fase conferma: il server ha riconosciuto un'email già registrata. Mostriamo il messaggio con
+	// "Ok" PRIMA di inviare l'OTP (RAD AUT_MEM_ID §8.3.3.1); l'invio parte solo all'"Ok".
+	let confirmPhase = $derived(form?.step === 'confirm');
 
 	// Provider scelto: fase locale senza round-trip. null = mostra il menu dei provider.
 	let selectedProvider = $state<string | null>(null);
@@ -35,8 +39,10 @@
 	let code = $state('');
 
 	// Indicatore di avanzamento: la verifica OTP è un passaggio extra del ramo "email già nota".
-	let steps = $derived(otpPhase ? ['Provider', 'Accesso', 'Verifica'] : ['Provider', 'Accesso']);
-	let currentStep = $derived(otpPhase ? 3 : selectedProvider ? 2 : 1);
+	let steps = $derived(
+		otpPhase || confirmPhase ? ['Provider', 'Accesso', 'Verifica'] : ['Provider', 'Accesso']
+	);
+	let currentStep = $derived(otpPhase ? 3 : confirmPhase ? 2 : selectedProvider ? 2 : 1);
 
 	// Pattern condiviso con login/register: overlay di caricamento durante la submit.
 	const withLoading = () => {
@@ -122,6 +128,30 @@
 					Non hai ricevuto il codice?
 					<button type="submit" formaction="?/resend" class="spid-linkbtn">Invia di nuovo</button>
 				</p>
+			</form>
+
+			{@render trust()}
+
+			<p class="spid-back-row">
+				<a href={resolve('/login')} class="spid-back"><i class="bi bi-arrow-left"></i> Torna al login</a>
+			</p>
+		</div>
+	{:else if confirmPhase}
+		<div in:fly={fadeIn}>
+			{@render lockup('Account già esistente', undefined, 'Verifica identità')}
+
+			<p class="spid-lead">
+				Abbiamo trovato un account ArtID con l'email <strong>{form?.email}</strong>. Ti invieremo un
+				codice OTP da inserire: premi <strong>Ok</strong> per procedere con l'invio della mail.
+			</p>
+
+			<form method="POST" action="?/sendOtp" use:enhance={withLoading}>
+				<input type="hidden" name="username" value={form?.username ?? ''} />
+				<input type="hidden" name="email" value={form?.email ?? ''} />
+
+				<div class="spid-cta">
+					<ArtidButton label="Ok" type="submit" />
+				</div>
 			</form>
 
 			{@render trust()}

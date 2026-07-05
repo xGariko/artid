@@ -16,7 +16,7 @@
 	// - altre pagine autenticate → navbar + sub-navbar → top: navbar + sub
 	const DASHBOARD = resolve('/dashboard');
 	const EXPLORE = resolve('/explore');
-	const PUBLIC_PATHS = ['/login', '/register', '/welcome', '/spid'];
+	const PUBLIC_PATHS = ['/login', '/register', '/welcome', '/spid', '/s', '/forgot-password'];
 
 	let currentPath = $derived(page.url.pathname);
 	let onPublic = $derived(PUBLIC_PATHS.some((p) => currentPath.startsWith(p)));

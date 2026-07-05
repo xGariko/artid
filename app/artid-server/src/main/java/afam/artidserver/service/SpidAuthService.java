@@ -13,7 +13,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.OffsetDateTime;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -63,9 +62,13 @@ public class SpidAuthService {
             return Optional.of(toAuthenticated(provisionUser(identity)));
         }
 
-        // 3) Email già registrata senza spidCode: prima dell'aggancio serve la verifica OTP (RAD).
-        OffsetDateTime expiresAt = otpService.generateAndSend(byMail.get());
-        return Optional.of(SpidAuthResponse.otpRequired(byMail.get().getMail(), expiresAt));
+        // 3) Email già registrata senza spidCode: prima di inviare l'OTP mostriamo la conferma
+        // (RAD AUT_MEM_ID §8.3.3.1, "Premi OK per procedere con l'invio della mail"). Qui armiamo
+        // soltanto la challenge, SENZA spedire la mail: l'invio effettivo (GENERA OTP) parte dal
+        // passo di conferma lato client, quando l'"Ok" invoca /resend-otp. La sessione arriva
+        // solo dopo verifyOtp.
+        otpService.arm(byMail.get());
+        return Optional.of(SpidAuthResponse.otpRequired(byMail.get().getMail(), null));
     }
 
     /**

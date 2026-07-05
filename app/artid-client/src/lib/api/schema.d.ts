@@ -52,6 +52,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/resources/{id}/favourite": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: operations["updateFavourite"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/profile": {
         parameters: {
             query?: never;
@@ -140,7 +156,7 @@ export interface paths {
             cookie?: never;
         };
         get?: never;
-        put: operations["updateFavourite"];
+        put: operations["updateFavourite_1"];
         post?: never;
         delete?: never;
         options?: never;
@@ -1500,6 +1516,30 @@ export interface operations {
             };
         };
     };
+    updateFavourite: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": boolean;
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
     profile: {
         parameters: {
             query?: never;
@@ -1691,7 +1731,7 @@ export interface operations {
             };
         };
     };
-    updateFavourite: {
+    updateFavourite_1: {
         parameters: {
             query?: never;
             header?: never;

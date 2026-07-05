@@ -7,8 +7,10 @@ import java.time.OffsetDateTime;
  * concludere in due modi (vedi {@link Outcome}):
  * <ul>
  *   <li>{@code AUTHENTICATED}: utente trovato/creato e sessione rilasciata → {@code token} valorizzato;</li>
- *   <li>{@code OTP_REQUIRED}: l'email è già di un account esistente senza spidCode → è stato inviato
- *       un OTP, la sessione si ottiene solo dopo la verifica → {@code expiresAt} valorizzato.</li>
+ *   <li>{@code OTP_REQUIRED}: l'email è già di un account esistente senza spidCode → serve la
+ *       verifica OTP. La challenge è armata ma la mail NON è ancora partita: il client mostra prima
+ *       la conferma d'invio (RAD AUT_MEM_ID §8.3.3.1) e l'OTP viene spedito solo all'"Ok". Per
+ *       questo {@code expiresAt} è {@code null} qui (lo valorizza l'invio effettivo via resend).</li>
  * </ul>
  * Il client tipizzato discrimina sull'{@code outcome}.
  */

@@ -62,14 +62,34 @@ public class OtpService {
      * non recapitata: è innocua (la sostituisce il tentativo successivo e scade dopo {@code otp.ttl-seconds}).
      */
     public OffsetDateTime generateAndSend(User user) {
+        Challenge challenge = persistChallenge(user);
+        emailService.sendHtml(user.getMail(), SUBJECT,
+                buildBody(user.getName(), challenge.code(), challenge.expiresAt()));
+        return challenge.expiresAt();
+    }
+
+    /**
+     * Arma una challenge OTP per l'utente SENZA inviare la mail: crea la riga come
+     * {@link #generateAndSend} ma salta l'SMTP. Serve al ramo SPID "email già registrata", dove il
+     * messaggio di conferma precede l'invio (RAD AUT_MEM_ID §8.3.3.1, "Premi OK per procedere con
+     * l'invio della mail"): l'"Ok" fa poi partire il "Riprova" ({@link #resend}), che rigenera il
+     * codice e lo invia (caso d'uso GENERA OTP). La challenge armata ma non confermata è innocua:
+     * scade dopo {@code otp.ttl-seconds} e viene comunque sostituita al primo invio effettivo.
+     */
+    public void arm(User user) {
+        persistChallenge(user);
+    }
+
+    // Genera, hash-a e persiste una nuova challenge (sostituendo l'eventuale precedente) senza
+    // inviare nulla. Delete + insert atomici (UNIQUE su id_user); la transazione si chiude e
+    // restituisce la connessione al pool prima di qualunque I/O di rete (SMTP) del chiamante.
+    private Challenge persistChallenge(User user) {
         String code = generateNumericCode();
         // BCrypt è volutamente CPU-intensive: l'hashing sta fuori dalla transazione per tenerla breve.
         String codeHash = passwordEncoder.encode(code);
         OffsetDateTime now = OffsetDateTime.now();
         OffsetDateTime expiresAt = now.plusSeconds(ttlSeconds);
 
-        // Delete + insert atomici (UNIQUE su id_user) ma senza l'invio email: la transazione si
-        // chiude e restituisce la connessione al pool prima dell'SMTP.
         new TransactionTemplate(transactionManager).executeWithoutResult(status -> {
             loginOtpDAO.deleteByIdUser(user.getId());
             LoginOtp otp = new LoginOtp();
@@ -81,9 +101,10 @@ public class OtpService {
             loginOtpDAO.save(otp);
         });
 
-        emailService.sendHtml(user.getMail(), SUBJECT, buildBody(user.getName(), code, expiresAt));
-        return expiresAt;
+        return new Challenge(code, expiresAt);
     }
+
+    private record Challenge(String code, OffsetDateTime expiresAt) {}
 
     /**
      * Rigenera e rinvia l'OTP ("Riprova") SOLO se esiste già una challenge attiva per l'utente:

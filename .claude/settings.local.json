@@ -226,7 +226,13 @@
       "PowerShell(Set-Location C:\\\\progetti\\\\artid\\\\app\\\\artid-client; npm run api:generate 2>&1 | Select-Object -Last 6; \"GEN_EXIT=$LASTEXITCODE\")",
       "PowerShell(Set-Location C:\\\\progetti\\\\artid\\\\app\\\\artid-client; npm run check 2>&1 | Select-String -Pattern '\\\\bERROR\\\\b' | ForEach-Object { $_.Line }; \"CHECK_EXIT=$LASTEXITCODE\")",
       "Bash(python -c \"import sys,json; ps=json.load\\(sys.stdin\\).get\\('paths',{}\\); print\\('internal/{artidId}:', '/api/shares/internal/{artidId}' in ps\\)\")",
-      "PowerShell(Set-Location C:\\\\progetti\\\\artid\\\\app\\\\artid-client; npm run api:generate 2>&1 | Select-Object -Last 3; \"GEN=$LASTEXITCODE\"; npm run check 2>&1 | Select-String -Pattern '\\\\bERROR\\\\b' | ForEach-Object { $_.Line }; \"CHECK=$LASTEXITCODE\")"
+      "PowerShell(Set-Location C:\\\\progetti\\\\artid\\\\app\\\\artid-client; npm run api:generate 2>&1 | Select-Object -Last 3; \"GEN=$LASTEXITCODE\"; npm run check 2>&1 | Select-String -Pattern '\\\\bERROR\\\\b' | ForEach-Object { $_.Line }; \"CHECK=$LASTEXITCODE\")",
+      "Bash(curl -s -m 4 -o /dev/null -w \"%{http_code}\" http://localhost:8080/v3/api-docs)",
+      "Bash(ps -W)",
+      "Bash(ls -1 pom.xml build.gradle build.gradle.kts settings.gradle settings.gradle.kts)",
+      "Bash(ls -d target/classes)",
+      "Bash(ls -d build/classes)",
+      "Bash(ls -d out)"
     ]
   }
 }
