@@ -73,8 +73,9 @@ export const actions: Actions = {
 			surname,
 			email,
 			password,
-			birthdate: birthdate || undefined,
-			birthplace: birthplace || undefined,
+			confirmPassword,
+			birthdate,
+			birthplace,
 		});
 
 		if (!parsed.success) {
@@ -86,9 +87,9 @@ export const actions: Actions = {
 			}
 		}
 
-		if (password && confirmPassword !== password) {
-			errors.confirmPassword = FIELD_MESSAGES.confirmPassword;
-		}
+		// if (password && confirmPassword !== password) {
+		// 	errors.confirmPassword = FIELD_MESSAGES.confirmPassword;
+		// }
 
 		if (Object.keys(errors).length > 0) {
 			return fail(400, { errors, ...formState } as RegisterActionData);
@@ -99,8 +100,8 @@ export const actions: Actions = {
 			surname,
 			email,
 			password,
-			birthdate: birthdate || undefined,
-			birthplace: birthplace || undefined,
+			birthdate,
+			birthplace,
 		});
 
 		if (!result.ok) {
@@ -134,8 +135,9 @@ export const actions: Actions = {
 			surname,
 			email,
 			password,
-			birthdate: birthdate || undefined,
-			birthplace: birthplace || undefined,
+			confirmPassword,
+			birthdate,
+			birthplace,
 		});
 
 		if (!parsed.success) {
@@ -147,9 +149,9 @@ export const actions: Actions = {
 			}
 		}
 
-		if (password && confirmPassword !== password) {
-			errors.confirmPassword = FIELD_MESSAGES.confirmPassword;
-		}
+		// if (password && confirmPassword !== password) {
+		// 	errors.confirmPassword = FIELD_MESSAGES.confirmPassword;
+		// }
 
 		if (Object.keys(errors).length > 0) {
 			return fail(400, { errors, ...formState } as RegisterActionData);
@@ -160,8 +162,8 @@ export const actions: Actions = {
 			surname,
 			email,
 			password,
-			birthdate: birthdate || undefined,
-			birthplace: birthplace || undefined,
+			birthdate,
+			birthplace,
 		});
 
 		if (!result.ok) {
