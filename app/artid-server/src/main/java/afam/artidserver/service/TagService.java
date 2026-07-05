@@ -76,6 +76,24 @@ public class TagService {
 
     }
 
+    /**
+     * Elimina un tag dalla libreria dell'utente. Consentito solo al proprietario del tag (id_user):
+     * un id non posseduto/inesistente non elimina nulla. Le righe di artid_tag vengono rimosse
+     * automaticamente dal DB (FK id_tag ON DELETE CASCADE), quindi il tag sparisce da tutti gli ArtID
+     * a cui era applicato.
+     *
+     * @return true se il tag esisteva ed era dell'utente (eliminato), false altrimenti (→ 404).
+     */
+    public boolean delete(Long tagId, Long userId) {
+        return tagDAO.findById(tagId)
+                .filter(tag -> userId.equals(tag.getIdUser()))
+                .map(tag -> {
+                    tagDAO.deleteById(tagId);
+                    return true;
+                })
+                .orElse(false);
+    }
+
     public List<TagResponse> findByArtid(Long artidId, Long userId) {
         return toResponses(tagDAO.findByArtidForUser(artidId, userId));
     }

@@ -7,6 +7,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -55,5 +57,16 @@ public class TagController {
             return ResponseEntity.badRequest().build();
         }
 
+    }
+
+    // DELETE /api/tags/{id} -> Elimina definitivamente un tag della libreria dell'utente loggato.
+    // 204 se eliminato, 404 se il tag non esiste o non è di questo utente. Le associazioni artid_tag
+    // sono rimosse in cascata dal DB.
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable Long id,
+            @AuthenticationPrincipal AuthenticatedUser principal) {
+        return tagService.delete(id, principal.getId())
+                ? ResponseEntity.noContent().build()
+                : ResponseEntity.notFound().build();
     }
 }

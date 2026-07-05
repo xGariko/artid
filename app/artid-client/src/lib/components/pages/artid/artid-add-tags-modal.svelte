@@ -4,6 +4,7 @@
 	import type { TagResponse } from '$lib/api/types';
 	import ArtidButton from '$lib/components/ui/artid-button.svelte';
 	import ArtidEditorModal from '$lib/components/ui/artid-editor-modal.svelte';
+	import ArtidModal from '$lib/components/ui/artid-modal.svelte';
 	import { toast } from '$lib/toast';
 
 	let {
@@ -18,6 +19,12 @@
 
 	let userTags: TagResponse[] = $state([]);
 	let isSaving = $state(false);
+
+	// Eliminazione definitiva di un tag dalla libreria dell'utente (diversa dalla rimozione del tag
+	// da un singolo ArtID): richiede conferma perché il tag viene tolto da tutti gli ArtID.
+	let tagToDelete = $state<TagResponse | null>(null);
+	let showDeleteTagModal = $state(false);
+	let isDeletingTag = $state(false);
 
 	const artidTagsIds = $derived(new Set(artidTags.map((t) => t.id)));
 	let selectedTagsIds = $state<Set<number>>(new Set());
@@ -63,6 +70,47 @@
 		selectedTagsIds = nextSelection;
 	}
 
+	function askDeleteTag(tag: TagResponse) {
+		tagToDelete = tag;
+		showDeleteTagModal = true;
+	}
+
+	async function confirmDeleteTag() {
+		if (!tagToDelete || isDeletingTag) return;
+		const tag = tagToDelete;
+		isDeletingTag = true;
+
+		try {
+			const response = await api.DELETE('/api/tags/{id}', {
+				params: { path: { id: tag.id! } }
+			});
+
+			if (response.error) {
+				toast.error("Errore durante l'eliminazione del tag");
+				return;
+			}
+
+			// Rimuove il tag dal listato della libreria e da un'eventuale selezione in corso.
+			userTags = userTags.filter((t) => t.id !== tag.id);
+			if (tag.id != null && selectedTagsIds.has(tag.id)) {
+				const nextSelection = new Set(selectedTagsIds);
+				nextSelection.delete(tag.id);
+				selectedTagsIds = nextSelection;
+			}
+			// Il DB rimuove in cascata anche l'associazione con l'ArtID corrente: riallineo il binding
+			// (così il contatore e i chip nella pagina dettagli restano coerenti) e ricarico la load.
+			artidTags = artidTags.filter((t) => t.id !== tag.id);
+			toast.success('Tag eliminato con successo');
+			await invalidateAll();
+		} catch {
+			toast.error('Errore di rete');
+		} finally {
+			isDeletingTag = false;
+			showDeleteTagModal = false;
+			tagToDelete = null;
+		}
+	}
+
 	async function handleSubmit() {
 		isSaving = true;
 
@@ -104,16 +152,30 @@
 			{#each userTags as tag (tag.id)}
 				{@const isTagSelected = tag.id != null && selectedTagsIds.has(tag.id)}
 				{@const isTagInArtid = tag.id != null && artidTagsIds.has(tag.id)}
-				<button
-					class="d-inline border rounded-3 p-2"
-					style="height: min-content;"
+				<div
+					class="tag-chip d-inline-flex align-items-center gap-1 border rounded-3 ps-2 pe-1 py-1"
 					class:disabled={isTagInArtid}
 					class:selected={isTagSelected}
-					onclick={() => (!isTagInArtid ? toggleTagSelection(tag.id) : '')}
-					aria-disabled={isTagInArtid}
 				>
-					<span>{tag.title}</span>
-				</button>
+					<button
+						type="button"
+						class="tag-chip__label border-0 bg-transparent p-0"
+						onclick={() => (!isTagInArtid ? toggleTagSelection(tag.id) : '')}
+						aria-disabled={isTagInArtid}
+					>
+						<span>{tag.title}</span>
+					</button>
+					<!-- Elimina il tag dalla libreria (non solo da questo ArtID): apre la conferma. -->
+					<button
+						type="button"
+						class="tag-chip__remove border-0 bg-transparent p-0 d-flex lh-1"
+						onclick={() => askDeleteTag(tag)}
+						aria-label={`Elimina il tag ${tag.title}`}
+						title="Elimina definitivamente il tag"
+					>
+						<i class="bi bi-x fs-6"></i>
+					</button>
+				</div>
 			{/each}
 		</div>
 		<div
@@ -131,7 +193,36 @@
 	</div>
 </ArtidEditorModal>
 
+<ArtidModal
+	bind:isOpen={showDeleteTagModal}
+	title="Elimina tag"
+	message={`Vuoi eliminare definitivamente il tag "${tagToDelete?.title ?? ''}"? Verrà rimosso da tutti gli ArtID a cui è applicato.`}
+	onConfirm={confirmDeleteTag}
+	btnStyle="danger"
+	confirmLabel="Elimina"
+/>
+
 <style lang="scss">
+	.tag-chip {
+		height: min-content;
+	}
+
+	// I due bottoni interni (seleziona / elimina) sono trasparenti: ereditano il colore del chip,
+	// così restano leggibili anche sullo sfondo primario dello stato .selected.
+	.tag-chip__label,
+	.tag-chip__remove {
+		color: inherit;
+	}
+
+	.tag-chip__remove {
+		cursor: pointer;
+		opacity: 0.6;
+
+		&:hover {
+			opacity: 1;
+		}
+	}
+
 	.disabled {
 		cursor: not-allowed;
 		opacity: 0.6;

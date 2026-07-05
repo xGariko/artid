@@ -23,8 +23,11 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 
 import java.time.Duration;
 import java.time.OffsetDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 
 @Service
@@ -35,6 +38,7 @@ public class UserService {
     private final NamedParameterJdbcTemplate namedJdbcTemplate;
     private final AvatarService avatarService;
     private final StorageService storageService;
+    private final EmailService emailService;
 
     @Value("${supabase.s3.propics-bucket}")
     private String propicsBucket;
@@ -168,6 +172,11 @@ public class UserService {
              WHERE id_user = :userId
             """;
 
+    // Mail di conferma eliminazione account (RAD). Data mostrata nel fuso italiano (es. "5 luglio 2026").
+    private static final String ACCOUNT_DELETION_SUBJECT = "ARTID - CONFERMA ELIMINAZIONE ACCOUNT";
+    private static final DateTimeFormatter DELETION_DATE_FORMAT =
+            DateTimeFormatter.ofPattern("d MMMM yyyy", Locale.ITALIAN).withZone(ZoneId.of("Europe/Rome"));
+
     public List<User> findAll() {
         return userRepository.findAll();
     }
@@ -201,7 +210,13 @@ public class UserService {
      */
     @Transactional
     public void deleteById(Long id) {
-        String propicKey = userRepository.findById(id).map(User::getPropicPath).orElse(null);
+        // Carichiamo la riga PRIMA del delete: dopo la cancellazione fisica nome ed email non
+        // esistono più, ma servono per la mail di conferma spedita dopo il commit.
+        User user = userRepository.findById(id).orElse(null);
+        String propicKey = user != null ? user.getPropicPath() : null;
+        String recipientEmail = user != null ? user.getMail() : null;
+        String recipientName = user != null ? user.getName() : null;
+        String deletionDate = DELETION_DATE_FORMAT.format(OffsetDateTime.now());
 
         List<Long> fileIds = new ArrayList<>();
         List<String> fileKeys = new ArrayList<>();
@@ -227,6 +242,10 @@ public class UserService {
         // Foto profilo (bucket propics) + file risorse/certificazioni (bucket default): rimossi
         // dopo il commit, così un eventuale rollback non lascia il DB con byte già cancellati.
         deleteFromStorageAfterCommit(propicKey, fileKeys);
+
+        // Conferma di eliminazione via email: anch'essa dopo il commit, così un rollback non manda
+        // una conferma per un account che in realtà non è stato eliminato.
+        sendDeletionEmailAfterCommit(recipientEmail, recipientName, deletionDate);
     }
 
     private void deleteFromStorageAfterCommit(String propicKey, List<String> fileKeys) {
@@ -240,6 +259,33 @@ public class UserService {
                 purgeStorage(propicKey, fileKeys);
             }
         });
+    }
+
+    // Mail di conferma eliminazione: spedita SOLO dopo il commit (fire-and-forget come le altre email
+    // via EmailService, che logga senza propagare gli errori SMTP). Se non c'è una transazione attiva
+    // invia subito; nessun destinatario → no-op.
+    private void sendDeletionEmailAfterCommit(String email, String name, String deletionDate) {
+        if (email == null || email.isBlank()) {
+            return;
+        }
+        Runnable send = () -> emailService.sendText(
+                email, ACCOUNT_DELETION_SUBJECT, buildDeletionEmailBody(name, deletionDate));
+        if (!TransactionSynchronizationManager.isSynchronizationActive()) {
+            send.run();
+            return;
+        }
+        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+            @Override
+            public void afterCommit() {
+                send.run();
+            }
+        });
+    }
+
+    private static String buildDeletionEmailBody(String name, String deletionDate) {
+        String greetingName = (name == null || name.isBlank()) ? "Membro" : name;
+        return "Salve " + greetingName + ", la informiamo che il suo account ArtID è stato eliminato in data "
+                + deletionDate + ".";
     }
 
     private void purgeStorage(String propicKey, List<String> fileKeys) {

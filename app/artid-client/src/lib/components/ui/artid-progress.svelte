@@ -33,7 +33,7 @@
 
 {#if active}
 	<div
-		class="artid-progress"
+		class="artid-progress z-2"
 		role="progressbar"
 		aria-busy="true"
 		aria-label="Caricamento in corso"
