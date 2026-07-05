@@ -5,7 +5,7 @@
 	import ArtidEditorModal from '$lib/components/ui/artid-editor-modal.svelte';
 	import ArtidInput from '$lib/components/ui/artid-input.svelte';
 	import { toDateInputValue } from '$lib/utilities';
-	import { toast } from 'svelte-sonner';
+	import { toast } from '$lib/toast';
 
 	let {
 		isOpen = $bindable(),

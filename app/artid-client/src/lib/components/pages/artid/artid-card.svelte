@@ -4,7 +4,7 @@
 	import { formatItalianDate, type ArtIdFilterType } from '$lib/utilities';
 	import { resolve } from '$app/paths';
 	import { api } from '$lib/api/browser-client';
-	import { toast } from 'svelte-sonner';
+	import { toast } from '$lib/toast';
 	import { invalidateAll } from '$app/navigation';
 	import type { TagResponse } from '$lib/api/types';
 

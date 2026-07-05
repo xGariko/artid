@@ -6,7 +6,7 @@
 	import { badgeColorForExtension, badgeLabelForExtension } from '$lib/utilities';
 
 	import { dndzone } from 'svelte-dnd-action';
-	import { toast } from 'svelte-sonner';
+	import { toast } from '$lib/toast';
 	import ArtidAddMaterialsModal from '../artid-add-materials-modal.svelte';
 
 	let { artidId, artidMaterials }: { artidId: number; artidMaterials: ResourceResponse[] } =

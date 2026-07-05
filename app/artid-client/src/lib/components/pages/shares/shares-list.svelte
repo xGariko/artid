@@ -15,7 +15,7 @@
 		formatFileSize,
 		formatItalianDate
 	} from '$lib/utilities';
-	import { toast } from 'svelte-sonner';
+	import { toast } from '$lib/toast';
 	import type { InternalShareArtIDResponse, ExternalShareArtIDResponse } from '$lib/api/types';
 
 	let {

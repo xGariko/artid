@@ -5,7 +5,7 @@
 	import ArtidInput from '$lib/components/ui/artid-input.svelte';
 	import type { SidebarAction, SidebarButtonGroup } from '$lib/models/sidebar-buttons';
 	import { isRecent, type ArtIdFilterType } from '$lib/utilities';
-	import { toast } from 'svelte-sonner';
+	import { toast } from '$lib/toast';
 	import type { PageData } from './$types';
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';

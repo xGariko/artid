@@ -8,7 +8,7 @@
 	import ArtidModal from '$lib/components/ui/artid-modal.svelte';
 	import type { ArtIdVisibilityType } from '$lib/utilities';
 	import { isFileWithinUploadLimit, FILE_TOO_LARGE_MESSAGE } from '$lib/utilities';
-	import { toast } from 'svelte-sonner';
+	import { toast } from '$lib/toast';
 	import 'quill/dist/quill.snow.css';
 
 	let {

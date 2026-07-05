@@ -4,7 +4,7 @@
 	import type { TagResponse } from '$lib/api/types';
 	import ArtidButton from '$lib/components/ui/artid-button.svelte';
 	import ArtidEditorModal from '$lib/components/ui/artid-editor-modal.svelte';
-	import { toast } from 'svelte-sonner';
+	import { toast } from '$lib/toast';
 
 	let {
 		isOpen = $bindable(),

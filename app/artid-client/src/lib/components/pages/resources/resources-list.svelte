@@ -12,7 +12,7 @@
 		formatFileSize,
 		formatItalianDate
 	} from '$lib/utilities';
-	import { toast } from 'svelte-sonner';
+	import { toast } from '$lib/toast';
 
 	let {
 		resources,

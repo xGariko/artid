@@ -5,7 +5,7 @@
 	import ArtidButton from '$lib/components/ui/artid-button.svelte';
 	import ArtidEditorModal from '$lib/components/ui/artid-editor-modal.svelte';
 	import { badgeColorForExtension, badgeLabelForExtension, formatFileSize } from '$lib/utilities';
-	import { toast } from 'svelte-sonner';
+	import { toast } from '$lib/toast';
 
 	let {
 		isOpen = $bindable(),

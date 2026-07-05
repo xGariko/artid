@@ -2,7 +2,7 @@
 	import artidImage from '$lib/assets/artid_logo_outline_primary.svg';
 	import { resolve } from '$app/paths';
 	import { api } from '$lib/api/browser-client';
-	import { toast } from 'svelte-sonner';
+	import { toast } from '$lib/toast';
 	import { invalidateAll } from '$app/navigation';
 	import type { InternalShareArtIDExtendedResponse } from '$lib/api/types';
 

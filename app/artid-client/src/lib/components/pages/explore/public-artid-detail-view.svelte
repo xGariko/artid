@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { PublicArtidDetail } from '$lib/api/types';
 	import PublicMaterialCard from '$lib/components/pages/explore/public-material-card.svelte';
+	import { sanitizeHtml } from '$lib/sanitize';
 	import { avatarColorFor, formatItalianDateLong, initialsFor, resourceTypeFromMime } from '$lib/utilities';
 	import { resolve } from '$app/paths';
 	import artidPlaceholder from '$lib/assets/artid_logo_outline_primary.svg';
@@ -122,7 +123,10 @@
 			<div class="col-12 col-lg-7">
 				<h2 class="fw-bold text-artid-text fs-5 mb-2">Descrizione</h2>
 				{#if artid.description}
-					<p class="text-artid-text mb-0 artid-detail__description">{artid.description}</p>
+					<!-- Descrizione rich-text (Quill): sanitizzata prima del rendering con {@html} (vedi $lib/sanitize). -->
+					<div class="text-artid-text mb-0 artid-detail__description">
+						{@html sanitizeHtml(artid.description)}
+					</div>
 				{:else}
 					<p class="text-artid-text-muted mb-0">Nessuna descrizione disponibile.</p>
 				{/if}
@@ -185,8 +189,13 @@
 		background-color: var(--artid-surface);
 	}
 
-	/* La descrizione può contenere a capo significativi (programma, note): li preserviamo. */
-	.artid-detail__description {
-		white-space: pre-line;
+	/* La descrizione è rich-text (Quill): azzeriamo i margini di primo/ultimo blocco così resta
+	   allineata al titolo "Descrizione" e mantiene il comportamento del vecchio mb-0. */
+	.artid-detail__description :global(> :first-child) {
+		margin-top: 0;
+	}
+
+	.artid-detail__description :global(> :last-child) {
+		margin-bottom: 0;
 	}
 </style>

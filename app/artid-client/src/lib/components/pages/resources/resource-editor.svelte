@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { invalidateAll } from '$app/navigation';
-	import { toast } from 'svelte-sonner';
+	import { toast } from '$lib/toast';
 	import type Quill from 'quill';
 	import 'quill/dist/quill.snow.css';
 	import type { ResourceResponse, ArtidResponse } from '$lib/api/types';

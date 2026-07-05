@@ -9,7 +9,7 @@
 		badgeColorForExtension,
 		badgeLabelForExtension
 	} from '$lib/utilities';
-	import { toast } from 'svelte-sonner';
+	import { toast } from '$lib/toast';
 	import { SvelteSet } from 'svelte/reactivity'; // Ottimizzato per Svelte 5
 
 	export interface CertificationResponse {

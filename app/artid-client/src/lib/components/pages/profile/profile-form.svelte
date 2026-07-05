@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { invalidateAll } from '$app/navigation';
-	import { toast } from 'svelte-sonner';
+	import { toast } from '$lib/toast';
 	import { api } from '$lib/api/browser-client';
 	import ArtidInput from '$lib/components/ui/artid-input.svelte';
 	import ArtidButton from '$lib/components/ui/artid-button.svelte';

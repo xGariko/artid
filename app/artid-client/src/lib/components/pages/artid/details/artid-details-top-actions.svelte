@@ -5,7 +5,7 @@
 	import type { ArtidResponse, TagResponse } from '$lib/api/types';
 	import ArtidButton from '$lib/components/ui/artid-button.svelte';
 	import type { ArtIdVisibilityType } from '$lib/utilities';
-	import { toast } from 'svelte-sonner';
+	import { toast } from '$lib/toast';
 	import ArtidAddTagsModal from '../artid-add-tags-modal.svelte';
 	import ArtidAddInternalShareModal from '../artid-add-internal-share-modal.svelte';
 	import ArtidCreateLinkModal from '../artid-create-link-modal.svelte';

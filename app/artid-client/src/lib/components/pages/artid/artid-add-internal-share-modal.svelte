@@ -5,7 +5,7 @@
 	import ArtidEditorModal from '$lib/components/ui/artid-editor-modal.svelte';
 	import { user } from '$lib/stores/auth';
 	import { get } from 'svelte/store';
-	import { toast } from 'svelte-sonner';
+	import { toast } from '$lib/toast';
 
 	let {
 		isOpen = $bindable(),
