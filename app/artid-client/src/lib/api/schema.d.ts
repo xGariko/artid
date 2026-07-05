@@ -1281,6 +1281,8 @@ export interface components {
             authorAvatarUrl?: string;
             authorVerified?: boolean;
             authorLinkedinId?: string;
+            authorFacebookId?: string;
+            authorInstagramId?: string;
             authorBusinessEmail?: string;
             materials?: components["schemas"]["PublicMaterialResponse"][];
         };
@@ -1322,7 +1324,10 @@ export interface components {
             avatarUrl?: string;
             verified?: boolean;
             linkedinId?: string;
+            facebookId?: string;
+            instagramId?: string;
             businessEmail?: string;
+            biography?: string;
             certifications?: components["schemas"]["PublicCertificationResponse"][];
             artids?: components["schemas"]["PublicArtidSummaryResponse"][];
         };
