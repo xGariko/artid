@@ -15,8 +15,10 @@
 
 	let { data }: { data: PageData } = $props();
 
-	// Valore del filtro sidebar attivo: raccolta ("recent"|"favourite").
+	// Filtro categoria attivo (sidebar). Il filtro tag è uno stato separato che si SOMMA
+	// alla categoria (AND), invece di sostituirla.
 	let activeFilterValue: ArtIdFilterType = $state('mine');
+	let activeTagId = $state<number | null>(null);
 
 	let isOpen = $state(false);
 	let isSaving = $state(false);
@@ -124,20 +126,22 @@
 		return counts;
 	});
 
-	// Sottoinsieme di risorse mostrato in tabella, in base al filtro sidebar.
+	// Sottoinsieme mostrato in tabella: categoria + (eventuale) tag in AND.
 	const visibleArtids = $derived.by(() => {
-		switch (activeFilterValue) {
-			case 'mine':
-				return data.artids;
-			case 'recent':
-				return data.artids.filter((artid) => isRecent(artid.lastModified));
-			case 'sharedWithMe':
-				return data.sharedArtids;
-			case 'favourite':
-				return data.artids.filter((artid) => artid.favourite);
-			default:
-				return [];
+		// "Condivisi con me" sono ArtID di altri (senza tag lato UI): niente filtro tag qui.
+		if (activeFilterValue === 'sharedWithMe') return data.sharedArtids;
+
+		let list = data.artids;
+		if (activeFilterValue === 'recent')
+			list = data.artids.filter((artid) => isRecent(artid.lastModified));
+		else if (activeFilterValue === 'favourite')
+			list = data.artids.filter((artid) => artid.favourite);
+
+		if (activeTagId != null) {
+			const tagId = activeTagId;
+			list = list.filter((artid) => artid.tagIds?.includes(tagId));
 		}
+		return list;
 	});
 
 	// I conteggi entrano nei pulsanti sidebar — derivato così resta in sync se i counts cambiano.
@@ -174,6 +178,7 @@
 	<ArtidSidebar
 		buttonsGroups={sidebarButtonGroups}
 		bind:activeButton={activeFilterValue}
+		bind:activeTag={activeTagId}
 		{sidebarActions}
 	/>
 

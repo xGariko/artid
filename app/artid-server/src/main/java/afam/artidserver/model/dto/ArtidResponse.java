@@ -1,6 +1,7 @@
 package afam.artidserver.model.dto;
 
 import java.time.OffsetDateTime;
+import java.util.List;
 
 public record ArtidResponse(
                 Long id,
@@ -12,5 +13,6 @@ public record ArtidResponse(
                 String visibilityState,
                 OffsetDateTime createdAt,
                 OffsetDateTime lastModified,
-                String thumbnailUrl) {
+                String thumbnailUrl,
+                List<Long> tagIds) {
 }

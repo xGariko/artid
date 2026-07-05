@@ -5,11 +5,13 @@
 	let {
 		buttonsGroups,
 		sidebarActions,
-		activeButton = $bindable()
+		activeButton = $bindable(),
+		activeTag = $bindable(null)
 	}: {
 		buttonsGroups: SidebarButtonGroup[];
 		sidebarActions: SidebarAction[];
 		activeButton: string;
+		activeTag?: number | null;
 	} = $props();
 </script>
 
@@ -54,11 +56,11 @@
 					<div>
 						{#each buttonsGroup.tags as tag, index (index)}
 							<button
-								class="w-100 border-0 d-flex align-items-center text-artid-text {activeButton ===
-								tag.title
+								class="w-100 border-0 d-flex align-items-center text-artid-text {activeTag ===
+								tag.id
 									? 'tag-active'
 									: ''} tag"
-								onclick={() => (activeButton = tag.title)}
+								onclick={() => (activeTag = activeTag === tag.id ? null : tag.id)}
 							>
 								<span
 									class="d-block me-2 tag-color"

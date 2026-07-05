@@ -143,7 +143,7 @@ public class UserService {
               JOIN resource r ON r.id = ar.id_resource
               LEFT JOIN file f ON f.id = r.id_file
              WHERE ar.id = :artidId AND r.deleted_at IS NULL
-             ORDER BY r.id
+             ORDER BY ar.rank ASC, r.id ASC
             """;
 
     // Object key (bucket risorse di default) dei file collegati a risorse, certificazioni e

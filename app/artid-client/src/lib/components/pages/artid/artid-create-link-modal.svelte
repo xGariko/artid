@@ -43,8 +43,6 @@
 		}
 	});
 
-	const currentStepLabel = $derived(STEPS.find((s) => s.n === step)?.label ?? '');
-
 	// Data minima selezionabile: domani (la scadenza deve essere una data futura).
 	const minDate = $derived.by(() => {
 		const now = new Date();
@@ -109,23 +107,22 @@
 		<div class="d-flex align-items-center gap-2 text-artid-primary fw-semibold">
 			<i class="bi bi-link-45deg fs-5 text-primary"></i>
 			<span>Crea link</span>
-			<span class="text-artid-text-muted fw-normal ms-auto small">{currentStepLabel}</span>
+			<span class="text-artid-text-muted fw-normal ms-auto small">Passo {step} di {STEPS.length}</span>
 		</div>
 
-		<!-- Indicatore dello stepper: pallini numerati + connettori. -->
-		<div class="d-flex align-items-center w-100 px-1">
+		<!-- Indicatore dello stepper: pallino numerato + etichetta sotto, connettori tra i passi. -->
+		<div class="d-flex align-items-start w-100 px-1 mb-1">
 			{#each STEPS as s (s.n)}
-				<span
-					class="step-circle flex-shrink-0"
-					class:current={step === s.n}
-					class:done={step > s.n}
-				>
-					{#if step > s.n}
-						<i class="bi bi-check2"></i>
-					{:else}
-						{s.n}
-					{/if}
-				</span>
+				<div class="d-flex flex-column align-items-center gap-1 flex-shrink-0">
+					<span class="step-circle" class:current={step === s.n} class:done={step > s.n}>
+						{#if step > s.n}
+							<i class="bi bi-check2"></i>
+						{:else}
+							{s.n}
+						{/if}
+					</span>
+					<span class="step-label small" class:current={step === s.n}>{s.label}</span>
+				</div>
 				{#if s.n < STEPS.length}
 					<span class="step-connector flex-grow-1" class:done={step > s.n}></span>
 				{/if}
@@ -148,7 +145,7 @@
 					/>
 				</div>
 
-				<div class="d-flex justify-content-end gap-2">
+				<div class="d-flex justify-content-between gap-2">
 					<ArtidButton
 						label="Chiudi"
 						fullWidth={false}
@@ -172,7 +169,7 @@
 					<textarea
 						name="description"
 						placeholder="Descrizione (facoltativa)"
-						class="w-100 form-control"
+						class="w-100 form-control bg-artid-section rounded-3"
 						style="resize: none;"
 						rows="6"
 						bind:value={description}
@@ -189,7 +186,7 @@
 						onclick={() => (step = 1)}
 					/>
 					<ArtidButton
-						label="Conferma"
+						label={isSaving ? 'Creazione…' : 'Conferma'}
 						icon="check2"
 						fullWidth={false}
 						btnStyle="success"
@@ -249,20 +246,32 @@
 		font-weight: 600;
 	}
 
+	// Passo corrente: pieno, massima evidenza. Passo completato: segno primary su fondo tenue.
 	.step-circle.current {
-		border-color: var(--artid-primary);
-		color: var(--artid-primary);
-	}
-
-	.step-circle.done {
 		background-color: var(--artid-primary);
 		border-color: var(--artid-primary);
 		color: #fff;
 	}
 
+	.step-circle.done {
+		background-color: var(--artid-primary-subtle);
+		border-color: var(--artid-primary);
+		color: var(--artid-primary);
+	}
+
+	.step-label {
+		color: var(--artid-text-muted);
+	}
+
+	.step-label.current {
+		color: var(--artid-primary);
+		font-weight: 600;
+	}
+
 	.step-connector {
 		height: 2px;
-		margin: 0 0.5rem;
+		// 1rem in alto = metà del pallino (2rem): allinea il connettore al centro dei cerchi.
+		margin: 1rem 0.5rem 0;
 		background-color: var(--artid-border);
 	}
 

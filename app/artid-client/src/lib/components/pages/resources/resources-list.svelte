@@ -4,6 +4,7 @@
 	import type { ResourceResponse } from '$lib/api/types';
 	import ArtidButton from '$lib/components/ui/artid-button.svelte';
 	import ArtidModal from '$lib/components/ui/artid-modal.svelte';
+	import { sanitizeHtml } from '$lib/sanitize';
 
 	import {
 		badgeColorForExtension,
@@ -26,6 +27,20 @@
 	let selectedResourceIds = $state<Set<number>>(new Set());
 
 	let showDeleteModal = $state(false);
+
+	// Tooltip descrizione: un unico elemento position:fixed condiviso, posizionato all'hover
+	// dell'icona. Fixed (non absolute) per non essere tagliato dall'overflow del contenitore lista.
+	let descTooltip = $state<{ html: string; x: number; y: number } | null>(null);
+
+	function showDescription(event: MouseEvent, description: string | undefined | null): void {
+		if (!description) return;
+		const rect = (event.currentTarget as HTMLElement).getBoundingClientRect();
+		descTooltip = { html: sanitizeHtml(description), x: rect.left, y: rect.bottom + 6 };
+	}
+
+	function hideDescription(): void {
+		descTooltip = null;
+	}
 
 	// Cambiando filtro sidebar il parent passa un nuovo array `resources`:
 	// resettiamo la selezione per evitare di trattenere id non più visibili.
@@ -154,7 +169,8 @@
 					aria-label="Seleziona tutto"
 				/>
 			</div>
-			<div class="col-3">Nome</div>
+			<div class="col-2">Nome</div>
+			<div class="col-1 text-center">Descr.</div>
 			<div class="col-2">Dimensioni</div>
 			<div class="col-2">Creato</div>
 			<div class="col-2">Modificato</div>
@@ -189,10 +205,26 @@
 					</span>
 				</div>
 				<div
-					class="col-3 pe-3 text-truncate fw-medium text-artid-text resource-title"
+					class="col-2 pe-3 text-truncate fw-medium text-artid-text resource-title"
 					title={resource.title}
 				>
 					{resource.title}
+				</div>
+				<div class="col-1 text-center">
+					{#if resource.description}
+						<button
+							type="button"
+							class="btn btn-link p-0 border-0 desc-icon"
+							aria-label="Mostra descrizione"
+							onmouseenter={(event) => showDescription(event, resource.description)}
+							onmouseleave={hideDescription}
+							onclick={(event) => event.stopPropagation()}
+						>
+							<i class="bi bi-card-text fs-5 text-artid-primary"></i>
+						</button>
+					{:else}
+						<i class="bi bi-card-text fs-5 text-artid-border" aria-hidden="true"></i>
+					{/if}
 				</div>
 				<div class="col-2 text-artid-text">{formatFileSize(resource.fileSize)}</div>
 				<div class="col-2 text-artid-text text-nowrap">{formatItalianDate(resource.createdAt)}</div>
@@ -251,6 +283,16 @@
 	</div>
 </div>
 
+<!-- Tooltip descrizione (HTML sanificato). Fuori dal contenitore con overflow per non essere tagliato. -->
+{#if descTooltip}
+	<div
+		class="desc-tooltip border border-artid-border bg-artid-surface rounded-3 p-3 text-artid-text"
+		style="left: {descTooltip.x}px; top: {descTooltip.y}px;"
+	>
+		{@html descTooltip.html}
+	</div>
+{/if}
+
 <ArtidModal
 	bind:isOpen={showDeleteModal}
 	title="Conferma eliminazione"
@@ -302,6 +344,27 @@
 	/* Consente al titolo di troncare con ellissi dentro la colonna flex. */
 	.resource-title {
 		min-width: 0;
+	}
+
+	.desc-icon {
+		cursor: default;
+	}
+
+	/* Tooltip descrizione: flat (bordo + fondo, niente ombra), non intercetta il mouse. */
+	.desc-tooltip {
+		position: fixed;
+		z-index: 1080;
+		width: 20rem;
+		max-width: 90vw;
+		max-height: 16rem;
+		overflow-y: auto;
+		font-size: 0.85rem;
+		line-height: 1.4;
+		pointer-events: none;
+	}
+
+	.desc-tooltip :global(p:last-child) {
+		margin-bottom: 0;
 	}
 
 	.badge-type {

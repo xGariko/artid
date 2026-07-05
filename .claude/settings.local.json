@@ -196,7 +196,13 @@
       "PowerShell(& \"app\\\\artid-server\\\\mvnw.cmd\" -f \"app\\\\artid-server\\\\pom.xml\" -q -DskipTests compile)",
       "PowerShell(npm --prefix app/artid-client run api:generate)",
       "Bash(node -e \"const p=require\\('C:/progetti/artid/app/artid-client/package.json'\\); console.log\\(JSON.stringify\\(p.scripts,null,2\\)\\)\")",
-      "PowerShell(Set-Location \"C:\\\\progetti\\\\artid\\\\app\\\\artid-server\"; .\\\\mvnw.cmd -q -DskipTests compile; \"EXIT=$LASTEXITCODE\")"
+      "PowerShell(Set-Location \"C:\\\\progetti\\\\artid\\\\app\\\\artid-server\"; .\\\\mvnw.cmd -q -DskipTests compile; \"EXIT=$LASTEXITCODE\")",
+      "Bash(./mvnw.cmd -q -DskipTests compile)",
+      "Bash(curl -s -o /dev/null -w \"HTTP %{http_code}\\\\n\" http://localhost:8080/api/shares/public/tokentaroccato)",
+      "Bash(curl -s http://localhost:8080/api/shares/public/tokentaroccato)",
+      "Bash(curl -s -i http://localhost:8080/api/shares/public/tokentaroccato)",
+      "Bash(curl -s -o /dev/null -w \"HTTP %{http_code}\\\\n\" \"http://localhost:8080/api/users/search?query=test\")",
+      "Bash(curl -s -o /dev/null -w \"HTTP %{http_code}\\\\n\" http://localhost:8080/v3/api-docs)"
     ]
   }
 }

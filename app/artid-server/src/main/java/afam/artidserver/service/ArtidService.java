@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.time.Duration;
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -59,12 +60,30 @@ public class ArtidService {
     public List<ArtidResponse> findByUser(Long userId) {
         List<Artid> artids = artidDAO.findAllByIdUserAndDeletedAtIsNullOrderByLastModifiedDesc(userId);
         Map<Long, String> thumbnailUrls = presignThumbnails(artids);
+        Map<Long, List<Long>> tagsByArtid = tagIdsByArtid(artids.stream().map(Artid::getId).toList());
         return artids.stream()
                 .map(a -> {
                     Long thumbnailId = a.getIdThumbnail();
-                    return toResponse(a, thumbnailId != null ? thumbnailUrls.get(thumbnailId) : null);
+                    return toResponse(a, thumbnailId != null ? thumbnailUrls.get(thumbnailId) : null,
+                            tagsByArtid.getOrDefault(a.getId(), List.of()));
                 })
                 .toList();
+    }
+
+    // Mappa artidId → lista di id tag, in un'unica query batch (evita l'N+1 lato lista/card).
+    private Map<Long, List<Long>> tagIdsByArtid(List<Long> artidIds) {
+        if (artidIds.isEmpty())
+            return Map.of();
+        Map<Long, List<Long>> result = new HashMap<>();
+        namedJdbcTemplate.query(
+                "SELECT id_artid, id_tag FROM artid_tag WHERE id_artid IN (:ids)",
+                new MapSqlParameterSource("ids", artidIds),
+                (rs, rowNum) -> {
+                    result.computeIfAbsent(rs.getLong("id_artid"), k -> new ArrayList<>())
+                            .add(rs.getLong("id_tag"));
+                    return null;
+                });
+        return result;
     }
 
     @Transactional
@@ -88,7 +107,8 @@ public class ArtidService {
      */
     public Optional<ArtidResponse> findByIdForUser(Long id, Long userId) {
         return artidDAO.findByIdAndIdUserAndDeletedAtIsNull(id, userId)
-                .map(a -> toResponse(a, presignThumbnail(a.getIdThumbnail())));
+                .map(a -> toResponse(a, presignThumbnail(a.getIdThumbnail()),
+                        tagIdsByArtid(List.of(a.getId())).getOrDefault(a.getId(), List.of())));
     }
 
     /**
@@ -132,7 +152,7 @@ public class ArtidService {
         artid.setCreatedAt(now);
         artid.setLastModified(now);
         artid.setVisibilityState(visibility);
-        return toResponse(artid, null);
+        return toResponse(artid, null, List.of());
     }
 
     // Le etichette valide sono quelle dell'enum Postgres visibility_state. Un
@@ -179,7 +199,7 @@ public class ArtidService {
                 tagId, id);
     }
 
-    private static ArtidResponse toResponse(Artid a, String thumbnailUrl) {
+    private static ArtidResponse toResponse(Artid a, String thumbnailUrl, List<Long> tagIds) {
         return new ArtidResponse(
                 a.getId(),
                 a.getIdUser(),
@@ -190,7 +210,8 @@ public class ArtidService {
                 a.getVisibilityState(),
                 a.getCreatedAt(),
                 a.getLastModified(),
-                thumbnailUrl);
+                thumbnailUrl,
+                tagIds);
     }
 
     // Presigned GET URL della thumbnail (bucket di default, come i materiali); null

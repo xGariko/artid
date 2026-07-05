@@ -270,9 +270,10 @@
 		goto(resolve('/(app)/artid/details/[id]/preview', { id: String(artidId) }));
 	}
 
+	// Click sul titolo: apre la pagina di dettaglio/modifica dell'ArtID.
 	function openDetails(artidId: number | undefined): void {
 		if (artidId == null) {
-			toast.error('L\'ArtID selezionato è stato cancellato.');
+			toast.error("L'ArtID selezionato è stato cancellato.");
 			return;
 		}
 		goto(resolve('/(app)/artid/details/[id]', { id: String(artidId) }));

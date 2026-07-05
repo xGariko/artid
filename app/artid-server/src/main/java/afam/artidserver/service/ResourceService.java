@@ -166,10 +166,11 @@ public class ResourceService {
         }
         Resource saved = resourceDAO.save(resource);
 
-        // TODO rivedere logica
-        // Il design corrente vincola un materiale a un solo ArtID → wipe+insert.
-        jdbcTemplate.update("DELETE FROM artid_resource WHERE id_resource = ?", saved.getId());
+        // Il design vincola un materiale a un solo ArtID (wipe+insert). Tocchiamo i collegamenti
+        // SOLO se l'update specifica un artidId: la modifica dai "Materiali" (solo titolo/descrizione)
+        // non deve scollegare il materiale dai suoi ArtID.
         if (request.artidId() != null) {
+            jdbcTemplate.update("DELETE FROM artid_resource WHERE id_resource = ?", saved.getId());
             artidService.linkArtidResource(request.artidId(), saved.getId(), userId);
         }
 

@@ -1103,6 +1103,7 @@ export interface components {
             /** Format: date-time */
             lastModified?: string;
             thumbnailUrl?: string;
+            tagIds?: number[];
         };
         ExtendExpirationRequest: {
             /** Format: date-time */

@@ -342,6 +342,15 @@ public class ShareService {
                     });
             internalShareDAO.save(share);
 
+            // Notifica il destinatario solo se registrato e se accetta condivisioni interne.
+            if (Boolean.TRUE.equals(targetUser.getInternalShareEnabled())
+                    && targetUser.getMail() != null && !targetUser.getMail().isBlank()) {
+                String sharerName = displayName(userDAO.findById(userId).orElse(null));
+                String subject = sharerName + " ha condiviso un ArtID con te";
+                String body = sharerName + " ha condiviso con te l'ArtID \"" + artid.getTitle() + "\".";
+                emailService.sendText(targetUser.getMail(), subject, body);
+            }
+
         } else {
             InternalShare share = internalShareDAO.findByIdUserFromAndRecipientMailAndIdArtid(
                     userId,
@@ -368,9 +377,17 @@ public class ShareService {
                     });
             internalShareDAO.save(share);
         }
+    }
 
-        // TODO se accetta condivisioni invia mail
-
+    // Nome visualizzato del mittente per le notifiche ("Nome Cognome", fallback su email).
+    private static String displayName(User user) {
+        if (user == null)
+            return "Un utente";
+        String full = ((user.getName() != null ? user.getName() : "") + " "
+                + (user.getSurname() != null ? user.getSurname() : "")).trim();
+        if (!full.isBlank())
+            return full;
+        return user.getMail() != null ? user.getMail() : "Un utente";
     }
 
     @Transactional

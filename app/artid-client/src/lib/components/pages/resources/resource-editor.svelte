@@ -172,29 +172,33 @@
 		</div>
 
 		<div class="row g-3">
-			<div class="col-12 col-md-6">
+			<div class={isEditMode ? 'col-12' : 'col-12 col-md-6'}>
 				<ArtidInput name="resource-title" label="Titolo" bind:value={title}/>
 			</div>
-			<div class="col-12 col-md-6">
-				<!-- Span wrapper: select[disabled] non firea hover events, il title vive sullo span. -->
-				<span
-					class="d-inline-block w-100"
-					title={artids.length === 0 ? 'Nessun ArtID creato — creane uno prima di collegare un materiale' : null}
-				>
-					<select
-						id="resource-artid"
-						class="form-select bg-artid-section rounded-1 px-3 artid-select w-100"
-						class:text-artid-text-muted={!selectedArtidId}
-						bind:value={selectedArtidId}
-						disabled={artids.length === 0}
+			<!-- In modifica si aggiornano solo titolo e descrizione: la select ArtID è nascosta
+				 (il collegamento non si tocca, vedi guardia in ResourceService.update lato backend). -->
+			{#if !isEditMode}
+				<div class="col-12 col-md-6">
+					<!-- Span wrapper: select[disabled] non firea hover events, il title vive sullo span. -->
+					<span
+						class="d-inline-block w-100"
+						title={artids.length === 0 ? 'Nessun ArtID creato — creane uno prima di collegare un materiale' : null}
 					>
-						<option value="" disabled>Aggiungi a un ArtID</option>
-						{#each artids as artid (artid.id)}
-							<option value={String(artid.id)}>{artid.title}</option>
-						{/each}
-					</select>
-				</span>
-			</div>
+						<select
+							id="resource-artid"
+							class="form-select bg-artid-section rounded-1 px-3 artid-select w-100"
+							class:text-artid-text-muted={!selectedArtidId}
+							bind:value={selectedArtidId}
+							disabled={artids.length === 0}
+						>
+							<option value="" disabled>Aggiungi a un ArtID</option>
+							{#each artids as artid (artid.id)}
+								<option value={String(artid.id)}>{artid.title}</option>
+							{/each}
+						</select>
+					</span>
+				</div>
+			{/if}
 		</div>
 
 		<div class="d-flex flex-column gap-1">
@@ -206,31 +210,33 @@
 			</div>
 		</div>
 
-		<button
-			type="button"
-			class="dropzone d-flex align-items-center justify-content-between p-4 rounded-3 bg-artid-section text-start w-100"
-			class:is-dragging={isDragging}
-			onclick={() => fileInput?.click()}
-			ondragover={handleDragOver}
-			ondragleave={handleDragLeave}
-			ondrop={handleDrop}
-		>
-			<div class="d-flex flex-column gap-1">
-				<span class="fw-bold text-artid-text">
-					{selectedFile?.name ?? 'Trascina qui il tuo file'}
-				</span>
-				<span class="text-artid-primary text-decoration-underline small">
-					O clicca qui per sceglierlo dal tuo dispositivo
-				</span>
-			</div>
-			<i class="bi bi-upload text-artid-primary fs-3"></i>
-		</button>
-		<input
-			type="file"
-			class="d-none"
-			bind:this={fileInput}
-			onchange={handleFilePick}
-		/>
+		{#if !isEditMode}
+			<button
+				type="button"
+				class="dropzone d-flex align-items-center justify-content-between p-4 rounded-3 bg-artid-section text-start w-100"
+				class:is-dragging={isDragging}
+				onclick={() => fileInput?.click()}
+				ondragover={handleDragOver}
+				ondragleave={handleDragLeave}
+				ondrop={handleDrop}
+			>
+				<div class="d-flex flex-column gap-1">
+					<span class="fw-bold text-artid-text">
+						{selectedFile?.name ?? 'Trascina qui il tuo file'}
+					</span>
+					<span class="text-artid-primary text-decoration-underline small">
+						O clicca qui per sceglierlo dal tuo dispositivo
+					</span>
+				</div>
+				<i class="bi bi-upload text-artid-primary fs-3"></i>
+			</button>
+			<input
+				type="file"
+				class="d-none"
+				bind:this={fileInput}
+				onchange={handleFilePick}
+			/>
+		{/if}
 
 		<div class="d-flex justify-content-end gap-2">
 			<ArtidButton

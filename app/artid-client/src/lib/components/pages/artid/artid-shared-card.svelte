@@ -34,7 +34,10 @@
 </script>
 
 <a
-	href={resolve('/(app)/artid/details/[id]/preview', { id: String(sharedArtid.id) })}
+	href={resolve('/explore/[id]/artid/[artidId]', {
+		id: String(sharedArtid.idUserFrom),
+		artidId: String(sharedArtid.idArtid)
+	})}
 	data-sveltekit-preload-data="off"
 	class="rounded-3 border border-artid-border w-100 d-block text-decoration-none artid-card z-2"
 >

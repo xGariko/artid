@@ -30,13 +30,12 @@
 		}
 	}
 
-	// Il prop `artid` non è un proxy $state: per aggiornare subito l'icona tengo lo
-	// stato in locale e lo riallineo al dato del server quando la lista si ricarica.
+	// Stato locale ottimistico per la stella: il prop `artid` (dato di load) non è un proxy
+	// reattivo. NIENTE $effect di riallineamento dal prop: dopo invalidateAll rimetterebbe il
+	// valore del server annullando l'update ottimistico (era la causa del bug "la stella non si
+	// riempie" quando il GET risponde prima che la scrittura sia visibile).
 	// svelte-ignore state_referenced_locally
 	let isFavourite = $state(artid.favourite ?? false);
-	$effect(() => {
-		isFavourite = artid.favourite ?? false;
-	});
 
 	let favouriteLabel = $derived(isFavourite ? 'Rimuovi dai preferiti' : 'Aggiungi ai preferiti');
 	let deleteLabel = 'Rimuovi condivisione';
