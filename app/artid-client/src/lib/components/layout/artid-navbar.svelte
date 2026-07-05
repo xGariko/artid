@@ -16,19 +16,37 @@
 		{ href: '/profile', label: 'Profilo' }
 	];
 
-	let userLogged = $derived(!!$user);
+	// 1. Inizializza lo stato di rete a true (sicuro per il Server-Side Rendering)
+	let isOnline = $state(true);
+
+	// 2. Sincronizza lo stato di rete lato client
+	$effect(() => {
+		isOnline = navigator.onLine;
+
+		const handleOnline = () => isOnline = true;
+		const handleOffline = () => isOnline = false;
+
+		window.addEventListener('online', handleOnline);
+		window.addEventListener('offline', handleOffline);
+
+		return () => {
+			window.removeEventListener('online', handleOnline);
+			window.removeEventListener('offline', handleOffline);
+		};
+	});
+
+	// 3. L'utente risulta "loggato" graficamente solo se il token/user esiste E c'è connessione
+	let userLogged = $derived(!!$user && isOnline);
 
 	async function handleLogout() {
 		await fetch(resolve('/logout'), { method: 'POST' });
 		await goto(resolve('/welcome'));
 	}
 
-	// Stesso match per prefisso usato da ArtidLink, replicato per i dropdown-item.
 	function isLinkActive(href: Pathname): boolean {
 		const resolvedHref = resolve(href);
 		return page.url.pathname === resolvedHref || page.url.pathname.startsWith(resolvedHref + '/');
 	}
-
 </script>
 
 <nav class="w-100 bg-primary justify-content-around align-items-center position-fixed top-0 start-0 d-flex px-2 z-3">
