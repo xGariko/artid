@@ -153,7 +153,7 @@
 	}
 </script>
 
-<ArtidEditorModal bind:isOpen customHeight="70" customWidth="50">
+<ArtidEditorModal bind:isOpen customHeight="{isEditMode ? "55" : "70"}" customWidth="50">
 	<div class="d-flex flex-column gap-4 resource-editor pt-1 w-100">
 		<div class="d-flex align-items-center justify-content-between pe-5">
 			<div class="d-flex align-items-center gap-2 text-artid-primary fw-semibold">

@@ -102,7 +102,7 @@
 	}
 </script>
 
-<ArtidEditorModal bind:isOpen customHeight="50" customWidth="42">
+<ArtidEditorModal bind:isOpen customHeight="50" customWidth="50">
 	<div class="d-flex flex-column gap-3 pt-1 h-100">
 		<div class="d-flex align-items-center gap-2 text-artid-primary fw-semibold">
 			<i class="bi bi-link-45deg fs-5 text-primary"></i>
@@ -129,9 +129,9 @@
 			{/each}
 		</div>
 
-		<div class="flex-grow-1 d-flex flex-column justify-content-between">
+		<div class="flex-grow-1 d-flex flex-column justify-content-between w-100 align-items-center">
 			{#if step === 1}
-				<div class="d-flex flex-column gap-2">
+				<div class="d-flex flex-column gap-2 w-50">
 					<span class="text-artid-text-muted small">
 						Scegli fino a quando il link di condivisione resterà valido.
 					</span>
@@ -145,7 +145,7 @@
 					/>
 				</div>
 
-				<div class="d-flex justify-content-between gap-2">
+				<div class="d-flex justify-content-between w-100 gap-2">
 					<ArtidButton
 						label="Chiudi"
 						fullWidth={false}
@@ -162,7 +162,7 @@
 					/>
 				</div>
 			{:else if step === 2}
-				<div class="d-flex flex-column gap-2">
+				<div class="d-flex flex-column gap-2 w-100">
 					<span class="text-artid-text-muted small">
 						Aggiungi una descrizione per ricordarti a chi è destinato il link (facoltativa).
 					</span>
@@ -195,7 +195,7 @@
 					/>
 				</div>
 			{:else}
-				<div class="d-flex flex-column gap-3">
+				<div class="d-flex flex-column gap-3 w-100">
 					<div class="d-flex align-items-center gap-2 text-success fw-semibold">
 						<i class="bi bi-check-circle-fill fs-5"></i>
 						<span>Condivisione creata!</span>
