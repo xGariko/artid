@@ -449,6 +449,7 @@ public class UserService {
 
         ArtidDetailRow row = rows.get(0);
         boolean verified = author.getSpidCode() != null && !author.getSpidCode().isBlank();
+        boolean authorProfilePublic = Boolean.TRUE.equals(author.getIsPublic());
         return Optional.of(new PublicArtidDetailResponse(
                 row.id(),
                 row.title(),
@@ -461,6 +462,7 @@ public class UserService {
                 author.getProfession(),
                 avatarService.presignKey(author.getPropicPath()),
                 verified,
+                authorProfilePublic,
                 author.getLinkedinId(),
                 author.getFacebookId(),
                 author.getInstagramId(),

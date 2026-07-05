@@ -22,6 +22,9 @@ public record PublicArtidDetailResponse(
         String authorAvatarUrl,
         // true se l'identità dell'autore è verificata via SPID.
         boolean authorVerified,
+        // true se il profilo dell'autore è pubblico (is_public). Falso nei contesti di condivisione
+        // in cui l'ArtID è visibile ma il profilo autore non lo è: il frontend disabilita "Vai al profilo".
+        boolean authorProfilePublic,
         String authorLinkedinId,
         String authorFacebookId,
         String authorInstagramId,

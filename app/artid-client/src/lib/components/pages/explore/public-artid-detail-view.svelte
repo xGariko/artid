@@ -23,6 +23,9 @@
 	const thumbnailSrc = $derived(hasThumbnail ? artid.thumbnailUrl! : artidPlaceholder);
 
 	const profileHref = $derived(resolve('/explore/[id]', { id: String(artid.authorId) }));
+	// Profilo autore privato (contesti di condivisione): la pagina profilo risponderebbe 404,
+	// quindi disabilitiamo "Vai al profilo". Assente/undefined = comportamento storico (abilitato).
+	const profilePublic = $derived(artid.authorProfilePublic ?? true);
 
 	// Handle/URL social dell'autore normalizzati verso l'URL completo del profilo (null = niente bottone).
 	const linkedinUrl = $derived(socialUrlFor('linkedin', artid.authorLinkedinId));
@@ -82,7 +85,13 @@
 			</div>
 
 			<div class="d-flex align-items-center gap-2">
-				<a href={profileHref} class="btn btn-primary rounded-2 px-3 py-2 fw-semibold">
+				<a
+					href={profilePublic ? profileHref : undefined}
+					class="btn btn-primary rounded-2 px-3 py-2 fw-semibold"
+					class:disabled={!profilePublic}
+					aria-disabled={!profilePublic}
+					tabindex={profilePublic ? undefined : -1}
+				>
 					Vai al profilo
 				</a>
 				{#if linkedinUrl}
