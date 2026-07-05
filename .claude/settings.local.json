@@ -238,7 +238,12 @@
       "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:8080/v3/api-docs --max-time 5)",
       "PowerShell(& \"C:\\\\progetti\\\\artid\\\\app\\\\artid-server\\\\mvnw.cmd\" -f \"C:\\\\progetti\\\\artid\\\\app\\\\artid-server\\\\pom.xml\" -q -o compile 2>&1)",
       "PowerShell(& \"C:\\\\progetti\\\\artid\\\\app\\\\artid-server\\\\mvnw.cmd\" -f \"C:\\\\progetti\\\\artid\\\\app\\\\artid-server\\\\pom.xml\" -q compile; \"EXIT=$LASTEXITCODE\"; Get-ChildItem \"C:\\\\progetti\\\\artid\\\\app\\\\artid-server\\\\target\\\\classes\\\\afam\\\\artidserver\\\\exception\",\"C:\\\\progetti\\\\artid\\\\app\\\\artid-server\\\\target\\\\classes\\\\afam\\\\artidserver\\\\model\\\\dto\\\\ErrorResponse.class\" -ErrorAction SilentlyContinue | Select-Object FullName)",
-      "Bash(git mv *)"
+      "Bash(git mv *)",
+      "Bash(echo \"=== PAGE /s/<token> \\(status only\\) ===\")",
+      "Bash(curl -sS -o /dev/null -w 'HTTP %{http_code}\\\\n' https://www.artid.space/s/0nqNmo04x6N8kiRQp6GWH7c0FA1MOBS9gzWMEFZMgGo)",
+      "Bash(echo)",
+      "Bash(echo \"=== API /api/shares/public/<token> \\(status + body\\) ===\")",
+      "Bash(curl -sS -i https://www.artid.space/api/shares/public/0nqNmo04x6N8kiRQp6GWH7c0FA1MOBS9gzWMEFZMgGo)"
     ]
   }
 }
