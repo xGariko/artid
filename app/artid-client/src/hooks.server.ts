@@ -3,7 +3,7 @@ import { redirect } from '@sveltejs/kit';
 import { fetchCurrentUser, getToken, logout } from '$lib/auth';
 import { createApiClient } from '$lib/api/client';
 
-// Pagine "auth-only": accessibili senza login, ma se sei loggato vieni rimandato in dashboard.
+// Pagine "auth-only": accessibili senza login, ma se sei loggato vieni rimandato in home.
 const PUBLIC_PATHS = ['/login', '/register', '/welcome', '/spid', '/forgot-password'];
 
 // Pagine aperte a tutti, con o senza login (nessun redirect in nessuno dei due sensi).
@@ -45,7 +45,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 	const isApiRoute = pathname.startsWith('/api/');
 
 	if (pathname === '/') {
-		redirect(303, token ? '/dashboard' : '/welcome');
+		redirect(303, token ? '/home' : '/welcome');
 	}
 
 	if (!token && !isPublic(pathname) && !isOpen(pathname) && !isApiRoute) {
@@ -53,7 +53,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 	}
 
 	if (token && isPublic(pathname)) {
-		redirect(303, '/dashboard');
+		redirect(303, '/home');
 	}
 
 	return resolve(event);

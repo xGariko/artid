@@ -46,7 +46,7 @@ export const actions: Actions = {
 
 		const result = await spidLogin(locals.api, cookies, { providerId, username, password });
 		if (result.status === 'authenticated') {
-			redirect(303, '/dashboard');
+			redirect(303, '/home');
 		}
 		if (result.status === 'otp') {
 			// Email già registrata: mostriamo prima la conferma d'invio (RAD AUT_MEM_ID §8.3.3.1).
@@ -100,7 +100,7 @@ export const actions: Actions = {
 			} as SpidActionData);
 		}
 
-		redirect(303, '/dashboard');
+		redirect(303, '/home');
 	},
 
 	// "Riprova": rinvia l'OTP riusando la challenge di login dell'account esistente.

@@ -11,7 +11,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 	const { data } = await locals.api.GET("/api/dashboard/summary");
 
 	if (!data) {
-		throw error(500, "Errore nel caricamento della dashboard");
+		throw error(500, "Errore nel caricamento della home");
 	}
 
 	return {

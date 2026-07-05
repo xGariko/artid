@@ -12,20 +12,20 @@
 	// Posizionamento dinamico in base alla shell visibile (path corrente,
 	// non destinazione: la barra deve allinearsi alla UI ancora montata):
 	// - pagine pubbliche (login/register/welcome) → no navbar → top: 0
-	// - /dashboard → solo navbar → top: navbar-height
+	// - /home → solo navbar → top: navbar-height
 	// - altre pagine autenticate → navbar + sub-navbar → top: navbar + sub
-	const DASHBOARD = resolve('/dashboard');
+	const HOME = resolve('/home');
 	const EXPLORE = resolve('/explore');
 	const PUBLIC_PATHS = ['/login', '/register', '/welcome', '/spid', '/s', '/forgot-password'];
 
 	let currentPath = $derived(page.url.pathname);
 	let onPublic = $derived(PUBLIC_PATHS.some((p) => currentPath.startsWith(p)));
-	let onDashboard = $derived(currentPath === DASHBOARD || currentPath === EXPLORE);
+	let onHome = $derived(currentPath === HOME || currentPath === EXPLORE);
 
 	let topStyle = $derived(
 		onPublic
 			? '0px'
-			: onDashboard
+			: onHome
 				? 'var(--artid-navbar-height, 0px)'
 				: 'calc(var(--artid-navbar-height, 0px) + var(--artid-navbar-height, 0px) / 2)'
 	);

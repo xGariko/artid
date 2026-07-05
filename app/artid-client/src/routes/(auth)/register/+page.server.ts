@@ -178,7 +178,7 @@ export const actions: Actions = {
 		return { step: "otp", email: result.email, ...formState } as RegisterActionData;
 	},
 
-	// Step 2: verifica l'OTP e, se valido, crea l'account, apre la sessione e va in dashboard.
+	// Step 2: verifica l'OTP e, se valido, crea l'account, apre la sessione e va in home.
 	verify: async ({ request, cookies, locals }) => {
 		const form = await request.formData();
 		const email = (form.get("email") as string)?.trim() ?? "";
@@ -200,7 +200,7 @@ export const actions: Actions = {
 			return fail(401, { step: "otp", email, codeError: INVALID_CODE } as RegisterActionData);
 		}
 
-		redirect(303, "/dashboard");
+		redirect(303, "/home");
 	},
 
 	// "Riprova": rigenera e rinvia l'OTP, restando nella fase di verifica.
