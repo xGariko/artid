@@ -128,6 +128,9 @@ public class SpidAuthService {
         user.setIsPublic(false);
         user.setInternalShareEnabled(false);
         user.setPasswordHash(passwordEncoder.encode(UUID.randomUUID().toString()));
+        // Nato da SPID: nessuna password reale. L'eliminazione account chiederà le credenziali SPID
+        // finché l'utente non ne imposta una da "Modifica Password" (che porta il flag a true).
+        user.setPasswordSet(false);
         return userDAO.save(user);
     }
 

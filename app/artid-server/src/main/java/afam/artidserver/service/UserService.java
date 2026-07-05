@@ -304,7 +304,10 @@ public class UserService {
                 avatarService.presignKey(user.getPropicPath()),
                 verified,
                 user.getLinkedinId(),
+                user.getFacebookId(),
+                user.getInstagramId(),
                 user.getBusinessEmail(),
+                user.getBiography(),
                 findPublicCertifications(userId),
                 findPublicArtids(userId)
         );
@@ -413,6 +416,8 @@ public class UserService {
                 avatarService.presignKey(author.getPropicPath()),
                 verified,
                 author.getLinkedinId(),
+                author.getFacebookId(),
+                author.getInstagramId(),
                 author.getBusinessEmail(),
                 findPublicArtidMaterials(artidId)));
     }

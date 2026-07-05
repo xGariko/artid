@@ -153,6 +153,27 @@ export function avatarColorFor(seed: string | null | undefined): string {
 	return AVATAR_PALETTE[Math.abs(hash) % AVATAR_PALETTE.length];
 }
 
+// Base URL dei profili social per piattaforma: LinkedIn usa il path /in/, Facebook e Instagram
+// lo username diretto.
+const SOCIAL_PROFILE_BASE: Record<'linkedin' | 'facebook' | 'instagram', string> = {
+	linkedin: 'https://www.linkedin.com/in/',
+	facebook: 'https://www.facebook.com/',
+	instagram: 'https://www.instagram.com/'
+};
+
+// Normalizza un handle o un URL social verso l'URL completo del profilo: un valore già assoluto
+// (http/https) resta com'è, altrimenti si antepone il base della piattaforma (rimuovendo una
+// eventuale "@" iniziale). null/vuoto → null, così il chiamante nasconde il relativo bottone.
+export function socialUrlFor(
+	platform: 'linkedin' | 'facebook' | 'instagram',
+	handle: string | null | undefined
+): string | null {
+	const value = handle?.trim();
+	if (!value) return null;
+	if (/^https?:\/\//i.test(value)) return value;
+	return `${SOCIAL_PROFILE_BASE[platform]}${value.replace(/^@/, '')}`;
+}
+
 export type ArtIdFilterType = 'all' | 'mine' | 'sharedWithMe' | 'recent' | 'favourite';
 
 export function isExpired(isoDate: string | null | undefined): boolean {

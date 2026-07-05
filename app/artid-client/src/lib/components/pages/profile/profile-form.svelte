@@ -269,35 +269,60 @@
 	let deleteAccountModalOpen = $state(false);
 	let password = $state('');
 	let elimina = $state('');
+	// Credenziali SPID per l'eliminazione di un account nato da SPID (senza password reale).
+	let spidCf = $state('');
+	let spidPassword = $state('');
+
+	// Un account nato da SPID non ha una password a DB (passwordSet=false): la chiusura account
+	// verifica le credenziali SPID (codice fiscale + password) invece della password. Default true
+	// (flusso classico con password) finché il campo non è presente nel contratto rigenerato.
+	let deletesWithPassword = $derived(profile.passwordSet ?? true);
 
 	function deleteAccountModal() {
+		// Ripulisce i campi a ogni apertura: nessun residuo tra un tentativo e l'altro.
+		password = '';
+		spidCf = '';
+		spidPassword = '';
+		elimina = '';
 		deleteAccountModalOpen = true;
 	}
 
 	async function deleteAccount(): Promise<void> {
-		if (!password.trim() || !elimina.trim()) {
-			toast.error('Bisogna compilare tutti i campi!');
+		if (elimina !== 'Elimina') {
+			toast.error('Per confermare devi digitare esattamente la parola "Elimina" ');
 			return;
 		}
 
-		if (elimina !== 'Elimina') {
-			toast.error('Per confermare devi digitare esattamente la parola "Elimina" ');
+		// Le credenziali richieste dipendono dal tipo di account.
+		if (deletesWithPassword ? !password.trim() : !spidCf.trim() || !spidPassword.trim()) {
+			toast.error('Bisogna compilare tutti i campi!');
 			return;
 		}
 
 		isSaving = true;
 
 		try {
-			const verifyResponse = await api.POST('/api/auth/verify-password', {
-				body: { password }
-			});
-
-			const isPasswordValid = verifyResponse?.data?.['passwordCorretta'] ?? false;
-
-			if (!isPasswordValid) {
-				toast.error('Password Sbagliata');
-				isSaving = false;
-				return;
+			// Verifica delle credenziali prima dell'eliminazione: password oppure identità SPID collegata.
+			if (deletesWithPassword) {
+				const verifyResponse = await api.POST('/api/auth/verify-password', {
+					body: { password }
+				});
+				const isPasswordValid = verifyResponse?.data?.['passwordCorretta'] ?? false;
+				if (!isPasswordValid) {
+					toast.error('Password Sbagliata');
+					isSaving = false;
+					return;
+				}
+			} else {
+				const verifyResponse = await api.POST('/api/auth/verify-spid', {
+					body: { username: spidCf.trim(), password: spidPassword }
+				});
+				const isSpidValid = verifyResponse?.data?.['spidCorretta'] ?? false;
+				if (!isSpidValid) {
+					toast.error('Credenziali SPID non valide');
+					isSaving = false;
+					return;
+				}
 			}
 
 			const actualUserId = profile?.id; // Letto sul momento, al click, quindi è sicuro al 100%
@@ -654,7 +679,7 @@
 					<ArtidInput
 						type="email"
 						name="businessEmail"
-						label="Email aziendale"
+						label="Email di contatto"
 						bind:value={model.businessEmail}
 						error={err('businessEmail')}
 					/>
@@ -776,7 +801,7 @@
 	</div>
 </div>
 
-<ArtidEditorModal bind:isOpen={deleteAccountModalOpen} customHeight="40">
+<ArtidEditorModal bind:isOpen={deleteAccountModalOpen} customHeight={deletesWithPassword ? '40' : '50'}>
 	<div class="d-flex flex-column align-items-start justify-content-around w-100 h-100 flex-fill">
 		<div class="text-artid-primary fw-semibold w-100">
 			<i class="bi bi-person-x fs-5 text-danger"></i>
@@ -785,14 +810,37 @@
 
 		<div class="w-100 mb-3">
 			<div class="my-2">
-				<ArtidInput
-					type="password"
-					name="password"
-					label="Password"
-					placeholder="Password"
-					bind:value={password}
-					addClass="mb-2"
-				/>
+				{#if deletesWithPassword}
+					<ArtidInput
+						type="password"
+						name="password"
+						label="Password"
+						placeholder="Password"
+						bind:value={password}
+						addClass="mb-2"
+					/>
+				{:else}
+					<p class="text-muted small mb-2">
+						Questo account accede con SPID e non ha una password: conferma con le credenziali
+						SPID (codice fiscale e password).
+					</p>
+					<ArtidInput
+						type="text"
+						name="spidCf"
+						label="Codice fiscale"
+						placeholder="Codice fiscale"
+						bind:value={spidCf}
+						addClass="mb-2"
+					/>
+					<ArtidInput
+						type="password"
+						name="spidPassword"
+						label="Password SPID"
+						placeholder="Password SPID"
+						bind:value={spidPassword}
+						addClass="mb-2"
+					/>
+				{/if}
 
 				<hr />
 				<span class="text-muted fst-italic"

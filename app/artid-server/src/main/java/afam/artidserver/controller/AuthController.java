@@ -4,6 +4,7 @@ import afam.artidserver.model.dto.*;
 import afam.artidserver.model.entity.User;
 import afam.artidserver.security.AuthenticatedUser;
 import afam.artidserver.security.JwtUtil;
+import afam.artidserver.service.MockSpidIdentityProvider;
 import afam.artidserver.service.OtpService;
 import afam.artidserver.service.PasswordResetService;
 import afam.artidserver.service.RegistrationService;
@@ -39,6 +40,7 @@ public class AuthController {
     private final OtpService otpService;
     private final RegistrationService registrationService;
     private final PasswordResetService passwordResetService;
+    private final MockSpidIdentityProvider identityProvider;
 
     /**
      * Step 1 del login: valida le credenziali e, se corrette, genera l'OTP e ne avvia l'invio
@@ -228,6 +230,32 @@ public class AuthController {
 
         Map<String, Boolean> response = new HashMap<>();
         response.put("passwordCorretta", isCorrect);
+
+        return ResponseEntity.ok(response);
+    }
+
+    /**
+     * Verifica le credenziali SPID del Membro autenticato (gemello di {@link #verifyPassword} per gli
+     * account nati da SPID, che non hanno una password reale). Serve alla modale "Chiudi account":
+     * quando {@code passwordSet} è false il client chiede codice fiscale + password del provider invece
+     * della password. Esito {@code true} solo se le credenziali autenticano presso il provider mock E
+     * l'identità autenticata è QUELLA collegata all'account ({@code spid_code} del profilo == CF
+     * inserito): impedisce di eliminare l'account con le credenziali SPID di un terzo. Sempre 200 con
+     * l'esito nel body {@code {"spidCorretta": ...}}, coerente con verify-password.
+     */
+    @PostMapping("/verify-spid")
+    public ResponseEntity<Map<String, Boolean>> verifySpid(
+            @AuthenticationPrincipal AuthenticatedUser principal,
+            @RequestBody SpidLoginRequest request) {
+
+        User user = principal.getUser();
+        boolean isCorrect = user.getSpidCode() != null
+                && identityProvider.authenticate(request.getUsername(), request.getPassword())
+                        .map(identity -> identity.username().equalsIgnoreCase(user.getSpidCode()))
+                        .orElse(false);
+
+        Map<String, Boolean> response = new HashMap<>();
+        response.put("spidCorretta", isCorrect);
 
         return ResponseEntity.ok(response);
     }

@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { PublicProfileDetail } from '$lib/api/types';
-	import { avatarColorFor, initialsFor } from '$lib/utilities';
+	import { avatarColorFor, initialsFor, socialUrlFor } from '$lib/utilities';
+	import ContactEmailButton from '$lib/components/pages/explore/contact-email-button.svelte';
 
 	// comment for CI
 	let { profile }: { profile: PublicProfileDetail } = $props();
@@ -9,12 +10,10 @@
 	const initials = $derived(initialsFor(profile.name, profile.surname));
 	const avatarColor = $derived(avatarColorFor(fullName));
 
-	// linkedinId può essere un handle o un URL completo: normalizziamo verso l'URL del profilo.
-	const linkedinUrl = $derived.by(() => {
-		const handle = profile.linkedinId?.trim();
-		if (!handle) return null;
-		return /^https?:\/\//i.test(handle) ? handle : `https://www.linkedin.com/in/${handle}`;
-	});
+	// Handle/URL social normalizzati verso l'URL completo del profilo (null = niente bottone).
+	const linkedinUrl = $derived(socialUrlFor('linkedin', profile.linkedinId));
+	const facebookUrl = $derived(socialUrlFor('facebook', profile.facebookId));
+	const instagramUrl = $derived(socialUrlFor('instagram', profile.instagramId));
 </script>
 
 <div class="d-flex align-items-start justify-content-between gap-3 flex-wrap">
@@ -56,25 +55,45 @@
 			{/if}
 		</div>
 	</div>
-	<div class="d-flex align-items-center gap-2">
+	<div class="d-flex align-items-center gap-2 flex-wrap">
 		{#if linkedinUrl}
-			<button
-				onclick={()=>{return window.open("" + linkedinUrl, "_blank");}}
-				class="btn btn-primary rounded-2 d-flex align-items-center justify-content-center profile-header__linkedin"
+			<a
+				href={linkedinUrl}
+				target="_blank"
+				rel="noopener"
+				class="btn btn-primary rounded-2 d-flex align-items-center justify-content-center profile-header__social"
 				aria-label="Profilo LinkedIn"
 			>
 				<i class="bi bi-linkedin"></i>
-			</button>
+			</a>
+		{/if}
+
+		{#if facebookUrl}
+			<a
+				href={facebookUrl}
+				target="_blank"
+				rel="noopener"
+				class="btn btn-primary rounded-2 d-flex align-items-center justify-content-center profile-header__social"
+				aria-label="Profilo Facebook"
+			>
+				<i class="bi bi-facebook"></i>
+			</a>
+		{/if}
+
+		{#if instagramUrl}
+			<a
+				href={instagramUrl}
+				target="_blank"
+				rel="noopener"
+				class="btn btn-primary rounded-2 d-flex align-items-center justify-content-center profile-header__social"
+				aria-label="Profilo Instagram"
+			>
+				<i class="bi bi-instagram"></i>
+			</a>
 		{/if}
 
 		{#if profile.businessEmail}
-			<a
-				href="mailto:{profile.businessEmail}"
-				class="btn btn-primary rounded-2 px-3 py-2 fw-semibold d-flex align-items-center gap-2"
-			>
-				<i class="bi bi-envelope-fill"></i>
-				Contatta
-			</a>
+			<ContactEmailButton email={profile.businessEmail} />
 		{/if}
 	</div>
 </div>
@@ -87,7 +106,7 @@
 		object-fit: cover;
 	}
 
-	.profile-header__linkedin {
+	.profile-header__social {
 		width: 2.75rem;
 		height: 2.75rem;
 	}

@@ -30,6 +30,9 @@ public class ProfileResponse {
     // true se l'account è verificato via SPID (spidCode valorizzato): in Gestione Profilo il
     // pulsante mostra "SPID COLLEGATO" invece di "Associa SPID" (RAD, caso d'uso COL_SPID).
     private Boolean spidLinked;
+    // true se l'account ha una password reale. Guida la modale "Chiudi account": se false (Membro
+    // nato da SPID senza password) l'eliminazione chiede le credenziali SPID invece della password.
+    private Boolean passwordSet;
 
     public static ProfileResponse from(User user, String propicUrl) {
         return new ProfileResponse(
@@ -50,7 +53,10 @@ public class ProfileResponse {
                 user.getBusinessEmail(),
                 propicUrl,
                 user.getInternalShareEnabled(),
-                user.getSpidCode() != null && !user.getSpidCode().isBlank()
+                user.getSpidCode() != null && !user.getSpidCode().isBlank(),
+                // Difensivo: una riga senza flag (non dovrebbe capitare, la colonna è NOT NULL) viene
+                // trattata come "ha password", così l'eliminazione ricade sul flusso classico.
+                !Boolean.FALSE.equals(user.getPasswordSet())
         );
     }
 }
