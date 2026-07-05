@@ -243,7 +243,15 @@
       "Bash(curl -sS -o /dev/null -w 'HTTP %{http_code}\\\\n' https://www.artid.space/s/0nqNmo04x6N8kiRQp6GWH7c0FA1MOBS9gzWMEFZMgGo)",
       "Bash(echo)",
       "Bash(echo \"=== API /api/shares/public/<token> \\(status + body\\) ===\")",
-      "Bash(curl -sS -i https://www.artid.space/api/shares/public/0nqNmo04x6N8kiRQp6GWH7c0FA1MOBS9gzWMEFZMgGo)"
+      "Bash(curl -sS -i https://www.artid.space/api/shares/public/0nqNmo04x6N8kiRQp6GWH7c0FA1MOBS9gzWMEFZMgGo)",
+      "Bash(git -C \"C:/progetti/artid\" remote -v)",
+      "Bash(gh run *)",
+      "Bash(git -C \"C:/progetti/artid\" log -8 --oneline -- app/artid-server)",
+      "Bash(git -C \"C:/progetti/artid\" log -8 --oneline)",
+      "Bash(git -C \"C:/progetti/artid\" log --oneline origin/main..main)",
+      "Bash(git -C \"C:/progetti/artid\" rev-list --left-right --count origin/main...main)",
+      "WebFetch(domain:www.artid.space)",
+      "mcp__supabase__get_logs"
     ]
   }
 }

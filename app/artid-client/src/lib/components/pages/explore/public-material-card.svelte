@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { PublicMaterial } from '$lib/api/types';
 	import { resourceTypeFromMime, iconForResourceType } from '$lib/utilities';
+	import { sanitizeHtml } from '$lib/sanitize';
 
 	let { material }: { material: PublicMaterial } = $props();
 
@@ -74,7 +75,9 @@
 			src={material.url}
 		></audio>
 		{#if material.description}
-			<p class="text-artid-text-muted small mb-0 mt-auto pt-1">{material.description}</p>
+			<div class="text-artid-text-muted small mb-0 mt-auto pt-1 material-card__description">
+			{@html sanitizeHtml(material.description)}
+		</div>
 		{/if}
 	{:else if kind === 'video'}
 		{#if videoLoaded}
@@ -87,7 +90,9 @@
 				src={material.url}
 			></video>
 			{#if material.description}
-				<p class="text-artid-text-muted small mb-0 pt-1">{material.description}</p>
+				<div class="text-artid-text-muted small mb-0 pt-1 material-card__description">
+					{@html sanitizeHtml(material.description)}
+				</div>
 			{/if}
 		{:else}
 			<button
@@ -107,7 +112,9 @@
 				<i class="bi bi-play-fill"></i>
 			</button>
 			{#if material.description}
-				<p class="text-artid-text-muted small mb-0 pt-1">{material.description}</p>
+				<div class="text-artid-text-muted small mb-0 pt-1 material-card__description">
+					{@html sanitizeHtml(material.description)}
+				</div>
 			{/if}
 		{/if}
 	{:else if kind === 'image'}
@@ -118,7 +125,9 @@
 			loading="lazy"
 		/>
 		{#if material.description}
-			<p class="text-artid-text-muted small mb-0 mt-auto pt-1">{material.description}</p>
+			<div class="text-artid-text-muted small mb-0 mt-auto pt-1 material-card__description">
+			{@html sanitizeHtml(material.description)}
+		</div>
 		{/if}
 	{:else}
 		<a
@@ -131,7 +140,9 @@
 			Apri il file
 		</a>
 		{#if material.description}
-			<p class="text-artid-text-muted small mb-0 mt-auto pt-1">{material.description}</p>
+			<div class="text-artid-text-muted small mb-0 mt-auto pt-1 material-card__description">
+			{@html sanitizeHtml(material.description)}
+		</div>
 		{/if}
 	{/if}
 </div>
@@ -198,5 +209,15 @@
 	.material-card__image {
 		max-height: 16rem;
 		object-fit: cover;
+	}
+
+	/* La descrizione del materiale è rich-text (Quill): come per la descrizione dell'ArtID
+	   azzeriamo i margini di primo/ultimo blocco così resta compatta (equivalente al vecchio mb-0). */
+	.material-card__description :global(> :first-child) {
+		margin-top: 0;
+	}
+
+	.material-card__description :global(> :last-child) {
+		margin-bottom: 0;
 	}
 </style>
