@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { toast } from 'svelte-sonner';
+	import { toast } from '$lib/toast';
 	import { api } from '$lib/api/browser-client';
 	import type { PublicProfile } from '$lib/api/types';
 	import ArtidNavbar from '$lib/components/layout/artid-navbar.svelte';
