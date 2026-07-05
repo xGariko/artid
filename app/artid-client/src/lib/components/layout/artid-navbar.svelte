@@ -8,6 +8,9 @@
 	import { user } from '$lib/stores/auth';
 	import ArtidButton from '../ui/artid-button.svelte';
 
+	// 1. Aggiungiamo la prop con valore di default a false
+	let { forceLoggedOut = false } = $props();
+
 	const navLinks: { href: Pathname; label: string }[] = [
 		{ href: '/artid', label: 'ArtID' },
 		{ href: '/resources', label: 'Materiali' },
@@ -16,27 +19,8 @@
 		{ href: '/profile', label: 'Profilo' }
 	];
 
-	// 1. Inizializza lo stato di rete a true (sicuro per il Server-Side Rendering)
-	let isOnline = $state(true);
-
-	// 2. Sincronizza lo stato di rete lato client
-	$effect(() => {
-		isOnline = navigator.onLine;
-
-		const handleOnline = () => isOnline = true;
-		const handleOffline = () => isOnline = false;
-
-		window.addEventListener('online', handleOnline);
-		window.addEventListener('offline', handleOffline);
-
-		return () => {
-			window.removeEventListener('online', handleOnline);
-			window.removeEventListener('offline', handleOffline);
-		};
-	});
-
-	// 3. L'utente risulta "loggato" graficamente solo se il token/user esiste E c'è connessione
-	let userLogged = $derived(!!$user && isOnline);
+	// 2. L'utente risulta loggato solo se $user esiste E la prop non sta forzando il logout
+	let userLogged = $derived(!!$user && !forceLoggedOut);
 
 	async function handleLogout() {
 		await fetch(resolve('/logout'), { method: 'POST' });
