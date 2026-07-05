@@ -197,7 +197,7 @@ public class ShareService {
      * ignora la visibilità dell'ArtID: è il link stesso a concedere l'accesso.
      */
     @Transactional
-    public PublicArtidDetailResponse openSharedArtid(String token) {
+    public PublicArtidDetailResponse openSharedArtid(Long userId, String token) {
         long shareId;
         try {
             shareId = shareLinkCipher.decrypt(token);
@@ -207,6 +207,8 @@ public class ShareService {
 
         ExternalShare share = externalShareDAO.findById(shareId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Link non valido."));
+
+        long creatorId = share.getIdCreator();
 
         // Visibile solo se la condivisione è attiva e non scaduta.
         boolean expired = share.getExpirationDate() != null && !share.getExpirationDate().isAfter(OffsetDateTime.now());
@@ -230,18 +232,20 @@ public class ShareService {
                         "Non è possibile visualizzare questo ArtID"));
 
         // Statistiche di visualizzazione: contatore, prima e ultima visione.
-        boolean firstOpen = share.getFirstOpened() == null;
-        OffsetDateTime now = OffsetDateTime.now();
-        share.setClickCounter((share.getClickCounter() == null ? 0 : share.getClickCounter()) + 1);
-        if (firstOpen) {
-            share.setFirstOpened(now);
-        }
-        share.setLastOpened(now);
-        externalShareDAO.save(share);
+        if (userId == null || userId != creatorId) {
+            boolean firstOpen = share.getFirstOpened() == null;
+            OffsetDateTime now = OffsetDateTime.now();
+            share.setClickCounter((share.getClickCounter() == null ? 0 : share.getClickCounter()) + 1);
+            if (firstOpen) {
+                share.setFirstOpened(now);
+            }
+            share.setLastOpened(now);
+            externalShareDAO.save(share);
 
-        // Alla prima apertura notifica il proprietario dell'ArtID.
-        if (firstOpen) {
-            notifyOwnerFirstOpen(artid);
+            // Alla prima apertura notifica il proprietario dell'ArtID.
+            if (firstOpen) {
+                notifyOwnerFirstOpen(artid);
+            }
         }
 
         return detail;

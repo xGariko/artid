@@ -262,12 +262,18 @@
 	}
 
 	// Pulsante "Apri": anteprima in-app dell'ArtID collegato alla condivisione.
-	function openPreview(artidId: number | undefined): void {
-		if (artidId == null) {
-			toast.error('ArtID non collegato alla condivisione.');
+	async function openPreview(shareId: number | undefined) {
+		if (shareId == null) {
+			toast.error('Qualcosa è andato storto.');
 			return;
 		}
-		goto(resolve('/(app)/artid/details/[id]/preview', { id: String(artidId) }));
+		const response = await fetch('/api/shares/external/' + shareId + '/link');
+		if (!response.ok) {
+			toast.error('Errore nella generazione del link.');
+			return;
+		}
+		const { token } = await response.json();
+		goto(resolve('/s/[token]', {token: token}));
 	}
 
 	// Click sul titolo: apre la pagina di dettaglio/modifica dell'ArtID.
@@ -486,7 +492,7 @@
 							title="Apri anteprima"
 							onclick={(event) => {
 								event.stopPropagation();
-								openPreview(extShare.idArtid);
+								openPreview(extShare.id);
 							}}
 						>
 							<i class="bi bi-box-arrow-up-right fs-6"></i>

@@ -122,8 +122,9 @@ public class ShareController {
     // l'anteprima dell'ArtID collegato, purché la condivisione sia attiva e non
     // scaduta.
     @GetMapping("/public/{token}")
-    public ResponseEntity<PublicArtidDetailResponse> openSharedArtid(@PathVariable String token) {
-        return ResponseEntity.ok(shareService.openSharedArtid(token));
+    public ResponseEntity<PublicArtidDetailResponse> openSharedArtid(@AuthenticationPrincipal AuthenticatedUser principal, @PathVariable String token) {
+        Long id = (principal != null) ? principal.getId() : null;
+        return ResponseEntity.ok(shareService.openSharedArtid(id, token));
     }
 
     @DeleteMapping("/external")

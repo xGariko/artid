@@ -8,7 +8,7 @@
 	let { data }: { data: PageData } = $props();
 </script>
 
-<ArtidNavbar />
+<ArtidNavbar forceLoggedOut={true}/>
 
 <div
 	class="w-100 min-vh-100 d-flex flex-column align-items-center justify-content-start p-3 p-lg-5 artid-detail-container"
