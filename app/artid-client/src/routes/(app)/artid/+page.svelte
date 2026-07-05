@@ -11,6 +11,7 @@
 	import { resolve } from '$app/paths';
 	import { api } from '$lib/api/browser-client';
 	import ArtidCard from '$lib/components/pages/artid/artid-card.svelte';
+	import ArtidSharedCard from '$lib/components/pages/artid/artid-shared-card.svelte';
 
 	let { data }: { data: PageData } = $props();
 
@@ -180,11 +181,19 @@
 		class="bg-artid-section h-100 w-60 rounded-3 border border-artid-border p-3 d-flex flex-column gap-3 artid-list"
 	>
 		<div class="row">
-			{#each visibleArtids as artid (artid.id)}
-				<div class="col-3">
-					<ArtidCard {artid} filter={activeFilterValue} />
-				</div>
-			{/each}
+			{#if activeFilterValue !== 'sharedWithMe'}
+				{#each visibleArtids as artid (artid.id)}
+					<div class="col-3">
+						<ArtidCard {artid} filter={activeFilterValue} />
+					</div>
+				{/each}
+			{:else}
+				{#each data.sharedArtids as sharedArtid (sharedArtid.id)}
+					<div class="col-3">
+						<ArtidSharedCard {sharedArtid} />
+					</div>
+				{/each}
+			{/if}
 		</div>
 	</div>
 </div>

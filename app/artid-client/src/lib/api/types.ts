@@ -33,3 +33,4 @@ export type InternalShareArtIDResponse = Schemas['InternalShareArtIDResponse'];
 export type ExternalShareArtIDResponse = Schemas['ExternalShareArtIDResponse'];
 export type CertificationResponse = Schemas['CertificationResponse'];
 export type TagResponse = Schemas['TagResponse'];
+export type InternalShareArtIDExtendedResponse = Schemas['InternalShareArtIDExtendedResponse'];

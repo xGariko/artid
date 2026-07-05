@@ -2,6 +2,7 @@ package afam.artidserver.service;
 
 import java.util.List;
 import java.util.Random;
+import java.awt.Color;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -97,14 +98,14 @@ public class TagService {
      * Metodo helper privato per generare una stringa HEX a 6 cifre (es. "ff5733")
      */
     private String generateRandomColor() {
-        // Limitando il range tra 50 e 200 otteniamo tonalità pastello sature,
-        // evitando il nero totale (0) e il bianco totale (255)
-        int r = random.nextInt(151);
-        int g = random.nextInt(151);
-        int b = random.nextInt(151);
+        float hue = random.nextFloat(); // Varia la tonalità (rosso, verde, blu, giallo...)
+        float saturation = 0.85f; // 85% di saturazione: colore pieno e vivido
+        float brightness = 0.90f; // 90% di luminosità: splendente e visibile
 
-        // %02x significa: converti in esadecimale, minuscolo, usando sempre almeno 2
-        // cifre (es. 9 diventa 09)
-        return String.format("%02x%02x%02x", r, g, b);
+        // Converte HSB in un oggetto Color standard di Java
+        Color color = Color.getHSBColor(hue, saturation, brightness);
+
+        // Converte i canali RGB in una stringa HEX (es. "ff33a1")
+        return String.format("%02x%02x%02x", color.getRed(), color.getGreen(), color.getBlue());
     }
 }

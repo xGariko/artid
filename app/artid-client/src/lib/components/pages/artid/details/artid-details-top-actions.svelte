@@ -82,7 +82,8 @@
 	async function handleDelete() {
 		try {
 			const response = await api.DELETE('/api/artids/{id}', {
-				params: { path: { id: artidId } }
+				params: { path: { id: artidId } },
+				credentials: 'include'
 			});
 
 			if (!response.error) {

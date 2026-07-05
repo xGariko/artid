@@ -64,6 +64,8 @@ public interface InternalShareDAO extends ListCrudRepository<InternalShare, Long
 
     Optional<InternalShare> findByIdUserFromAndIdUserToAndIdArtid(Long idUserFrom, Long idUserTo, Long idArtid);
 
+    Optional<InternalShare> findByIdUserFromAndRecipientMailAndIdArtid(Long idUserFrom, String email, Long idArtid);
+
     @Modifying
     @Query("""
             UPDATE internal_share
