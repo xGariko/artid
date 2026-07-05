@@ -8,7 +8,7 @@
 
 <ArtidNavbar></ArtidNavbar>
 <ArtidSubNavbar></ArtidSubNavbar>
-<main class="flex-grow-1 w-100 h-100 p-4 bg-artid-surface overflow-auto {page.url.pathname === '/dashboard' ? 'dashboard' : ''}">
+<main class="flex-grow-1 w-100 h-100 p-4 bg-artid-surface overflow-auto {page.url.pathname === '/home' ? 'home' : ''}">
 	{@render children()}
 </main>
 
@@ -20,7 +20,7 @@
 			padding-top: calc(var(--artid-navbar-height) + (var(--artid-navbar-height) /2 ) + 1.5rem) !important;
 	}
 
-	.dashboard{
+	.home{
       padding-top: calc(var(--artid-navbar-height) + 1.5rem) !important;
 	}
 </style>

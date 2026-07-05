@@ -33,7 +33,7 @@ export type BreadcrumbCrumb = {
  *   );
  *
  * NB: gli `$effect` girano solo lato client, quindi i crumb extra compaiono dopo
- * l'hydration (la sezione e la Dashboard sono invece sempre presenti).
+ * l'hydration (la sezione e la Home sono invece sempre presenti).
  */
 const store = writable<Map<string, BreadcrumbCrumb>>(new Map());
 

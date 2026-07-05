@@ -6,9 +6,9 @@
 	import ArtidLogoIconWhite from '$lib/assets/artid_logo_icon_white.svg';
 	import { breadcrumb, type BreadcrumbCrumb } from '$lib/stores/breadcrumb';
 
-	const dashboard: BreadcrumbCrumb = {
-		label: 'Dashboard',
-		href: resolve('/dashboard'),
+	const home: BreadcrumbCrumb = {
+		label: 'Home',
+		href: resolve('/home'),
 		icon: 'bi-grid-fill'
 	};
 
@@ -37,11 +37,11 @@
 			.sort((a, b) => a.href.length - b.href.length)
 	);
 	let visibleLinks = $derived(
-		section ? [dashboard, section, ...extras] : [dashboard, ...extras]
+		section ? [home, section, ...extras] : [home, ...extras]
 	);
 </script>
 
-{#if currentPath !== dashboard.href}
+{#if currentPath !== home.href}
 	<div
 		class="sub-nav w-100 bg-artid-dark position-absolute d-flex align-items-center gap-3 px-3 z-1"
 		transition:fly={{ y: -35, duration: 220, easing: cubicOut }}
