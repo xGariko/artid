@@ -1,10 +1,10 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.27 (MiKTeX 25.4) (preloaded format=pdflatex 2025.10.5)  24 JUN 2026 03:53
+This is pdfTeX, Version 3.141592653-2.6-1.40.27 (MiKTeX 25.4) (preloaded format=pdflatex 2025.10.5)  6 JUL 2026 01:53
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
  %&-line parsing enabled.
-**c:/Users/andre/Desktop/RAD/RAD/RAD.tex
-(c:/Users/andre/Desktop/RAD/RAD/RAD.tex
+**c:/Users/andre/Desktop/RAD/RAD.tex
+(c:/Users/andre/Desktop/RAD/RAD.tex
 LaTeX2e <2025-06-01> patch level 1
 L3 programming layer <2025-09-02>
 (C:\Users\andre\AppData\Local\Programs\MiKTeX\tex/latex/base\article.cls
@@ -1242,32 +1242,33 @@ File: Immagini/Sequence Diagrams/Gestione Materiali/Rimuovi Materiale.png Graphi
 <use Immagini/Sequence Diagrams/Gestione Materiali/Rimuovi Materiale.png>
 Package pdftex.def Info: Immagini/Sequence Diagrams/Gestione Materiali/Rimuovi Materiale.png  used on input line 59.
 (pdftex.def)             Requested size: 432.48589pt x 189.5795pt.
-<Immagini/Sequence Diagrams/Gestione Materiali/Cancella ArtID.png, id=1771, 1428.90358pt x 839.74597pt>
-File: Immagini/Sequence Diagrams/Gestione Materiali/Cancella ArtID.png Graphic file (type png)
-<use Immagini/Sequence Diagrams/Gestione Materiali/Cancella ArtID.png>
-Package pdftex.def Info: Immagini/Sequence Diagrams/Gestione Materiali/Cancella ArtID.png  used on input line 65.
-(pdftex.def)             Requested size: 432.46815pt x 254.15527pt.
+<Immagini/Sequence Diagrams/Gestione Materiali/Modifica dettagli ArtID.png, id=1771, 1291.43347pt x 1124.11272pt>
+File: Immagini/Sequence Diagrams/Gestione Materiali/Modifica dettagli ArtID.png Graphic file (type png)
+<use Immagini/Sequence Diagrams/Gestione Materiali/Modifica dettagli ArtID.png>
+Package pdftex.def Info: Immagini/Sequence Diagrams/Gestione Materiali/Modifica dettagli ArtID.png  used on input line 65.
+(pdftex.def)             Requested size: 432.48018pt x 376.44716pt.
 
 
 [107 <./Immagini/Sequence Diagrams/Gestione Materiali/Aggiungi Materiale.png> <./Immagini/Sequence Diagrams/Gestione Materiali/Rimuovi Materiale.png>]
+<Immagini/Sequence Diagrams/Gestione Materiali/Cancella ArtID.png, id=1780, 1428.90358pt x 839.74597pt>
 File: Immagini/Sequence Diagrams/Gestione Materiali/Cancella ArtID.png Graphic file (type png)
 <use Immagini/Sequence Diagrams/Gestione Materiali/Cancella ArtID.png>
 Package pdftex.def Info: Immagini/Sequence Diagrams/Gestione Materiali/Cancella ArtID.png  used on input line 71.
 (pdftex.def)             Requested size: 432.46815pt x 254.15527pt.
-<Immagini/Sequence Diagrams/Gestione Materiali/Aggiungi ArtID ai preferiti.png, id=1780, 1079.33675pt x 723.48555pt>
+<Immagini/Sequence Diagrams/Gestione Materiali/Aggiungi ArtID ai preferiti.png, id=1781, 1079.33675pt x 723.48555pt>
 File: Immagini/Sequence Diagrams/Gestione Materiali/Aggiungi ArtID ai preferiti.png Graphic file (type png)
 <use Immagini/Sequence Diagrams/Gestione Materiali/Aggiungi ArtID ai preferiti.png>
 Package pdftex.def Info: Immagini/Sequence Diagrams/Gestione Materiali/Aggiungi ArtID ai preferiti.png  used on input line 77.
 (pdftex.def)             Requested size: 432.48465pt x 289.89691pt.
 
 
-[108 <./Immagini/Sequence Diagrams/Gestione Materiali/Cancella ArtID.png>]
-<Immagini/Sequence Diagrams/Gestione Materiali/Aggiorna Visibilità ArtID.png, id=1789, 1169.67424pt x 918.30032pt>
+[108 <./Immagini/Sequence Diagrams/Gestione Materiali/Modifica dettagli ArtID.png> <./Immagini/Sequence Diagrams/Gestione Materiali/Cancella ArtID.png>]
+<Immagini/Sequence Diagrams/Gestione Materiali/Aggiorna Visibilità ArtID.png, id=1791, 1169.67424pt x 918.30032pt>
 File: Immagini/Sequence Diagrams/Gestione Materiali/Aggiorna Visibilità ArtID.png Graphic file (type png)
 <use Immagini/Sequence Diagrams/Gestione Materiali/Aggiorna Visibilità ArtID.png>
 Package pdftex.def Info: Immagini/Sequence Diagrams/Gestione Materiali/Aggiorna Visibilità ArtID.png  used on input line 83.
 (pdftex.def)             Requested size: 432.46928pt x 339.52759pt.
-<Immagini/Sequence Diagrams/Gestione Materiali/Crea Tag.png, id=1790, 1241.94424pt x 1743.90652pt>
+<Immagini/Sequence Diagrams/Gestione Materiali/Crea Tag.png, id=1792, 1241.94424pt x 1743.90652pt>
 File: Immagini/Sequence Diagrams/Gestione Materiali/Crea Tag.png Graphic file (type png)
 <use Immagini/Sequence Diagrams/Gestione Materiali/Crea Tag.png>
 Package pdftex.def Info: Immagini/Sequence Diagrams/Gestione Materiali/Crea Tag.png  used on input line 89.
@@ -1275,7 +1276,7 @@ Package pdftex.def Info: Immagini/Sequence Diagrams/Gestione Materiali/Crea Tag.
 
 
 [109 <./Immagini/Sequence Diagrams/Gestione Materiali/Aggiungi ArtID ai preferiti.png> <./Immagini/Sequence Diagrams/Gestione Materiali/Aggiorna Visibilità ArtID.png>]
-<Immagini/Sequence Diagrams/Gestione Materiali/Aggiungi Tag.png, id=1799, 1194.81163pt x 1149.2501pt>
+<Immagini/Sequence Diagrams/Gestione Materiali/Aggiungi Tag.png, id=1801, 1194.81163pt x 1149.2501pt>
 File: Immagini/Sequence Diagrams/Gestione Materiali/Aggiungi Tag.png Graphic file (type png)
 <use Immagini/Sequence Diagrams/Gestione Materiali/Aggiungi Tag.png>
 Package pdftex.def Info: Immagini/Sequence Diagrams/Gestione Materiali/Aggiungi Tag.png  used on input line 95.
@@ -1283,7 +1284,7 @@ Package pdftex.def Info: Immagini/Sequence Diagrams/Gestione Materiali/Aggiungi 
 
 
 [110 <./Immagini/Sequence Diagrams/Gestione Materiali/Crea Tag.png>]
-<Immagini/Sequence Diagrams/Gestione Materiali/Rimuovi Tag.png, id=1806, 897.87619pt x 472.11163pt>
+<Immagini/Sequence Diagrams/Gestione Materiali/Rimuovi Tag.png, id=1808, 897.87619pt x 472.11163pt>
 File: Immagini/Sequence Diagrams/Gestione Materiali/Rimuovi Tag.png Graphic file (type png)
 <use Immagini/Sequence Diagrams/Gestione Materiali/Rimuovi Tag.png>
 Package pdftex.def Info: Immagini/Sequence Diagrams/Gestione Materiali/Rimuovi Tag.png  used on input line 101.
@@ -1291,7 +1292,7 @@ Package pdftex.def Info: Immagini/Sequence Diagrams/Gestione Materiali/Rimuovi T
 
 
 [111 <./Immagini/Sequence Diagrams/Gestione Materiali/Aggiungi Tag.png>]
-<Immagini/Sequence Diagrams/Gestione Materiali/Preview ArtID.png, id=1813, 1237.23097pt x 724.27109pt>
+<Immagini/Sequence Diagrams/Gestione Materiali/Preview ArtID.png, id=1815, 1237.23097pt x 724.27109pt>
 File: Immagini/Sequence Diagrams/Gestione Materiali/Preview ArtID.png Graphic file (type png)
 <use Immagini/Sequence Diagrams/Gestione Materiali/Preview ArtID.png>
 Package pdftex.def Info: Immagini/Sequence Diagrams/Gestione Materiali/Preview ArtID.png  used on input line 107.
@@ -1299,17 +1300,17 @@ Package pdftex.def Info: Immagini/Sequence Diagrams/Gestione Materiali/Preview A
 )
 
 [112 <./Immagini/Sequence Diagrams/Gestione Materiali/Rimuovi Tag.png> <./Immagini/Sequence Diagrams/Gestione Materiali/Preview ArtID.png>] (Pagine/Modelli del sistema/Modelli dinamici/Macro casi d'uso/condivisione.tex
-<Immagini/Sequence Diagrams/Condivisione/Visualizza schermata _BACHECA CONDIVISIONI_.png, id=1822, 1450.11327pt x 1110.75848pt>
+<Immagini/Sequence Diagrams/Condivisione/Visualizza schermata _BACHECA CONDIVISIONI_.png, id=1824, 1450.11327pt x 1110.75848pt>
 File: Immagini/Sequence Diagrams/Condivisione/Visualizza schermata _BACHECA CONDIVISIONI_.png Graphic file (type png)
 <use Immagini/Sequence Diagrams/Condivisione/Visualizza schermata _BACHECA CONDIVISIONI_.png>
 Package pdftex.def Info: Immagini/Sequence Diagrams/Condivisione/Visualizza schermata _BACHECA CONDIVISIONI_.png  used on input line 5.
 (pdftex.def)             Requested size: 432.47061pt x 331.26405pt.
-<Immagini/Sequence Diagrams/Condivisione/Visualizza schermata _DETTAGLI ARTID_ condiviso.png, id=1823, 1109.97293pt x 595.44196pt>
+<Immagini/Sequence Diagrams/Condivisione/Visualizza schermata _DETTAGLI ARTID_ condiviso.png, id=1825, 1109.97293pt x 595.44196pt>
 File: Immagini/Sequence Diagrams/Condivisione/Visualizza schermata _DETTAGLI ARTID_ condiviso.png Graphic file (type png)
 <use Immagini/Sequence Diagrams/Condivisione/Visualizza schermata _DETTAGLI ARTID_ condiviso.png>
 Package pdftex.def Info: Immagini/Sequence Diagrams/Condivisione/Visualizza schermata _DETTAGLI ARTID_ condiviso.png  used on input line 11.
 (pdftex.def)             Requested size: 432.46428pt x 231.99428pt.
-<Immagini/Sequence Diagrams/Condivisione/Visualizza ArtID condiviso tramite link.png, id=1824, 1092.69098pt x 2804.39021pt>
+<Immagini/Sequence Diagrams/Condivisione/Visualizza ArtID condiviso tramite link.png, id=1826, 1092.69098pt x 2804.39021pt>
 File: Immagini/Sequence Diagrams/Condivisione/Visualizza ArtID condiviso tramite link.png Graphic file (type png)
 <use Immagini/Sequence Diagrams/Condivisione/Visualizza ArtID condiviso tramite link.png>
 Package pdftex.def Info: Immagini/Sequence Diagrams/Condivisione/Visualizza ArtID condiviso tramite link.png  used on input line 17.
@@ -1319,7 +1320,7 @@ Package pdftex.def Info: Immagini/Sequence Diagrams/Condivisione/Visualizza ArtI
 [113
 
  <./Immagini/Sequence Diagrams/Condivisione/Visualizza schermata _BACHECA CONDIVISIONI_.png> <./Immagini/Sequence Diagrams/Condivisione/Visualizza schermata _DETTAGLI ARTID_ condiviso.png>]
-<Immagini/Sequence Diagrams/Condivisione/Visualizza preview link ArtID.png, id=1833, 1194.81163pt x 2138.24934pt>
+<Immagini/Sequence Diagrams/Condivisione/Visualizza preview link ArtID.png, id=1835, 1194.81163pt x 2138.24934pt>
 File: Immagini/Sequence Diagrams/Condivisione/Visualizza preview link ArtID.png Graphic file (type png)
 <use Immagini/Sequence Diagrams/Condivisione/Visualizza preview link ArtID.png>
 Package pdftex.def Info: Immagini/Sequence Diagrams/Condivisione/Visualizza preview link ArtID.png  used on input line 23.
@@ -1327,7 +1328,7 @@ Package pdftex.def Info: Immagini/Sequence Diagrams/Condivisione/Visualizza prev
 
 
 [114 <./Immagini/Sequence Diagrams/Condivisione/Visualizza ArtID condiviso tramite link.png>]
-<Immagini/Sequence Diagrams/Condivisione/Genera link ArtID.png, id=1841, 1075.40903pt x 1956.00327pt>
+<Immagini/Sequence Diagrams/Condivisione/Genera link ArtID.png, id=1843, 1075.40903pt x 1956.00327pt>
 File: Immagini/Sequence Diagrams/Condivisione/Genera link ArtID.png Graphic file (type png)
 <use Immagini/Sequence Diagrams/Condivisione/Genera link ArtID.png>
 Package pdftex.def Info: Immagini/Sequence Diagrams/Condivisione/Genera link ArtID.png  used on input line 29.
@@ -1335,7 +1336,7 @@ Package pdftex.def Info: Immagini/Sequence Diagrams/Condivisione/Genera link Art
 
 
 [115 <./Immagini/Sequence Diagrams/Condivisione/Visualizza preview link ArtID.png>]
-<Immagini/Sequence Diagrams/Condivisione/Elimina link condivisione ArtID.png, id=1848, 1102.90305pt x 2427.32935pt>
+<Immagini/Sequence Diagrams/Condivisione/Elimina link condivisione ArtID.png, id=1850, 1102.90305pt x 2427.32935pt>
 File: Immagini/Sequence Diagrams/Condivisione/Elimina link condivisione ArtID.png Graphic file (type png)
 <use Immagini/Sequence Diagrams/Condivisione/Elimina link condivisione ArtID.png>
 Package pdftex.def Info: Immagini/Sequence Diagrams/Condivisione/Elimina link condivisione ArtID.png  used on input line 35.
@@ -1343,7 +1344,7 @@ Package pdftex.def Info: Immagini/Sequence Diagrams/Condivisione/Elimina link co
 
 
 [116 <./Immagini/Sequence Diagrams/Condivisione/Genera link ArtID.png>]
-<Immagini/Sequence Diagrams/Condivisione/Modifica scadenza link ArtID condiviso.png, id=1855, 1153.17783pt x 1282.00696pt>
+<Immagini/Sequence Diagrams/Condivisione/Modifica scadenza link ArtID condiviso.png, id=1857, 1153.17783pt x 1282.00696pt>
 File: Immagini/Sequence Diagrams/Condivisione/Modifica scadenza link ArtID condiviso.png Graphic file (type png)
 <use Immagini/Sequence Diagrams/Condivisione/Modifica scadenza link ArtID condiviso.png>
 Package pdftex.def Info: Immagini/Sequence Diagrams/Condivisione/Modifica scadenza link ArtID condiviso.png  used on input line 41.
@@ -1351,7 +1352,7 @@ Package pdftex.def Info: Immagini/Sequence Diagrams/Condivisione/Modifica scaden
 
 
 [117 <./Immagini/Sequence Diagrams/Condivisione/Elimina link condivisione ArtID.png>]
-<Immagini/Sequence Diagrams/Condivisione/Visualizza ArtID _Condiviso con me_.png, id=1862, 1289.07684pt x 1240.37315pt>
+<Immagini/Sequence Diagrams/Condivisione/Visualizza ArtID _Condiviso con me_.png, id=1864, 1289.07684pt x 1240.37315pt>
 File: Immagini/Sequence Diagrams/Condivisione/Visualizza ArtID _Condiviso con me_.png Graphic file (type png)
 <use Immagini/Sequence Diagrams/Condivisione/Visualizza ArtID _Condiviso con me_.png>
 Package pdftex.def Info: Immagini/Sequence Diagrams/Condivisione/Visualizza ArtID _Condiviso con me_.png  used on input line 47.
@@ -1359,7 +1360,7 @@ Package pdftex.def Info: Immagini/Sequence Diagrams/Condivisione/Visualizza ArtI
 
 
 [118 <./Immagini/Sequence Diagrams/Condivisione/Modifica scadenza link ArtID condiviso.png>]
-<Immagini/Sequence Diagrams/Condivisione/Crea condivisione interna ArtID.png, id=1869, 1301.64554pt x 1854.66815pt>
+<Immagini/Sequence Diagrams/Condivisione/Crea condivisione interna ArtID.png, id=1871, 1301.64554pt x 1854.66815pt>
 File: Immagini/Sequence Diagrams/Condivisione/Crea condivisione interna ArtID.png Graphic file (type png)
 <use Immagini/Sequence Diagrams/Condivisione/Crea condivisione interna ArtID.png>
 Package pdftex.def Info: Immagini/Sequence Diagrams/Condivisione/Crea condivisione interna ArtID.png  used on input line 53.
@@ -1367,7 +1368,7 @@ Package pdftex.def Info: Immagini/Sequence Diagrams/Condivisione/Crea condivisio
 
 
 [119 <./Immagini/Sequence Diagrams/Condivisione/Visualizza ArtID _Condiviso con me_.png>]
-<Immagini/Sequence Diagrams/Condivisione/Annulla condivisione interna ArtID.png, id=1876, 937.15337pt x 1001.56793pt>
+<Immagini/Sequence Diagrams/Condivisione/Annulla condivisione interna ArtID.png, id=1878, 937.15337pt x 1001.56793pt>
 File: Immagini/Sequence Diagrams/Condivisione/Annulla condivisione interna ArtID.png Graphic file (type png)
 <use Immagini/Sequence Diagrams/Condivisione/Annulla condivisione interna ArtID.png>
 Package pdftex.def Info: Immagini/Sequence Diagrams/Condivisione/Annulla condivisione interna ArtID.png  used on input line 59.
@@ -1375,7 +1376,7 @@ Package pdftex.def Info: Immagini/Sequence Diagrams/Condivisione/Annulla condivi
 
 
 [120 <./Immagini/Sequence Diagrams/Condivisione/Crea condivisione interna ArtID.png>]
-<Immagini/Sequence Diagrams/Condivisione/Disattiva condivisione esterna ArtID.png, id=1884, 1019.63544pt x 796.54109pt>
+<Immagini/Sequence Diagrams/Condivisione/Disattiva condivisione esterna ArtID.png, id=1886, 1019.63544pt x 796.54109pt>
 File: Immagini/Sequence Diagrams/Condivisione/Disattiva condivisione esterna ArtID.png Graphic file (type png)
 <use Immagini/Sequence Diagrams/Condivisione/Disattiva condivisione esterna ArtID.png>
 Package pdftex.def Info: Immagini/Sequence Diagrams/Condivisione/Disattiva condivisione esterna ArtID.png  used on input line 65.
@@ -1383,7 +1384,7 @@ Package pdftex.def Info: Immagini/Sequence Diagrams/Condivisione/Disattiva condi
 
 
 [121 <./Immagini/Sequence Diagrams/Condivisione/Annulla condivisione interna ArtID.png>]
-<Immagini/Sequence Diagrams/Condivisione/Riattiva condivisione esterna ArtID.png, id=1891, 1012.56554pt x 780.83022pt>
+<Immagini/Sequence Diagrams/Condivisione/Riattiva condivisione esterna ArtID.png, id=1893, 1012.56554pt x 780.83022pt>
 File: Immagini/Sequence Diagrams/Condivisione/Riattiva condivisione esterna ArtID.png Graphic file (type png)
 <use Immagini/Sequence Diagrams/Condivisione/Riattiva condivisione esterna ArtID.png>
 Package pdftex.def Info: Immagini/Sequence Diagrams/Condivisione/Riattiva condivisione esterna ArtID.png  used on input line 71.
@@ -1391,7 +1392,7 @@ Package pdftex.def Info: Immagini/Sequence Diagrams/Condivisione/Riattiva condiv
 
 
 [122 <./Immagini/Sequence Diagrams/Condivisione/Disattiva condivisione esterna ArtID.png>]
-<Immagini/Sequence Diagrams/Condivisione/Modifica descrizione link ArtID condiviso.png, id=1898, 1009.42337pt x 808.32423pt>
+<Immagini/Sequence Diagrams/Condivisione/Modifica descrizione link ArtID condiviso.png, id=1900, 1009.42337pt x 808.32423pt>
 File: Immagini/Sequence Diagrams/Condivisione/Modifica descrizione link ArtID condiviso.png Graphic file (type png)
 <use Immagini/Sequence Diagrams/Condivisione/Modifica descrizione link ArtID condiviso.png>
 Package pdftex.def Info: Immagini/Sequence Diagrams/Condivisione/Modifica descrizione link ArtID condiviso.png  used on input line 77.
@@ -1399,7 +1400,7 @@ Package pdftex.def Info: Immagini/Sequence Diagrams/Condivisione/Modifica descri
 
 
 [123 <./Immagini/Sequence Diagrams/Condivisione/Riattiva condivisione esterna ArtID.png>]
-<Immagini/Sequence Diagrams/Condivisione/Elimina ArtID _Condiviso con me_.png, id=1905, 1138.2525pt x 1093.47652pt>
+<Immagini/Sequence Diagrams/Condivisione/Elimina ArtID _Condiviso con me_.png, id=1907, 1138.2525pt x 1093.47652pt>
 File: Immagini/Sequence Diagrams/Condivisione/Elimina ArtID _Condiviso con me_.png Graphic file (type png)
 <use Immagini/Sequence Diagrams/Condivisione/Elimina ArtID _Condiviso con me_.png>
 Package pdftex.def Info: Immagini/Sequence Diagrams/Condivisione/Elimina ArtID _Condiviso con me_.png  used on input line 83.
@@ -1409,12 +1410,12 @@ Package pdftex.def Info: Immagini/Sequence Diagrams/Condivisione/Elimina ArtID _
 [124 <./Immagini/Sequence Diagrams/Condivisione/Modifica descrizione link ArtID condiviso.png>]
 
 [125 <./Immagini/Sequence Diagrams/Condivisione/Elimina ArtID _Condiviso con me_.png>] (Pagine/Modelli del sistema/Modelli dinamici/Macro casi d'uso/discovery.tex
-<Immagini/Sequence Diagrams/Discovery/Ricerca Membri.png, id=1918, 1262.36836pt x 1770.615pt>
+<Immagini/Sequence Diagrams/Discovery/Ricerca Membri.png, id=1920, 1262.36836pt x 1770.615pt>
 File: Immagini/Sequence Diagrams/Discovery/Ricerca Membri.png Graphic file (type png)
 <use Immagini/Sequence Diagrams/Discovery/Ricerca Membri.png>
 Package pdftex.def Info: Immagini/Sequence Diagrams/Discovery/Ricerca Membri.png  used on input line 5.
 (pdftex.def)             Requested size: 432.47414pt x 606.5941pt.
-<Immagini/Sequence Diagrams/Discovery/Visualizza ArtID pubblico.png, id=1919, 1115.47174pt x 539.66837pt>
+<Immagini/Sequence Diagrams/Discovery/Visualizza ArtID pubblico.png, id=1921, 1115.47174pt x 539.66837pt>
 File: Immagini/Sequence Diagrams/Discovery/Visualizza ArtID pubblico.png Graphic file (type png)
 <use Immagini/Sequence Diagrams/Discovery/Visualizza ArtID pubblico.png>
 Package pdftex.def Info: Immagini/Sequence Diagrams/Discovery/Visualizza ArtID pubblico.png  used on input line 11.
@@ -1424,7 +1425,7 @@ Package pdftex.def Info: Immagini/Sequence Diagrams/Discovery/Visualizza ArtID p
 [126
 
  <./Immagini/Sequence Diagrams/Discovery/Ricerca Membri.png>]
-<Immagini/Sequence Diagrams/Comunicazione DBMS fallita.png, id=1927, 932.44011pt x 1556.16164pt>
+<Immagini/Sequence Diagrams/Comunicazione DBMS fallita.png, id=1929, 932.44011pt x 1556.16164pt>
 File: Immagini/Sequence Diagrams/Comunicazione DBMS fallita.png Graphic file (type png)
 <use Immagini/Sequence Diagrams/Comunicazione DBMS fallita.png>
 Package pdftex.def Info: Immagini/Sequence Diagrams/Comunicazione DBMS fallita.png  used on input line 18.
@@ -1434,7 +1435,7 @@ Package pdftex.def Info: Immagini/Sequence Diagrams/Comunicazione DBMS fallita.p
 [127 <./Immagini/Sequence Diagrams/Discovery/Visualizza ArtID pubblico.png>]
 
 [128 <./Immagini/Sequence Diagrams/Comunicazione DBMS fallita.png>] (Pagine/Modelli del sistema/mockups/mockups.tex
-<Immagini/mockups/Welcome Page.jpg, id=1940, 1927.2pt x 1027.84pt>
+<Immagini/mockups/Welcome Page.jpg, id=1942, 1927.2pt x 1027.84pt>
 File: Immagini/mockups/Welcome Page.jpg Graphic file (type jpg)
 <use Immagini/mockups/Welcome Page.jpg>
 Package pdftex.def Info: Immagini/mockups/Welcome Page.jpg  used on input line 5.
@@ -1442,17 +1443,17 @@ Package pdftex.def Info: Immagini/mockups/Welcome Page.jpg  used on input line 5
 
 
 [129 <./Immagini/mockups/Welcome Page.jpg>]
-<Immagini/mockups/Autenticazione/Register page.jpg, id=1946, 1927.2pt x 1027.84pt>
+<Immagini/mockups/Autenticazione/Register page.jpg, id=1948, 1927.2pt x 1027.84pt>
 File: Immagini/mockups/Autenticazione/Register page.jpg Graphic file (type jpg)
 <use Immagini/mockups/Autenticazione/Register page.jpg>
 Package pdftex.def Info: Immagini/mockups/Autenticazione/Register page.jpg  used on input line 15.
 (pdftex.def)             Requested size: 432.45444pt x 230.64236pt.
-<Immagini/mockups/Autenticazione/Login Page.jpg, id=1947, 1927.2pt x 1027.84pt>
+<Immagini/mockups/Autenticazione/Login Page.jpg, id=1949, 1927.2pt x 1027.84pt>
 File: Immagini/mockups/Autenticazione/Login Page.jpg Graphic file (type jpg)
 <use Immagini/mockups/Autenticazione/Login Page.jpg>
 Package pdftex.def Info: Immagini/mockups/Autenticazione/Login Page.jpg  used on input line 21.
 (pdftex.def)             Requested size: 432.45444pt x 230.64236pt.
-<Immagini/mockups/Autenticazione/OTP Code.jpg, id=1948, 1927.2pt x 1027.84pt>
+<Immagini/mockups/Autenticazione/OTP Code.jpg, id=1950, 1927.2pt x 1027.84pt>
 File: Immagini/mockups/Autenticazione/OTP Code.jpg Graphic file (type jpg)
 <use Immagini/mockups/Autenticazione/OTP Code.jpg>
 Package pdftex.def Info: Immagini/mockups/Autenticazione/OTP Code.jpg  used on input line 27.
@@ -1464,17 +1465,17 @@ Package pdftex.def Info: Immagini/mockups/Autenticazione/OTP Code.jpg  used on i
  <./Immagini/mockups/Autenticazione/Register page.jpg> <./Immagini/mockups/Autenticazione/Login Page.jpg>]
 
 [131 <./Immagini/mockups/Autenticazione/OTP Code.jpg>]
-<Immagini/mockups/Gestione Profilo/Gestione profilo.jpg, id=1960, 1927.2pt x 1027.84pt>
+<Immagini/mockups/Gestione Profilo/Gestione profilo.jpg, id=1962, 1927.2pt x 1027.84pt>
 File: Immagini/mockups/Gestione Profilo/Gestione profilo.jpg Graphic file (type jpg)
 <use Immagini/mockups/Gestione Profilo/Gestione profilo.jpg>
 Package pdftex.def Info: Immagini/mockups/Gestione Profilo/Gestione profilo.jpg  used on input line 37.
 (pdftex.def)             Requested size: 432.45444pt x 230.64236pt.
-<Immagini/mockups/Gestione Profilo/Gestione certificati.jpg, id=1961, 1927.2pt x 1027.84pt>
+<Immagini/mockups/Gestione Profilo/Gestione certificati.jpg, id=1963, 1927.2pt x 1027.84pt>
 File: Immagini/mockups/Gestione Profilo/Gestione certificati.jpg Graphic file (type jpg)
 <use Immagini/mockups/Gestione Profilo/Gestione certificati.jpg>
 Package pdftex.def Info: Immagini/mockups/Gestione Profilo/Gestione certificati.jpg  used on input line 43.
 (pdftex.def)             Requested size: 432.45444pt x 230.64236pt.
-<Immagini/mockups/Gestione Profilo/Nuovo certificato.jpg, id=1962, 1927.2pt x 1027.84pt>
+<Immagini/mockups/Gestione Profilo/Nuovo certificato.jpg, id=1964, 1927.2pt x 1027.84pt>
 File: Immagini/mockups/Gestione Profilo/Nuovo certificato.jpg Graphic file (type jpg)
 <use Immagini/mockups/Gestione Profilo/Nuovo certificato.jpg>
 Package pdftex.def Info: Immagini/mockups/Gestione Profilo/Nuovo certificato.jpg  used on input line 49.
@@ -1486,12 +1487,12 @@ Package pdftex.def Info: Immagini/mockups/Gestione Profilo/Nuovo certificato.jpg
  <./Immagini/mockups/Gestione Profilo/Gestione profilo.jpg> <./Immagini/mockups/Gestione Profilo/Gestione certificati.jpg>]
 
 [133 <./Immagini/mockups/Gestione Profilo/Nuovo certificato.jpg>]
-<Immagini/mockups/Gestione Materiali/Materiali.jpg, id=1975, 1927.2pt x 1027.84pt>
+<Immagini/mockups/Gestione Materiali/Materiali.jpg, id=1977, 1927.2pt x 1027.84pt>
 File: Immagini/mockups/Gestione Materiali/Materiali.jpg Graphic file (type jpg)
 <use Immagini/mockups/Gestione Materiali/Materiali.jpg>
 Package pdftex.def Info: Immagini/mockups/Gestione Materiali/Materiali.jpg  used on input line 59.
 (pdftex.def)             Requested size: 432.45444pt x 230.64236pt.
-<Immagini/mockups/Gestione Materiali/Nuovo Materiale.jpg, id=1976, 1927.2pt x 1027.84pt>
+<Immagini/mockups/Gestione Materiali/Nuovo Materiale.jpg, id=1978, 1927.2pt x 1027.84pt>
 File: Immagini/mockups/Gestione Materiali/Nuovo Materiale.jpg Graphic file (type jpg)
 <use Immagini/mockups/Gestione Materiali/Nuovo Materiale.jpg>
 Package pdftex.def Info: Immagini/mockups/Gestione Materiali/Nuovo Materiale.jpg  used on input line 65.
@@ -1501,17 +1502,17 @@ Package pdftex.def Info: Immagini/mockups/Gestione Materiali/Nuovo Materiale.jpg
 [134
 
  <./Immagini/mockups/Gestione Materiali/Materiali.jpg> <./Immagini/mockups/Gestione Materiali/Nuovo Materiale.jpg>]
-<Immagini/mockups/Gestione ArtID/ArtID.jpg, id=1983, 1927.2pt x 1027.84pt>
+<Immagini/mockups/Gestione ArtID/ArtID.jpg, id=1985, 1927.2pt x 1027.84pt>
 File: Immagini/mockups/Gestione ArtID/ArtID.jpg Graphic file (type jpg)
 <use Immagini/mockups/Gestione ArtID/ArtID.jpg>
 Package pdftex.def Info: Immagini/mockups/Gestione ArtID/ArtID.jpg  used on input line 75.
 (pdftex.def)             Requested size: 432.45444pt x 230.64236pt.
-<Immagini/mockups/Gestione ArtID/ArtID-1.jpg, id=1984, 1927.2pt x 1027.84pt>
+<Immagini/mockups/Gestione ArtID/ArtID-1.jpg, id=1986, 1927.2pt x 1027.84pt>
 File: Immagini/mockups/Gestione ArtID/ArtID-1.jpg Graphic file (type jpg)
 <use Immagini/mockups/Gestione ArtID/ArtID-1.jpg>
 Package pdftex.def Info: Immagini/mockups/Gestione ArtID/ArtID-1.jpg  used on input line 81.
 (pdftex.def)             Requested size: 432.45444pt x 230.64236pt.
-<Immagini/mockups/Gestione ArtID/Nuovo ArtID.jpg, id=1985, 1927.2pt x 1027.84pt>
+<Immagini/mockups/Gestione ArtID/Nuovo ArtID.jpg, id=1987, 1927.2pt x 1027.84pt>
 File: Immagini/mockups/Gestione ArtID/Nuovo ArtID.jpg Graphic file (type jpg)
 <use Immagini/mockups/Gestione ArtID/Nuovo ArtID.jpg>
 Package pdftex.def Info: Immagini/mockups/Gestione ArtID/Nuovo ArtID.jpg  used on input line 87.
@@ -1521,12 +1522,12 @@ Package pdftex.def Info: Immagini/mockups/Gestione ArtID/Nuovo ArtID.jpg  used o
 [135
 
  <./Immagini/mockups/Gestione ArtID/ArtID.jpg> <./Immagini/mockups/Gestione ArtID/ArtID-1.jpg>]
-<Immagini/mockups/Gestione ArtID/ArtID detail.jpg, id=1992, 1927.2pt x 1027.84pt>
+<Immagini/mockups/Gestione ArtID/ArtID detail.jpg, id=1994, 1927.2pt x 1027.84pt>
 File: Immagini/mockups/Gestione ArtID/ArtID detail.jpg Graphic file (type jpg)
 <use Immagini/mockups/Gestione ArtID/ArtID detail.jpg>
 Package pdftex.def Info: Immagini/mockups/Gestione ArtID/ArtID detail.jpg  used on input line 93.
 (pdftex.def)             Requested size: 432.45444pt x 230.64236pt.
-<Immagini/mockups/Gestione ArtID/ArtID aggiungi materiale.jpg, id=1993, 1927.2pt x 1027.84pt>
+<Immagini/mockups/Gestione ArtID/ArtID aggiungi materiale.jpg, id=1995, 1927.2pt x 1027.84pt>
 File: Immagini/mockups/Gestione ArtID/ArtID aggiungi materiale.jpg Graphic file (type jpg)
 <use Immagini/mockups/Gestione ArtID/ArtID aggiungi materiale.jpg>
 Package pdftex.def Info: Immagini/mockups/Gestione ArtID/ArtID aggiungi materiale.jpg  used on input line 99.
@@ -1534,12 +1535,12 @@ Package pdftex.def Info: Immagini/mockups/Gestione ArtID/ArtID aggiungi material
 
 
 [136 <./Immagini/mockups/Gestione ArtID/Nuovo ArtID.jpg> <./Immagini/mockups/Gestione ArtID/ArtID detail.jpg>]
-<Immagini/mockups/Gestione ArtID/ArtID condividi.jpg, id=2000, 1927.2pt x 1027.84pt>
+<Immagini/mockups/Gestione ArtID/ArtID condividi.jpg, id=2002, 1927.2pt x 1027.84pt>
 File: Immagini/mockups/Gestione ArtID/ArtID condividi.jpg Graphic file (type jpg)
 <use Immagini/mockups/Gestione ArtID/ArtID condividi.jpg>
 Package pdftex.def Info: Immagini/mockups/Gestione ArtID/ArtID condividi.jpg  used on input line 105.
 (pdftex.def)             Requested size: 432.45444pt x 230.64236pt.
-<Immagini/mockups/Gestione ArtID/ArtID preview.jpg, id=2001, 1927.2pt x 2957.0475pt>
+<Immagini/mockups/Gestione ArtID/ArtID preview.jpg, id=2003, 1927.2pt x 2957.0475pt>
 File: Immagini/mockups/Gestione ArtID/ArtID preview.jpg Graphic file (type jpg)
 <use Immagini/mockups/Gestione ArtID/ArtID preview.jpg>
 Package pdftex.def Info: Immagini/mockups/Gestione ArtID/ArtID preview.jpg  used on input line 111.
@@ -1549,17 +1550,17 @@ Package pdftex.def Info: Immagini/mockups/Gestione ArtID/ArtID preview.jpg  used
 [137 <./Immagini/mockups/Gestione ArtID/ArtID aggiungi materiale.jpg> <./Immagini/mockups/Gestione ArtID/ArtID condividi.jpg>]
 
 [138 <./Immagini/mockups/Gestione ArtID/ArtID preview.jpg>]
-<Immagini/mockups/Condivisione/ArtID bacheca condivisoni.jpg, id=2014, 1927.2pt x 1027.84pt>
+<Immagini/mockups/Condivisione/ArtID bacheca condivisoni.jpg, id=2016, 1927.2pt x 1027.84pt>
 File: Immagini/mockups/Condivisione/ArtID bacheca condivisoni.jpg Graphic file (type jpg)
 <use Immagini/mockups/Condivisione/ArtID bacheca condivisoni.jpg>
 Package pdftex.def Info: Immagini/mockups/Condivisione/ArtID bacheca condivisoni.jpg  used on input line 121.
 (pdftex.def)             Requested size: 432.45444pt x 230.64236pt.
-<Immagini/mockups/Condivisione/ArtID bacheca condivisoni-1.jpg, id=2015, 1927.2pt x 1027.84pt>
+<Immagini/mockups/Condivisione/ArtID bacheca condivisoni-1.jpg, id=2017, 1927.2pt x 1027.84pt>
 File: Immagini/mockups/Condivisione/ArtID bacheca condivisoni-1.jpg Graphic file (type jpg)
 <use Immagini/mockups/Condivisione/ArtID bacheca condivisoni-1.jpg>
 Package pdftex.def Info: Immagini/mockups/Condivisione/ArtID bacheca condivisoni-1.jpg  used on input line 127.
 (pdftex.def)             Requested size: 432.45444pt x 230.64236pt.
-<Immagini/mockups/Condivisione/ArtID Ospiti.jpg, id=2016, 1927.2pt x 2957.0475pt>
+<Immagini/mockups/Condivisione/ArtID Ospiti.jpg, id=2018, 1927.2pt x 2957.0475pt>
 File: Immagini/mockups/Condivisione/ArtID Ospiti.jpg Graphic file (type jpg)
 <use Immagini/mockups/Condivisione/ArtID Ospiti.jpg>
 Package pdftex.def Info: Immagini/mockups/Condivisione/ArtID Ospiti.jpg  used on input line 133.
@@ -1571,12 +1572,12 @@ Package pdftex.def Info: Immagini/mockups/Condivisione/ArtID Ospiti.jpg  used on
  <./Immagini/mockups/Condivisione/ArtID bacheca condivisoni.jpg> <./Immagini/mockups/Condivisione/ArtID bacheca condivisoni-1.jpg>]
 
 [140 <./Immagini/mockups/Condivisione/ArtID Ospiti.jpg>]
-<Immagini/mockups/Discovery/Discovery ricerca.jpg, id=2028, 1927.2pt x 1558.82375pt>
+<Immagini/mockups/Discovery/Discovery ricerca.jpg, id=2030, 1927.2pt x 1558.82375pt>
 File: Immagini/mockups/Discovery/Discovery ricerca.jpg Graphic file (type jpg)
 <use Immagini/mockups/Discovery/Discovery ricerca.jpg>
 Package pdftex.def Info: Immagini/mockups/Discovery/Discovery ricerca.jpg  used on input line 143.
 (pdftex.def)             Requested size: 432.45444pt x 349.79257pt.
-<Immagini/mockups/Discovery/Discovery profilo.jpg, id=2029, 1927.2pt x 1204.5pt>
+<Immagini/mockups/Discovery/Discovery profilo.jpg, id=2031, 1927.2pt x 1204.5pt>
 File: Immagini/mockups/Discovery/Discovery profilo.jpg Graphic file (type jpg)
 <use Immagini/mockups/Discovery/Discovery profilo.jpg>
 Package pdftex.def Info: Immagini/mockups/Discovery/Discovery profilo.jpg  used on input line 149.
@@ -1606,17 +1607,17 @@ Package rerunfilecheck Info: File `RAD.out' has not changed.
 (rerunfilecheck)             Checksum: 20FA8B48B01E1D458B9EB3E9CC745425;20242.
  ) 
 Here is how much of TeX's memory you used:
- 23233 strings out of 468130
- 469068 string characters out of 5430633
+ 23240 strings out of 468130
+ 469423 string characters out of 5430633
  952682 words of memory out of 5000000
- 50448 multiletter control sequences out of 15000+600000
+ 50455 multiletter control sequences out of 15000+600000
  631731 words of font info for 56 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 84i,10n,87p,1223b,973s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 84i,10n,87p,1219b,973s stack positions out of 10000i,1000n,20000p,200000b,200000s
  <C:\Users\andre\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\tcrm1000.pk><C:/Users/andre/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmbx10.pfb><C:/Users/andre/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmbx12.pfb><C:/Users/andre/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmcsc10.pfb><C:/Users/andre/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr10.pfb><C:/Users/andre/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmss10.pfb><C:/Users/andre/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmss9.pfb><C:/Users/andre/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmssbx10.pfb><C:/Users/andre/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmti10.pfb>
-Output written on RAD.pdf (144 pages, 19205878 bytes).
+Output written on RAD.pdf (144 pages, 19263190 bytes).
 PDF statistics:
- 2283 PDF objects out of 2487 (max. 8388607)
+ 2285 PDF objects out of 2487 (max. 8388607)
  972 named destinations out of 1000 (max. 500000)
- 1299 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 1304 words of extra memory for PDF output out of 10000 (max. 10000000)
 
