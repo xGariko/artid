@@ -258,17 +258,16 @@
 
 	function deleteAccountModal() {
 		deleteAccountModalOpen = true;
-		console.log('Close account');
 	}
 
 	async function deleteAccount(): Promise<void> {
 		if (!password.trim() || !elimina.trim()) {
-			toast.error('Compila tutti i campi per procedere');
+			toast.error('Bisogna compilare tutti i campi!');
 			return;
 		}
 
-		if (elimina.toLowerCase() !== 'conferma chiusura') {
-			toast.error('Digita: "Conferma chiusura" per procedere');
+		if (elimina !== 'Elimina') {
+			toast.error('Per confermare devi digitare esattamente la parola "Elimina" ');
 			return;
 		}
 
@@ -282,7 +281,7 @@
 			const isPasswordValid = verifyResponse?.data?.['passwordCorretta'] ?? false;
 
 			if (!isPasswordValid) {
-				toast.error('Errore: Password Sbagliata');
+				toast.error('Password Sbagliata');
 				isSaving = false;
 				return;
 			}
@@ -304,7 +303,7 @@
 				return;
 			}
 
-			toast.success('ACCOUNT ELIMINATO CON SUCCESSO');
+			toast.success('Account eliminato con successo');
 			deleteAccountModalOpen = false;
 			logoutLocal();
 		} catch (e) {
@@ -737,9 +736,9 @@
 			/>
 
 			{#if spidLinked}
-				<ArtidSpidButton label="SPID COLLEGATO" disabled fullWidth={false} onclick={() => {}} />
+				<ArtidSpidButton label="SPID Collegato" disabled fullWidth={false} onclick={() => {}} />
 			{:else}
-				<ArtidSpidButton label="Associa SPID" fullWidth={false} onclick={openSpidModal} />
+				<ArtidSpidButton label="Collega SPID" fullWidth={false} onclick={openSpidModal} />
 			{/if}
 		</div>
 		<div>
@@ -770,9 +769,11 @@
 					bind:value={password}
 					addClass="mb-2"
 				/>
-			
-				<hr>
-				<span class="text-muted fst-italic">Digita <span class="fw-semibold">"Elimina"</span> per procedere</span>
+
+				<hr />
+				<span class="text-muted fst-italic"
+					>Digita <span class="fw-semibold">"Elimina"</span> per procedere</span
+				>
 				<ArtidInput
 					type="text"
 					name="confirm_close"

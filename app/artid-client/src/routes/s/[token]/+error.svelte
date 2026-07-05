@@ -5,7 +5,7 @@
 </script>
 
 <!-- Passiamo la prop per forzare il pulsante "Accedi" -->
-<ArtidNavbar forceLoggedOut={true} />
+<ArtidNavbar />
 
 <div
 	class="w-100 min-vh-100 d-flex flex-column align-items-center justify-content-center p-4 text-center error-container"
