@@ -31,7 +31,7 @@
 
 </script>
 
-<nav class="w-100 bg-primary justify-content-around align-items-center position-absolute top-0 left-0 d-flex px-2 z-2 position-fixed top-0">
+<nav class="w-100 bg-primary justify-content-around align-items-center position-fixed top-0 start-0 d-flex px-2 z-3">
 	<div class="row w-100">
 		<div class="col-6 col-lg-4 d-flex align-items-center justify-content-start">
 			<a href="{resolve('/dashboard')}" class="mh-75 h-75">
