@@ -51,6 +51,7 @@ public interface InternalShareDAO extends ListCrudRepository<InternalShare, Long
             JOIN "user" u ON u.id = s.id_user_from
             LEFT JOIN file f ON a.id_thumbnail = f.id
             WHERE s.id_user_to = :userId AND s.is_accepted = true
+              AND a.visibility_state <> 'private'
             ORDER BY s.created_at
             """)
     List<InternalShareArtIDExtendedResponse> getInternalSharesToUserID(@Param("userId") Long userId);

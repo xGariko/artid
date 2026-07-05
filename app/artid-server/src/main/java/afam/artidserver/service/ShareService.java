@@ -4,6 +4,7 @@ import afam.artidserver.dao.ArtidDAO;
 import afam.artidserver.dao.ExternalShareDAO;
 import afam.artidserver.dao.InternalShareDAO;
 import afam.artidserver.dao.UserDAO;
+import afam.artidserver.model.VISIBILITY_STATE;
 import afam.artidserver.model.dto.*;
 import afam.artidserver.model.entity.Artid;
 import afam.artidserver.model.entity.ExternalShare;
@@ -257,9 +258,10 @@ public class ShareService {
     /**
      * Dettaglio di un ArtID condiviso INTERNAMENTE con l'utente loggato (destinatario). L'accesso è
      * concesso dalla condivisione interna accettata (id_user_to = utente, is_accepted = true): come
-     * per i link esterni, l'anteprima usa il read-model del proprietario e quindi IGNORA la
-     * visibilità dell'ArtID (funziona anche per ArtID unlisted/privati). 404 se non esiste una
-     * condivisione accettata verso l'utente o se l'ArtID non esiste più.
+     * per i link esterni, l'anteprima usa il read-model del proprietario e resta accessibile anche
+     * per gli ArtID 'unlisted'. Se però il proprietario porta l'ArtID a 'private', l'accesso viene
+     * revocato: la condivisione non basta più. 404 se non esiste una condivisione accettata verso
+     * l'utente, se l'ArtID non esiste più o se è diventato privato.
      */
     public PublicArtidDetailResponse openInternalSharedArtid(Long artidId, Long userId) {
         if (!internalShareDAO.existsByIdArtidAndIdUserToAndIsAcceptedTrue(artidId, userId)) {
@@ -268,6 +270,7 @@ public class ShareService {
 
         Artid artid = artidDAO.findById(artidId)
                 .filter(a -> a.getDeletedAt() == null)
+                .filter(a -> !VISIBILITY_STATE.PRIVATE.getLabel().equals(a.getVisibilityState()))
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                         "L'ArtID desiderato non esiste più."));
 

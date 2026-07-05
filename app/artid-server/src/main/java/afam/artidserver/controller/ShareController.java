@@ -39,9 +39,10 @@ public class ShareController {
         return ResponseEntity.ok(shareService.getInternalToUser(principal.getId()));
     }
 
-    // Dettaglio di un ArtID condiviso internamente CON ME (destinatario). A differenza della vista
-    // Explore (solo ArtID pubblici), qui l'accesso è concesso dalla condivisione: l'ArtID può essere
-    // unlisted o privato. 404 se non c'è una condivisione accettata verso l'utente loggato.
+    // Dettaglio di un ArtID condiviso internamente CON ME (destinatario). L'accesso è concesso dalla
+    // condivisione e vale anche per gli ArtID 'unlisted' (non solo 'public' come Explore), ma NON per
+    // i 'private': se il proprietario lo rende privato l'accesso è revocato. 404 se non c'è una
+    // condivisione accettata verso l'utente loggato o se l'ArtID è privato/eliminato.
     @GetMapping("/internal/{artidId}")
     public ResponseEntity<PublicArtidDetailResponse> getInternalSharedArtid(
             @AuthenticationPrincipal AuthenticatedUser principal,

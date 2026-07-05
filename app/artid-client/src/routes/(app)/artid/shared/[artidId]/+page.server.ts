@@ -12,8 +12,8 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 	}
 
 	// Dettaglio di un ArtID condiviso internamente CON ME. L'accesso è concesso dalla condivisione
-	// (id_user_to = utente loggato, accettata), non dalla visibilità: funziona anche per ArtID
-	// unlisted/privati, a differenza della vista Explore. 404 se non è condiviso con me.
+	// (id_user_to = utente loggato, accettata) e vale anche per ArtID unlisted, a differenza della
+	// vista Explore. 404 se non è condiviso con me o se nel frattempo è diventato privato.
 	const { data, response } = await locals.api.GET('/api/shares/internal/{artidId}', {
 		params: { path: { artidId } }
 	});
