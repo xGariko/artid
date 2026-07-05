@@ -68,7 +68,6 @@
 			<div class="d-flex justify-content-between">
 				<span class="fw-semibold" style="font-size: 16px;">{sharedArtid.title}</span>
 			</div>
-			{sharedArtid.isAccepted}
 			<span class="text-artid-text-muted" style="font-size: 14px;">Da: {sharedArtid.name}</span>
 		</div>
 	</div>

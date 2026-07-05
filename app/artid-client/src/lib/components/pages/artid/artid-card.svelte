@@ -164,11 +164,13 @@
 		position: relative;
 		height: 200px;
 		align-items: center;
+		justify-content: center;
 	}
 
 	.card-image img {
-		width: 100%;
+		max-width: 100%;
 		object-fit: cover;
+		max-height: 100%;
 	}
 
 	.artid-card {

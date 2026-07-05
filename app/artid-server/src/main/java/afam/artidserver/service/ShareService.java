@@ -275,12 +275,10 @@ public class ShareService {
             if (owner.getMail() == null || owner.getMail().isBlank()) {
                 return;
             }
-            String subject = "Il tuo ArtID \"" + artid.getTitle() + "\" è stato visualizzato";
+            String subject = "ArtID - Il tuo ArtID \"" + artid.getTitle() + "\" è stato visualizzato";
             String body = "Ciao " + (owner.getName() != null ? owner.getName() : "") + ",\n\n"
-                    + "il link di condivisione del tuo ArtID \"" + artid.getTitle()
-                    + "\" è stato aperto per la prima volta.\n\n"
-                    + "Puoi vedere il numero di visualizzazioni nella sezione Condivisioni.\n\n"
-                    + "— ArtID";
+                    + "La informiamo che il suo ArtID \"" + artid.getTitle()
+                    + "\" è stato visualizzato per la prima volta.";
             emailService.sendText(owner.getMail(), subject, body);
         });
     }
@@ -367,8 +365,8 @@ public class ShareService {
             if (Boolean.TRUE.equals(targetUser.getInternalShareEnabled())
                     && targetUser.getMail() != null && !targetUser.getMail().isBlank()) {
                 String sharerName = displayName(userDAO.findById(userId).orElse(null));
-                String subject = sharerName + " ha condiviso un ArtID con te";
-                String body = sharerName + " ha condiviso con te l'ArtID \"" + artid.getTitle() + "\".";
+                String subject = " ArtID - " + "Un ArtID è stato condiviso con te";
+                String body = "La informiamo che " + sharerName + " ha condiviso l'ArtID \"" + artid.getTitle() + "\" con lei.";
                 emailService.sendText(targetUser.getMail(), subject, body);
             }
 

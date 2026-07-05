@@ -148,6 +148,7 @@
 				}
 				selectedImage = null;
 				imagePreview = '';
+				baselineDescription = modelDescription;
 			} else {
 				toast.error('Errore durante la modifica dei dettagli');
 			}
