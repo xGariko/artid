@@ -268,5 +268,9 @@
 		<p class="text-center mt-4 mb-0">
 			Non hai un account? <a href={resolve('/register')} class="auth-link">Registrati</a>
 		</p>
+
+		<p class="text-center mt-5 mb-0">
+			<a href={resolve('/welcome')} class="auth-link">← Torna indietro</a>
+		</p>
 	{/if}
 {/if}
